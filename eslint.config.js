@@ -15,6 +15,6 @@ export default [
     },
   },
   {
-    ignores: ["eslint.config.js", ".prettierrc"],
+    ignores: [".output/**", "types/**", "eslint.config.js", ".prettierrc"],
   },
 ]

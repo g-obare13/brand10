@@ -11,6 +11,9 @@ importers:
       '@base-ui/react':
         specifier: ^1.7.0
         version: 1.7.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@boxicons/react':
+        specifier: ^1.0.3
+        version: 1.0.3(react@19.2.8)
       '@fontsource-variable/inter':
         specifier: ^5.3.0
         version: 5.3.0
@@ -291,6 +294,11 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
+
+  '@boxicons/react@1.0.3':
+    resolution: {integrity: sha512-NASJNbk4X6Xi24CIa/Anx7KhMH1KPiBuaq0RJq3HJiFg65Ct9mhIB6j/a/Ciz/ZOTGaGzisWYmbU4jdKKK/YYA==}
+    peerDependencies:
+      react: '>=16.8.0'
 
   '@bramus/specificity@2.4.2':
     resolution: {integrity: sha512-ctxtJ/eA+t+6q2++vj5j7FYX3nRu311q1wfYH3xjlLOsczhlhxAg2FWNUXhpGvAw3BWo1xBcvOV6/YLc2r5FJw==}
@@ -3733,6 +3741,10 @@ snapshots:
       use-sync-external-store: 1.6.0(react@19.2.8)
     optionalDependencies:
       '@types/react': 19.2.18
+
+  '@boxicons/react@1.0.3(react@19.2.8)':
+    dependencies:
+      react: 19.2.8
 
   '@bramus/specificity@2.4.2':
     dependencies:
