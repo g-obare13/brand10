@@ -3,6 +3,7 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import { TanStackDevtools } from "@tanstack/react-devtools"
 
 import appCss from "../styles.css?url"
+import { ThemeProvider } from "@/components/shared/theme-provider"
 
 export const Route = createRootRoute({
   head: () => ({
@@ -39,9 +40,27 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <script
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                let theme = localStorage.getItem("ui-theme");
+                if (theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+                  document.documentElement.classList.add("dark");
+                  document.documentElement.style.colorScheme = "dark";
+                } else {
+                  document.documentElement.classList.remove("dark");
+                  document.documentElement.style.colorScheme = "light";
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
       </head>
-      <body>
-        {children}
+      <body suppressHydrationWarning className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary transition-colors duration-150">
+        <ThemeProvider>{children}</ThemeProvider>
+
         <TanStackDevtools
           config={{
             position: "bottom-right",
