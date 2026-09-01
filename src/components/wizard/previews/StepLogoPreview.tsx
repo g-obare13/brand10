@@ -1,115 +1,359 @@
 import { useBrandStore } from "@/store/brandStore"
+import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 import GlassPanel from "@/components/shared/GlassPanel"
-import { IconMoon, IconSun, IconLayersLinked, IconShieldCheck, IconMaximize } from "@tabler/icons-react"
+import { IconX } from "@tabler/icons-react"
+
+const LOGO_DONTS = [
+  {
+    rule: "Don't use outdated versions",
+    detail:
+      "If the brand has had past logo iterations, only the current approved version should appear.",
+  },
+  {
+    rule: "Don't add effects",
+    detail:
+      "No drop shadows, gradients, outlines, bevels, or glows unless that's part of the actual logo design.",
+  },
+  {
+    rule: "Don't recolor outside the approved palette",
+    detail: "No random or off-brand colors applied to the mark.",
+  },
+  {
+    rule: "Don't rotate",
+    detail:
+      "Keep the logo at its intended orientation unless a rotated lockup is explicitly part of the system.",
+  },
+  {
+    rule: "Don't stretch or distort",
+    detail:
+      "Never scale non-proportionally (squishing horizontally or vertically).",
+  },
+]
+
+interface BlueprintFrameProps {
+  svgUri?: string | null
+  brandName: string
+  primaryColor: string
+  className?: string
+  isDark?: boolean
+  size?: "lg" | "sm"
+  isSecondary?: boolean
+}
+
+function BlueprintFrame({
+  svgUri,
+  brandName,
+  primaryColor,
+  className,
+  isDark = false,
+  size = "lg",
+  isSecondary = false,
+}: BlueprintFrameProps) {
+  const outerOffset = size === "lg" ? 14 : 10
+  const overshoot = size === "lg" ? 16 : 12
+  const totalExt = outerOffset + overshoot
+
+  const name = brandName || "Brandio"
+
+  const renderFallbackText = () => {
+    if (name.toLowerCase().endsWith("io") && name.length > 2) {
+      const prefix = name.slice(0, -2)
+      return (
+        <span
+          className={cn(
+            "font-bold tracking-tight select-none",
+            size === "lg" ? "text-2xl sm:text-3xl" : "text-base sm:text-lg",
+            isDark ? "text-white" : "text-zinc-900"
+          )}
+        >
+          {prefix}
+          <span style={{ color: isDark ? "#ffffff" : primaryColor }}>io</span>
+        </span>
+      )
+    }
+
+    return (
+      <span
+        className={cn(
+          "font-bold tracking-tight select-none",
+          size === "lg" ? "text-2xl sm:text-3xl" : "text-base sm:text-lg",
+          isDark ? "text-white" : "text-zinc-900"
+        )}
+      >
+        {name}
+      </span>
+    )
+  }
+
+  const lineClass = isDark
+    ? "bg-zinc-700/70"
+    : "bg-zinc-300 dark:bg-zinc-700/60"
+
+  return (
+    <div
+      className={cn(
+        "relative inline-flex items-center justify-center select-none",
+        className
+      )}
+    >
+      {/* Horizontal Blueprint Guidelines (4 lines with corner overshoots) */}
+      <div
+        className={cn("absolute h-px", lineClass)}
+        style={{
+          top: `-${outerOffset}px`,
+          left: `-${totalExt}px`,
+          right: `-${totalExt}px`,
+        }}
+      />
+      <div
+        className={cn("absolute top-0 h-px", lineClass)}
+        style={{
+          left: `-${totalExt}px`,
+          right: `-${totalExt}px`,
+        }}
+      />
+      <div
+        className={cn("absolute bottom-0 h-px", lineClass)}
+        style={{
+          left: `-${totalExt}px`,
+          right: `-${totalExt}px`,
+        }}
+      />
+      <div
+        className={cn("absolute h-px", lineClass)}
+        style={{
+          bottom: `-${outerOffset}px`,
+          left: `-${totalExt}px`,
+          right: `-${totalExt}px`,
+        }}
+      />
+
+      {/* Vertical Blueprint Guidelines (4 lines with corner overshoots) */}
+      <div
+        className={cn("absolute w-px", lineClass)}
+        style={{
+          left: `-${outerOffset}px`,
+          top: `-${totalExt}px`,
+          bottom: `-${totalExt}px`,
+        }}
+      />
+      <div
+        className={cn("absolute left-0 w-px", lineClass)}
+        style={{
+          top: `-${totalExt}px`,
+          bottom: `-${totalExt}px`,
+        }}
+      />
+      <div
+        className={cn("absolute right-0 w-px", lineClass)}
+        style={{
+          top: `-${totalExt}px`,
+          bottom: `-${totalExt}px`,
+        }}
+      />
+      <div
+        className={cn("absolute w-px", lineClass)}
+        style={{
+          right: `-${outerOffset}px`,
+          top: `-${totalExt}px`,
+          bottom: `-${totalExt}px`,
+        }}
+      />
+
+      {/* Logo Content Container */}
+      <div
+        className={cn(
+          "relative z-10 flex items-center justify-center",
+          size === "lg"
+            ? "min-h-16 min-w-36 px-6 py-3"
+            : "min-h-10 min-w-24 px-4 py-1.5"
+        )}
+      >
+        {svgUri ? (
+          <img
+            src={svgUri}
+            alt={isSecondary ? "Secondary Logo" : "Primary Logo"}
+            className={cn(
+              "object-contain transition-all",
+              size === "lg" ? "max-h-16 max-w-44" : "max-h-9 max-w-28",
+              isDark && "opacity-95 brightness-0 invert"
+            )}
+          />
+        ) : (
+          renderFallbackText()
+        )}
+      </div>
+    </div>
+  )
+}
 
 export function StepLogoPreview() {
   const brand = useBrandStore()
   const primaryColor =
     brand.colorPalette.find((c) => c.role === "primary")?.hex || "#6366f1"
 
-  const monogramLetter = (brand.brandName || "Brand")
-    .charAt(0)
-    .toUpperCase()
+  const primarySvgUri = brand.svgContent
+    ? `data:image/svg+xml;utf8,${encodeURIComponent(brand.svgContent)}`
+    : null
+
+  const secondarySvgUri = brand.secondarySvgContent
+    ? `data:image/svg+xml;utf8,${encodeURIComponent(brand.secondarySvgContent)}`
+    : null
 
   return (
-    <div className="space-y-4">
-      {/* 1. Large Hero Monogram / Logo Mark Presentation */}
-      <GlassPanel
-        blur="none"
-        noise
-        noiseOpacity={0.02}
-        className="relative overflow-hidden rounded-3xl border border-border/80 bg-card/90 p-8 shadow-sm text-center"
-      >
-        <div
-          className="pointer-events-none absolute inset-0 size-full blur-3xl opacity-20 transition-all duration-500"
-          style={{ backgroundColor: primaryColor }}
-        />
-
-        <div className="relative z-10 flex flex-col items-center justify-center space-y-4">
-          <div
-            className="flex size-24 items-center justify-center rounded-3xl border border-white/20 text-4xl font-bold text-white shadow-xl transition-all duration-300"
-            style={{
-              backgroundColor: primaryColor,
-              boxShadow: `0 12px 30px ${primaryColor}40`,
-            }}
+    <div className="space-y-6">
+      {/* 1. PRIMARY LOGO SYSTEM (TOP) */}
+      <div className="space-y-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
+          {/* Left: Large Showcase Card */}
+          <GlassPanel
+            blur="none"
+            noise
+            noiseOpacity={0.02}
+            className="flex min-h-55 items-center justify-between rounded-2xl bg-card md:col-span-7"
           >
-            {monogramLetter}
-          </div>
+            <div className="flex h-full flex-col items-center justify-center gap-12 p-8">
+              <BlueprintFrame
+                svgUri={primarySvgUri}
+                brandName={brand.brandName}
+                primaryColor={primaryColor}
+                size="lg"
+                className="bg-white"
+              />
+              <span className="text-xs font-medium text-foreground">
+                Primary Logo System
+              </span>
+            </div>
+          </GlassPanel>
 
-          <div className="space-y-1">
-            <h3
-              className="text-xl font-bold tracking-tight text-foreground"
-              style={{ fontFamily: `"${brand.displayFont}", sans-serif` }}
+          {/* Right: Stacked Light & Dark Canvas Cards */}
+          <div className="flex flex-col gap-4 md:col-span-5">
+            {/* Top: Light Canvas */}
+            <GlassPanel
+              blur="none"
+              noise
+              noiseOpacity={0.02}
+              className="flex min-h-25.5 items-center justify-between rounded-2xl bg-card"
             >
-              {brand.brandName || "Brand"} Monogram
-            </h3>
-            <p className="font-mono text-xs text-muted-foreground">
-              Primary Vector Identifier
-            </p>
-          </div>
-        </div>
-      </GlassPanel>
+              <div className="flex h-full flex-col items-center justify-center gap-12 p-8">
+                <BlueprintFrame
+                  svgUri={primarySvgUri}
+                  brandName={brand.brandName}
+                  primaryColor={primaryColor}
+                  size="lg"
+                  className="bg-white"
+                />
+              </div>
+            </GlassPanel>
 
-      {/* 2. Dual Canvas Contrast Matrix (Dark / Light / Accent) */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {/* Dark Background Test */}
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-zinc-800 bg-zinc-950 p-6 text-center space-y-3">
-          <div
-            className="flex size-14 items-center justify-center rounded-2xl text-xl font-bold text-white shadow-md"
-            style={{ backgroundColor: primaryColor }}
-          >
-            {monogramLetter}
+            {/* Bottom: Dark Canvas */}
+            <GlassPanel
+              blur="none"
+              noise
+              noiseOpacity={0.02}
+              className="flex min-h-25.5 items-center justify-between rounded-2xl bg-primary-950"
+            >
+              <div className="flex h-full flex-col items-center justify-center gap-12 p-8">
+                <BlueprintFrame
+                  svgUri={primarySvgUri}
+                  brandName={brand.brandName}
+                  primaryColor={primaryColor}
+                  isDark={true}
+                  size="sm"
+                />
+              </div>
+            </GlassPanel>
           </div>
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-300">
-            <IconMoon size={14} />
-            <span>Dark Obsidian Environment</span>
-          </div>
-          <span className="font-mono text-[10px] text-zinc-500">High Visibility</span>
-        </div>
-
-        {/* Light Background Test */}
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-zinc-200 bg-white p-6 text-center space-y-3 shadow-xs">
-          <div
-            className="flex size-14 items-center justify-center rounded-2xl text-xl font-bold text-white shadow-md"
-            style={{ backgroundColor: primaryColor }}
-          >
-            {monogramLetter}
-          </div>
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-800">
-            <IconSun size={14} />
-            <span>Light Crisp Canvas</span>
-          </div>
-          <span className="font-mono text-[10px] text-zinc-400">Pure Contrast</span>
         </div>
       </div>
 
-      {/* 3. Clearspace Safety Zone Specification */}
+      {/* 2. SECONDARY LOGO SYSTEM (BOTTOM) - Shown only when secondary SVG is uploaded */}
+      {secondarySvgUri && (
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
+            {/* Left: Large Showcase Card */}
+
+            <GlassPanel
+              blur="none"
+              noise
+              noiseOpacity={0.02}
+              className="flex min-h-55 items-center justify-between rounded-2xl bg-card md:col-span-7"
+            >
+              <div className="flex h-full flex-col items-center justify-center gap-12 p-8!">
+                <BlueprintFrame
+                  svgUri={secondarySvgUri}
+                  brandName={brand.brandName}
+                  primaryColor={primaryColor}
+                  size="lg"
+                  className="bg-white"
+                  isSecondary
+                />
+
+                <span className="text-xs font-medium text-foreground">
+                  Secondary Logo System
+                </span>
+              </div>
+            </GlassPanel>
+
+            {/* Right: Stacked Light & Dark Canvas Cards */}
+            <div className="flex flex-col gap-4 md:col-span-5">
+              {/* Top: Light Canvas */}
+              <div className="flex min-h-25.5 flex-1 items-center justify-center rounded-2xl border border-border/80 bg-white p-4 dark:bg-card/90">
+                <BlueprintFrame
+                  svgUri={secondarySvgUri}
+                  brandName={brand.brandName}
+                  primaryColor={primaryColor}
+                  size="sm"
+                  isSecondary
+                  className="bg-white"
+                />
+              </div>
+
+              {/* Bottom: Dark Canvas */}
+              <div className="flex min-h-25.5 flex-1 items-center justify-center rounded-2xl border border-zinc-800 bg-black p-4">
+                <BlueprintFrame
+                  svgUri={secondarySvgUri}
+                  brandName={brand.brandName}
+                  primaryColor={primaryColor}
+                  isDark={true}
+                  size="sm"
+                  isSecondary
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3. LOGO USAGE CONSTRAINTS / DON'TS */}
       <GlassPanel
         blur="none"
         noise
         noiseOpacity={0.02}
-        className="rounded-3xl border border-border/80 bg-card/90 p-5 shadow-sm space-y-3"
+        className="space-y-3 rounded-2xl border border-border/80 bg-card p-5"
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            <IconLayersLinked size={15} className="text-primary" />
-            <span>Clearspace &amp; Safe Padding Ratio</span>
-          </div>
-          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-emerald-500">
-            <IconShieldCheck size={12} />
-            {brand.clearspaceMultiplier || 1.5}x Buffer
+        <div className="mb-2 flex items-center justify-between">
+          <span className="font-medium">
+            Logo Usage Constraints (Don&apos;ts)
           </span>
         </div>
 
-        <div className="flex items-center justify-center rounded-2xl border border-dashed border-primary/40 bg-primary/5 p-6">
-          <div className="rounded-xl border border-dashed border-primary/60 p-4">
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+          {LOGO_DONTS.map((item, idx) => (
             <div
-              className="flex size-12 items-center justify-center rounded-xl text-lg font-bold text-white shadow-sm"
-              style={{ backgroundColor: primaryColor }}
+              key={idx}
+              className="flex items-start gap-2.5 rounded-xl p-3 text-left transition-all"
             >
-              {monogramLetter}
+              <div className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-rose-500/20 text-rose-500">
+                <IconX size={10} />
+              </div>
+              <div className="space-y-0.5">
+                <h5 className="text-sm font-medium">{item.rule}</h5>
+                <p className="text-sm text-muted-foreground">{item.detail}</p>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
       </GlassPanel>
     </div>

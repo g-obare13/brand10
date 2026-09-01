@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { temporal } from 'zundo'
-import { get as idbGet, set as idbSet } from 'idb-keyval'
+import { get as idbGet, set as idbSet, del as idbDel } from 'idb-keyval'
 import type { ColorSwatch } from '../lib/colorUtils'
 import { createColorSwatch } from '../lib/colorUtils'
 import { supabase } from '../lib/supabase'
@@ -32,6 +32,8 @@ export interface BrandState {
   // Logo System
   logoUrl?: string
   svgContent?: string
+  secondaryLogoUrl?: string
+  secondarySvgContent?: string
   rasterDataUri?: string
   isVector: boolean
   aspectRatio: number
@@ -83,6 +85,12 @@ export interface BrandState {
     aspectRatio: number
     logoUrl?: string
   }) => Promise<void>
+  setSecondaryLogoData: (data: {
+    svgContent?: string
+    logoUrl?: string
+  }) => Promise<void>
+  removeLogo: () => Promise<void>
+  removeSecondaryLogo: () => Promise<void>
   setClearspaceMultiplier: (multiplier: number) => void
   addDoDont: (item: Omit<BrandDoDontItem, 'id'>) => void
   removeDoDont: (id: string) => void
@@ -203,10 +211,40 @@ export const useBrandStore = create<BrandState>()(
       aspectRatio: 1.0,
       clearspaceMultiplier: 1.0,
       dosAndDonts: [
-        { id: '1', type: 'do', rule: 'Maintain Clearspace', detail: 'Always leave at least 1x clear margin around the symbol.' },
-        { id: '2', type: 'do', rule: 'Use On High Contrast', detail: 'Ensure the logo is placed on backgrounds with WCAG AA compliance.' },
-        { id: '3', type: 'dont', rule: 'Do Not Distort', detail: 'Never stretch, skew, or alter the proportional aspect ratio.' },
-        { id: '4', type: 'dont', rule: 'Do Not Re-color Elements', detail: 'Do not apply unapproved gradient or shadow effects.' },
+        {
+          id: '1',
+          type: 'dont',
+          rule: "Don't use outdated versions",
+          detail:
+            'If the brand has had past logo iterations, only the current approved version should appear.',
+        },
+        {
+          id: '2',
+          type: 'dont',
+          rule: "Don't add effects",
+          detail:
+            "No drop shadows, gradients, outlines, bevels, or glows unless that's part of the actual logo design.",
+        },
+        {
+          id: '3',
+          type: 'dont',
+          rule: "Don't recolor outside the approved palette",
+          detail: 'No random or off-brand colors applied to the mark.',
+        },
+        {
+          id: '4',
+          type: 'dont',
+          rule: "Don't rotate",
+          detail:
+            'Keep the logo at its intended orientation unless a rotated lockup is explicitly part of the system.',
+        },
+        {
+          id: '5',
+          type: 'dont',
+          rule: "Don't stretch or distort",
+          detail:
+            'Never scale non-proportionally (squishing horizontally or vertically).',
+        },
       ],
 
       // Colors
@@ -269,6 +307,34 @@ export const useBrandStore = create<BrandState>()(
           aspectRatio: aspectRatio || 1.0,
           logoUrl,
         })
+      },
+
+      setSecondaryLogoData: async ({ svgContent, logoUrl }) => {
+        const id = get().projectId || 'current'
+        if (svgContent) {
+          await idbSet(`brand_secondary_svg_${id}`, svgContent)
+        }
+        set({
+          secondarySvgContent: svgContent,
+          secondaryLogoUrl: logoUrl,
+        })
+      },
+
+      removeLogo: async () => {
+        const id = get().projectId || 'current'
+        try {
+          await idbDel(`brand_svg_${id}`)
+          await idbDel(`brand_raster_${id}`)
+        } catch {}
+        set({ svgContent: undefined, rasterDataUri: undefined, logoUrl: undefined })
+      },
+
+      removeSecondaryLogo: async () => {
+        const id = get().projectId || 'current'
+        try {
+          await idbDel(`brand_secondary_svg_${id}`)
+        } catch {}
+        set({ secondarySvgContent: undefined, secondaryLogoUrl: undefined })
       },
 
       setClearspaceMultiplier: (multiplier) => set({ clearspaceMultiplier: multiplier }),
@@ -347,15 +413,19 @@ export const useBrandStore = create<BrandState>()(
           projectId,
           isLoading: true,
           svgContent: undefined,
+          secondarySvgContent: undefined,
           rasterDataUri: undefined,
           logoUrl: undefined,
+          secondaryLogoUrl: undefined,
         })
 
         // Load cached images from IndexedDB if available
         try {
           const cachedSvg = await idbGet<string>(`brand_svg_${projectId}`)
+          const cachedSecondarySvg = await idbGet<string>(`brand_secondary_svg_${projectId}`)
           const cachedRaster = await idbGet<string>(`brand_raster_${projectId}`)
           if (cachedSvg) set({ svgContent: cachedSvg, isVector: true })
+          if (cachedSecondarySvg) set({ secondarySvgContent: cachedSecondarySvg })
           if (cachedRaster) set({ rasterDataUri: cachedRaster })
         } catch (e) {
           console.warn('Could not read images from IndexedDB', e)

@@ -6,8 +6,9 @@ import { StepImageryPreview } from "./previews/StepImageryPreview"
 import { StepIconographyPreview } from "./previews/StepIconographyPreview"
 import { StepSummaryPreview } from "./previews/StepSummaryPreview"
 
-interface WizardBentoPreviewProps {
+export interface WizardBentoPreviewProps {
   currentStep?: number
+  isLoading?: boolean
 }
 
 const STEP_TITLES: Record<number, string> = {
@@ -22,12 +23,13 @@ const STEP_TITLES: Record<number, string> = {
 
 export function WizardBentoPreview({
   currentStep = 1,
+  isLoading = false,
 }: WizardBentoPreviewProps) {
   return (
     <div className="sticky top-24 space-y-4">
       {/* Dynamic Step Preview Content */}
       <div className="transition-all duration-300">
-        {currentStep === 1 && <StepFoundationPreview />}
+        {currentStep === 1 && <StepFoundationPreview isLoading={isLoading} />}
         {currentStep === 2 && <StepLogoPreview />}
         {currentStep === 3 && <StepColorsPreview />}
         {currentStep === 4 && <StepTypographyPreview />}

@@ -45,7 +45,7 @@ export function WizardHeader({
       {/* Top Control Bar Below Main Fixed Header */}
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         {/* Left: Back Link & Brand Name Display */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-row items-center gap-3">
           <GlassPanel
             blur="none"
             noise
@@ -63,6 +63,7 @@ export function WizardHeader({
               <IconArrowLeft size={18} />
             </Button>
           </GlassPanel>
+          <h4>{brand.brandName || "Brand Workspace"}</h4>
         </div>
 
         {/* Right: Stepper Pills & Skip CTA */}

@@ -133,10 +133,40 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
           typeScaleRatio: 1.25,
           clearspaceMultiplier: 1.0,
           dosAndDonts: [
-            { id: '1', type: 'do', rule: 'Maintain Clearspace', detail: 'Always leave at least 1x clear margin around the symbol.' },
-            { id: '2', type: 'do', rule: 'Use On High Contrast', detail: 'Ensure the logo is placed on backgrounds with WCAG AA compliance.' },
-            { id: '3', type: 'dont', rule: 'Do Not Distort', detail: 'Never stretch, skew, or alter the proportional aspect ratio.' },
-            { id: '4', type: 'dont', rule: 'Do Not Re-color Elements', detail: 'Do not apply unapproved gradient or shadow effects.' },
+            {
+              id: '1',
+              type: 'dont',
+              rule: "Don't use outdated versions",
+              detail:
+                'If the brand has had past logo iterations, only the current approved version should appear.',
+            },
+            {
+              id: '2',
+              type: 'dont',
+              rule: "Don't add effects",
+              detail:
+                "No drop shadows, gradients, outlines, bevels, or glows unless that's part of the actual logo design.",
+            },
+            {
+              id: '3',
+              type: 'dont',
+              rule: "Don't recolor outside the approved palette",
+              detail: 'No random or off-brand colors applied to the mark.',
+            },
+            {
+              id: '4',
+              type: 'dont',
+              rule: "Don't rotate",
+              detail:
+                'Keep the logo at its intended orientation unless a rotated lockup is explicitly part of the system.',
+            },
+            {
+              id: '5',
+              type: 'dont',
+              rule: "Don't stretch or distort",
+              detail:
+                'Never scale non-proportionally (squishing horizontally or vertically).',
+            },
           ],
           colorPalette: [
             {

@@ -15,7 +15,11 @@ import { StepIconography } from "@/components/wizard/steps/StepIconography"
 import { StepSummary } from "@/components/wizard/steps/StepSummary"
 import { Button } from "@/components/ui/button"
 import GlassPanel from "@/components/shared/GlassPanel"
-import { IconArrowLeft, IconArrowRight, IconSparkles } from "@tabler/icons-react"
+import {
+  IconArrowLeft,
+  IconArrowRight,
+  IconSparkles,
+} from "@tabler/icons-react"
 
 export const Route = createFileRoute("/studio/$projectId_/wizard")({
   component: StudioWizardRoute,
@@ -27,13 +31,17 @@ function StudioWizardRoute() {
   const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(1)
 
+  const isProjectLoading =
+    brand.isLoading || (!!projectId && brand.projectId !== projectId)
+
   useEffect(() => {
     if (projectId && brand.projectId !== projectId) {
       brand.loadFromProject(projectId)
     }
-  }, [projectId])
+  }, [projectId, brand.projectId])
 
   const handleNext = async () => {
+    if (isProjectLoading) return
     if (currentStep < 7) {
       await brand.saveToSupabase()
       setCurrentStep((prev) => prev + 1)
@@ -42,6 +50,7 @@ function StudioWizardRoute() {
   }
 
   const handleBack = () => {
+    if (isProjectLoading) return
     if (currentStep > 1) {
       setCurrentStep((prev) => prev - 1)
       window.scrollTo({ top: 0, behavior: "smooth" })
@@ -76,32 +85,37 @@ function StudioWizardRoute() {
           {/* Main Wizard Split Layout */}
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
             {/* Left Column: Step Configuration Form (5 cols) */}
-            <div className="lg:col-span-5 space-y-8">
+            <div className="flex flex-col lg:col-span-5">
               <GlassPanel
                 blur="none"
                 noise
                 noiseOpacity={0.02}
-                className="rounded-3xl border border-border/80 bg-card/85 p-6 shadow-sm sm:p-8 backdrop-blur-xl"
+                className="flex h-full flex-col justify-between rounded-3xl border border-border/80 bg-card/85 p-6 shadow-sm backdrop-blur-xl sm:p-8"
               >
-                {currentStep === 1 && <StepFoundation />}
-                {currentStep === 2 && <StepLogo />}
-                {currentStep === 3 && <StepColors />}
-                {currentStep === 4 && <StepTypography />}
-                {currentStep === 5 && <StepImagery />}
-                {currentStep === 6 && <StepIconography />}
-                {currentStep === 7 && <StepSummary projectId={projectId} />}
+                <div className="flex-1">
+                  {currentStep === 1 && (
+                    <StepFoundation isLoading={isProjectLoading} />
+                  )}
+                  {currentStep === 2 && <StepLogo />}
+                  {currentStep === 3 && <StepColors />}
+                  {currentStep === 4 && <StepTypography />}
+                  {currentStep === 5 && <StepImagery />}
+                  {currentStep === 6 && <StepIconography />}
+                  {currentStep === 7 && <StepSummary projectId={projectId} />}
+                </div>
 
                 {/* Bottom Step Actions */}
                 {currentStep < 7 && (
-                  <div className="mt-8 flex items-center justify-between border-t border-border/60 pt-5">
+                  <div className="mt-8 flex items-center justify-between pt-5">
                     <Button
                       variant="outline"
                       size="pill"
                       gsapFill
                       onClick={handleBack}
-                      disabled={currentStep === 1}
+                      disabled={currentStep === 1 || isProjectLoading}
                       className="cursor-pointer rounded-full px-4 text-xs font-semibold disabled:opacity-30"
                       icon={<IconArrowLeft size={14} />}
+                      iconPlacement="left"
                     >
                       Back
                     </Button>
@@ -112,7 +126,8 @@ function StudioWizardRoute() {
                         size="pill"
                         gsapFill
                         onClick={handleSkipToStudio}
-                        className="cursor-pointer rounded-full px-4 text-xs font-semibold text-muted-foreground hover:text-foreground"
+                        disabled={isProjectLoading}
+                        className="cursor-pointer rounded-full px-4 text-xs font-semibold text-muted-foreground hover:text-foreground disabled:opacity-30"
                       >
                         Skip Step
                       </Button>
@@ -122,7 +137,8 @@ function StudioWizardRoute() {
                         size="pill"
                         gsapFill
                         onClick={handleNext}
-                        className="cursor-pointer rounded-full px-6 text-xs font-semibold"
+                        disabled={isProjectLoading}
+                        className="cursor-pointer rounded-full px-6 text-xs font-semibold disabled:opacity-30"
                         icon={
                           currentStep === 6 ? (
                             <IconSparkles size={14} />
@@ -142,7 +158,10 @@ function StudioWizardRoute() {
 
             {/* Right Column: Sticky Live Step Preview (7 cols) */}
             <div className="lg:col-span-7">
-              <WizardBentoPreview currentStep={currentStep} />
+              <WizardBentoPreview
+                currentStep={currentStep}
+                isLoading={isProjectLoading}
+              />
             </div>
           </div>
         </Container>

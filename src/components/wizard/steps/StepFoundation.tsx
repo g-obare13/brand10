@@ -12,7 +12,6 @@ import { gsap } from "gsap"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { XCircle } from "@boxicons/react"
-import GlassPanel from "@/components/shared/GlassPanel"
 
 export function StepFoundationSkeleton() {
   return (
@@ -54,8 +53,13 @@ export function StepFoundationSkeleton() {
   )
 }
 
-export function StepFoundation() {
+export interface StepFoundationProps {
+  isLoading?: boolean
+}
+
+export function StepFoundation({ isLoading }: StepFoundationProps = {}) {
   const brand = useBrandStore()
+  const effectiveLoading = isLoading ?? (brand.isLoading || !brand.projectId)
   const containerRef = useRef<HTMLDivElement>(null)
   const floatingRef = useRef<HTMLDivElement>(null)
   const [hoveredIndex, setHoveredIndex] = useState<number>(0)
@@ -96,21 +100,27 @@ export function StepFoundation() {
   }
 
   useEffect(() => {
-    if (!containerRef.current) return
+    if (!containerRef.current || effectiveLoading) return
     const ctx = gsap.context(() => {
       const items = containerRef.current?.querySelectorAll(".foundation-item")
       if (items && items.length > 0) {
-        animateFadeUp(items, {
-          y: 20,
-          duration: 0.8,
-          stagger: 0.08,
-          ease: "power3.out",
-        })
+        gsap.fromTo(
+          items,
+          { y: 24, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            stagger: 0.08,
+            delay: 0.1,
+            ease: "power3.out",
+          }
+        )
       }
     }, containerRef)
 
     return () => ctx.revert()
-  }, [])
+  }, [effectiveLoading])
 
   const handleToggleMovement = (movement: DesignMovement) => {
     if (selectedMovementId === movement.id) {
@@ -123,25 +133,22 @@ export function StepFoundation() {
     }
   }
 
-  if (brand.isLoading) {
+  if (effectiveLoading) {
     return <StepFoundationSkeleton />
   }
 
   return (
-    <GlassPanel
-      blur="none"
-      noise
+    <div
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      noiseOpacity={0.02}
-      className="relative flex h-full items-center justify-center space-y-6"
+      className="relative flex h-full flex-col space-y-6"
     >
       {/* Title Header */}
       <WordReveal
         as="h2"
         stagger={0.03}
         duration={1.2}
-        start="top 90%"
+        disableScrollTrigger={true}
         className="mb-2"
       >
         {brand.brandName || "Strategic Foundation"}
@@ -270,6 +277,6 @@ export function StepFoundation() {
           ))}
         </div>
       </div>
-    </GlassPanel>
+    </div>
   )
 }
