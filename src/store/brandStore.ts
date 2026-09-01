@@ -192,6 +192,52 @@ export const PRESET_BRANDS = {
   },
 }
 
+/**
+ * Helper to upload SVG/raster logo directly to Supabase Storage bucket 'brand-assets'
+ */
+export async function uploadLogoToSupabase(
+  contentOrUri: string,
+  projectId: string,
+  slot: 'primary' | 'secondary' = 'primary',
+  isSvg = true
+): Promise<string | null> {
+  if (!supabase || !projectId || projectId.startsWith('demo-') || projectId === 'current') {
+    return null
+  }
+
+  try {
+    const bucket = 'brand-assets'
+    const ext = isSvg ? 'svg' : 'png'
+    const fileName = `${projectId}/${slot}_logo_${Date.now()}.${ext}`
+
+    let fileBody: Blob
+    if (isSvg) {
+      fileBody = new Blob([contentOrUri], { type: 'image/svg+xml' })
+    } else {
+      const res = await fetch(contentOrUri)
+      fileBody = await res.blob()
+    }
+
+    const { error: uploadError } = await supabase.storage
+      .from(bucket)
+      .upload(fileName, fileBody, {
+        contentType: isSvg ? 'image/svg+xml' : 'image/png',
+        upsert: true,
+      })
+
+    if (uploadError) {
+      console.warn(`Supabase Storage upload to '${bucket}' returned:`, uploadError.message)
+      return null
+    }
+
+    const { data } = supabase.storage.from(bucket).getPublicUrl(fileName)
+    return data?.publicUrl || null
+  } catch (err) {
+    console.warn('Failed to upload logo to Supabase storage:', err)
+    return null
+  }
+}
+
 const defaultApex = PRESET_BRANDS.apex
 
 export const useBrandStore = create<BrandState>()(
@@ -300,12 +346,22 @@ export const useBrandStore = create<BrandState>()(
         if (rasterDataUri) {
           await idbSet(`brand_raster_${id}`, rasterDataUri)
         }
+
+        let uploadedUrl = logoUrl
+        if (!uploadedUrl && (svgContent || rasterDataUri)) {
+          const content = svgContent || rasterDataUri || ''
+          const remoteUrl = await uploadLogoToSupabase(content, id, 'primary', Boolean(svgContent))
+          if (remoteUrl) {
+            uploadedUrl = remoteUrl
+          }
+        }
+
         set({
           svgContent,
           rasterDataUri,
           isVector,
           aspectRatio: aspectRatio || 1.0,
-          logoUrl,
+          logoUrl: uploadedUrl,
         })
       },
 
@@ -314,9 +370,18 @@ export const useBrandStore = create<BrandState>()(
         if (svgContent) {
           await idbSet(`brand_secondary_svg_${id}`, svgContent)
         }
+
+        let uploadedUrl = logoUrl
+        if (!uploadedUrl && svgContent) {
+          const remoteUrl = await uploadLogoToSupabase(svgContent, id, 'secondary', true)
+          if (remoteUrl) {
+            uploadedUrl = remoteUrl
+          }
+        }
+
         set({
           secondarySvgContent: svgContent,
-          secondaryLogoUrl: logoUrl,
+          secondaryLogoUrl: uploadedUrl,
         })
       },
 
@@ -352,7 +417,9 @@ export const useBrandStore = create<BrandState>()(
       setColorPalette: (colors) => set({ colorPalette: colors }),
       updateColorSwatch: (id, updates) => {
         set({
-          colorPalette: get().colorPalette.map((c) => (c.id === id ? { ...c, ...updates } : c)),
+          colorPalette: get().colorPalette.map((swatch) =>
+            swatch.id === id ? { ...swatch, ...updates } : swatch
+          ),
         })
       },
       addColorSwatch: (hex, role = 'custom') => {
@@ -360,38 +427,40 @@ export const useBrandStore = create<BrandState>()(
         set({ colorPalette: [...get().colorPalette, newSwatch] })
       },
       removeColorSwatch: (id) => {
-        set({ colorPalette: get().colorPalette.filter((c) => c.id !== id) })
+        set({
+          colorPalette: get().colorPalette.filter((s) => s.id !== id),
+        })
       },
 
       setTypography: (updates) => {
-        set({
-          displayFont: updates.displayFont ?? get().displayFont,
-          bodyFont: updates.bodyFont ?? get().bodyFont,
-          monoFont: updates.monoFont ?? get().monoFont,
-          baseFontSize: updates.baseFontSize ?? get().baseFontSize,
-          typeScaleRatio: updates.typeScaleRatio ?? get().typeScaleRatio,
-        })
+        set((state) => ({
+          displayFont: updates.displayFont || state.displayFont,
+          bodyFont: updates.bodyFont || state.bodyFont,
+          monoFont: updates.monoFont || state.monoFont,
+          baseFontSize: updates.baseFontSize || state.baseFontSize,
+          typeScaleRatio: updates.typeScaleRatio || state.typeScaleRatio,
+        }))
       },
 
       setImagery: (updates) => {
-        set({
-          imageryMood: updates.mood ?? get().imageryMood,
-          imageryOverlay: updates.overlay ?? get().imageryOverlay,
-        })
+        set((state) => ({
+          imageryMood: updates.mood || state.imageryMood,
+          imageryOverlay: updates.overlay || state.imageryOverlay,
+        }))
       },
 
       setIconography: (updates) => {
-        set({
-          iconStyle: updates.style ?? get().iconStyle,
-          iconRadius: updates.radius ?? get().iconRadius,
-          iconStroke: updates.stroke ?? get().iconStroke,
-        })
+        set((state) => ({
+          iconStyle: updates.style || state.iconStyle,
+          iconRadius: updates.radius !== undefined ? updates.radius : state.iconRadius,
+          iconStroke: updates.stroke !== undefined ? updates.stroke : state.iconStroke,
+        }))
       },
 
       setActiveTab: (tab) => set({ activeTab: tab }),
 
-      loadPreset: (presetKey) => {
-        const preset = PRESET_BRANDS[presetKey]
+      loadPreset: (presetName) => {
+        const preset = PRESET_BRANDS[presetName] || defaultApex
         set({
           brandName: preset.brandName,
           tagline: preset.tagline,
@@ -408,62 +477,38 @@ export const useBrandStore = create<BrandState>()(
         })
       },
 
-      loadFromProject: async (projectId) => {
-        set({
-          projectId,
-          isLoading: true,
-          svgContent: undefined,
-          secondarySvgContent: undefined,
-          rasterDataUri: undefined,
-          logoUrl: undefined,
-          secondaryLogoUrl: undefined,
-        })
+      loadFromProject: async (projectId: string) => {
+        if (!projectId) return
 
-        // Load cached images from IndexedDB if available
-        try {
-          const cachedSvg = await idbGet<string>(`brand_svg_${projectId}`)
-          const cachedSecondarySvg = await idbGet<string>(`brand_secondary_svg_${projectId}`)
-          const cachedRaster = await idbGet<string>(`brand_raster_${projectId}`)
-          if (cachedSvg) set({ svgContent: cachedSvg, isVector: true })
-          if (cachedSecondarySvg) set({ secondarySvgContent: cachedSecondarySvg })
-          if (cachedRaster) set({ rasterDataUri: cachedRaster })
-        } catch (e) {
-          console.warn('Could not read images from IndexedDB', e)
-        }
+        set({ isLoading: true })
 
-        if (!supabase || projectId.startsWith('project-') || projectId.startsWith('demo-')) {
+        // Check if demo or local project fallback
+        if (!supabase || projectId.startsWith('demo-') || projectId.startsWith('project-')) {
           try {
-            const localData = localStorage.getItem(`brandio_local_brand_${projectId}`)
-            if (localData) {
-              const parsed = JSON.parse(localData)
+            const raw = localStorage.getItem(`brandio_local_brand_${projectId}`)
+            if (raw) {
+              const parsed = JSON.parse(raw)
               set({
                 ...parsed,
                 projectId,
                 isLoading: false,
               })
               return
-            }
-
-            const localProjects = JSON.parse(
-              localStorage.getItem('brandio_local_projects') || '[]'
-            )
-            const found = localProjects.find((p: any) => p.id === projectId)
-            if (found) {
+            } else {
               set({
                 projectId,
-                brandName: found.brand_name || found.name || 'Untitled Brand',
-                tagline: '',
-                mission: '',
-                vision: '',
-                coreValues: ['Excellence', 'Innovation', 'Integrity', 'Velocity'],
+                brandName: 'Apex Cloud',
+                tagline: 'Next-Generation Autonomous Cloud Infrastructure',
+                mission: 'To make distributed cloud computing instant, zero-maintenance, and universally accessible.',
+                vision: 'A world where developers build world-scale intelligence without server operational friction.',
+                coreValues: ['Radical Velocity', 'Architectural Elegance', 'Zero Trust Security', 'Developer Empathy'],
                 toneRatings: { formal: 60, playful: 20, minimalist: 85, bold: 90 },
                 colorPalette: defaultApex.colors,
                 displayFont: defaultApex.displayFont,
                 bodyFont: defaultApex.bodyFont,
                 monoFont: defaultApex.monoFont,
-                baseFontSize: defaultApex.baseFontSize,
-                typeScaleRatio: defaultApex.typeScaleRatio,
-                clearspaceMultiplier: 1.0,
+                baseFontSize: 16,
+                typeScaleRatio: 1.25,
                 isLoading: false,
               })
               return
@@ -474,6 +519,13 @@ export const useBrandStore = create<BrandState>()(
         }
 
         try {
+          const id = projectId || 'current'
+          const [cachedSvg, cachedSecondarySvg, cachedRaster] = await Promise.all([
+            idbGet(`brand_svg_${id}`).catch(() => null),
+            idbGet(`brand_secondary_svg_${id}`).catch(() => null),
+            idbGet(`brand_raster_${id}`).catch(() => null),
+          ])
+
           const { data, error } = await supabase
             .from('brand_data')
             .select('*')
@@ -483,6 +535,30 @@ export const useBrandStore = create<BrandState>()(
           if (error) throw error
 
           if (data) {
+            let svgContent = cachedSvg || undefined
+            let secondarySvgContent = cachedSecondarySvg || undefined
+
+            // If not in local cache but remote URL is present, fetch SVG text
+            if (!svgContent && data.logo_url) {
+              try {
+                const res = await fetch(data.logo_url)
+                if (res.ok) {
+                  svgContent = await res.text()
+                  await idbSet(`brand_svg_${id}`, svgContent)
+                }
+              } catch {}
+            }
+
+            if (!secondarySvgContent && data.secondary_logo_url) {
+              try {
+                const res = await fetch(data.secondary_logo_url)
+                if (res.ok) {
+                  secondarySvgContent = await res.text()
+                  await idbSet(`brand_secondary_svg_${id}`, secondarySvgContent)
+                }
+              } catch {}
+            }
+
             set({
               projectId,
               brandName: data.brand_name || 'Untitled Brand',
@@ -492,6 +568,10 @@ export const useBrandStore = create<BrandState>()(
               coreValues: data.core_values || ['Excellence', 'Innovation', 'Integrity', 'Velocity'],
               toneRatings: data.tone_ratings || defaultApex.toneRatings,
               logoUrl: data.logo_url,
+              secondaryLogoUrl: data.secondary_logo_url,
+              svgContent,
+              secondarySvgContent,
+              rasterDataUri: cachedRaster || undefined,
               clearspaceMultiplier: Number(data.clearspace_multiplier) || 1.0,
               colorPalette: data.color_palette || defaultApex.colors,
               displayFont: data.display_font || defaultApex.displayFont,
@@ -574,6 +654,7 @@ export const useBrandStore = create<BrandState>()(
             core_values: state.coreValues,
             tone_ratings: state.toneRatings,
             logo_url: state.logoUrl,
+            secondary_logo_url: state.secondaryLogoUrl,
             clearspace_multiplier: state.clearspaceMultiplier,
             color_palette: state.colorPalette,
             display_font: state.displayFont,
