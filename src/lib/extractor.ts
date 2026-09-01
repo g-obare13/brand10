@@ -56,15 +56,15 @@ function isInterestingColor(hex: string): boolean {
 /**
  * Cluster similar colors together and return top distinct colors
  */
-function clusterDistinctColors(hexColors: string[], maxCount = 5): string[] {
-  if (!hexColors.length) return ['#4f46e5', '#06b6d4', '#10b981', '#f59e0b', '#64748b']
+export function clusterDistinctColors(hexColors: string[], maxCount = 2): string[] {
+  if (!hexColors.length) return []
 
   const distinct: string[] = []
 
   for (const hex of hexColors) {
     const isClose = distinct.some((existing) => {
       try {
-        return chroma.deltaE(hex, existing) < 16
+        return chroma.deltaE(hex, existing) < 14
       } catch {
         return false
       }
@@ -75,71 +75,68 @@ function clusterDistinctColors(hexColors: string[], maxCount = 5): string[] {
     if (distinct.length >= maxCount) break
   }
 
-  // If we have fewer than 2 colors, supplement with harmonious compliments
-  if (distinct.length === 1) {
-    const primary = distinct[0]
-    distinct.push(chroma(primary).set('hsl.h', '+45').hex())
-    distinct.push(chroma(primary).set('hsl.h', '+180').hex())
-    distinct.push('#64748b')
-    distinct.push('#f8fafc')
-  }
-
   return distinct
 }
 
 /**
- * Dual Path 1: Vector (SVG) Color Extractor
+ * Dual Path 1: Vector (SVG) Dominant Color Extractor
+ * Extracts only the most dominant colors present in the SVG (default max 2)
  */
-export async function extractColorsFromSvg(svgText: string): Promise<string[]> {
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(svgText, 'image/svg+xml')
-  const rawColors = new Set<string>()
+export async function extractColorsFromSvg(
+  svgText: string,
+  maxCount = 2
+): Promise<string[]> {
+  if (!svgText) return []
+  try {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(svgText, 'image/svg+xml')
+    if (doc.querySelector('parsererror')) return []
 
-  // 1. Check all elements with fill, stroke, stop-color
-  const elements = doc.querySelectorAll('*')
-  elements.forEach((el) => {
-    const fill = el.getAttribute('fill')
-    const stroke = el.getAttribute('stroke')
-    const stopColor = el.getAttribute('stop-color')
-    const style = el.getAttribute('style')
+    const colorCounts = new Map<string, number>()
 
-    if (fill) {
-      const c = normalizeColor(fill)
-      if (c) rawColors.add(c)
-    }
-    if (stroke) {
-      const c = normalizeColor(stroke)
-      if (c) rawColors.add(c)
-    }
-    if (stopColor) {
-      const c = normalizeColor(stopColor)
-      if (c) rawColors.add(c)
-    }
-
-    if (style) {
-      const fillMatch = style.match(/fill\s*:\s*([^;]+)/i)
-      if (fillMatch) {
-        const c = normalizeColor(fillMatch[1])
-        if (c) rawColors.add(c)
-      }
-      const strokeMatch = style.match(/stroke\s*:\s*([^;]+)/i)
-      if (strokeMatch) {
-        const c = normalizeColor(strokeMatch[1])
-        if (c) rawColors.add(c)
-      }
-      const stopMatch = style.match(/stop-color\s*:\s*([^;]+)/i)
-      if (stopMatch) {
-        const c = normalizeColor(stopMatch[1])
-        if (c) rawColors.add(c)
+    const recordColor = (raw: string | null) => {
+      if (!raw) return
+      const hex = normalizeColor(raw)
+      if (hex) {
+        colorCounts.set(hex, (colorCounts.get(hex) || 0) + 1)
       }
     }
-  })
 
-  const arrayColors = Array.from(rawColors)
-  const interestingColors = arrayColors.filter(isInterestingColor)
-  const candidateColors = interestingColors.length > 0 ? interestingColors : arrayColors
+    // 1. Traverse all elements and tally color occurrences
+    const elements = doc.querySelectorAll('*')
+    elements.forEach((el) => {
+      recordColor(el.getAttribute('fill'))
+      recordColor(el.getAttribute('stroke'))
+      recordColor(el.getAttribute('stop-color'))
 
-  return clusterDistinctColors(candidateColors, 5)
+      const style = el.getAttribute('style')
+      if (style) {
+        const fillMatch = style.match(/fill\s*:\s*([^;]+)/i)
+        if (fillMatch) recordColor(fillMatch[1])
+        const strokeMatch = style.match(/stroke\s*:\s*([^;]+)/i)
+        if (strokeMatch) recordColor(strokeMatch[1])
+        const stopMatch = style.match(/stop-color\s*:\s*([^;]+)/i)
+        if (stopMatch) recordColor(stopMatch[1])
+      }
+    })
+
+    if (!colorCounts.size) return []
+
+    // 2. Sort colors by frequency/dominance (most used first)
+    const sortedColors = Array.from(colorCounts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([color]) => color)
+
+    // 3. Separate vivid/saturated brand colors from pure black/white/grays
+    const vividColors = sortedColors.filter(isInterestingColor)
+    const candidateColors = vividColors.length > 0 ? vividColors : sortedColors
+
+    // 4. Return top distinct dominant colors (no artificial filler colors)
+    return clusterDistinctColors(candidateColors, maxCount)
+  } catch (err) {
+    console.error('Failed to extract SVG colors:', err)
+    return []
+  }
 }
 
 /**

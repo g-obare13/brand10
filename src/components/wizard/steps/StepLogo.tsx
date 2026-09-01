@@ -1,6 +1,6 @@
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useBrandStore } from "@/store/brandStore"
-import { extractColorsFromSvg } from "@/lib/extractor"
+import { extractColorsFromSvg, clusterDistinctColors } from "@/lib/extractor"
 import { createColorSwatch } from "@/lib/colorUtils"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
@@ -42,6 +42,33 @@ export function StepLogo() {
 
   const primaryInputRef = useRef<HTMLInputElement>(null)
   const secondaryInputRef = useRef<HTMLInputElement>(null)
+
+  // Extract up to 2 dominant colors from primary and secondary SVGs
+  const refreshExtractedColors = async (
+    primarySvg?: string | null,
+    secondarySvg?: string | null
+  ) => {
+    const primaryColors = primarySvg
+      ? await extractColorsFromSvg(primarySvg, 2)
+      : []
+    const secondaryColors = secondarySvg
+      ? await extractColorsFromSvg(secondarySvg, 2)
+      : []
+
+    const combined = clusterDistinctColors(
+      [...primaryColors, ...secondaryColors],
+      4
+    )
+    setExtractedColors(combined)
+  }
+
+  useEffect(() => {
+    if (brand.svgContent || brand.secondarySvgContent) {
+      refreshExtractedColors(brand.svgContent, brand.secondarySvgContent)
+    } else {
+      setExtractedColors([])
+    }
+  }, [brand.svgContent, brand.secondarySvgContent])
 
   const handleSvgFile = async (file: File, slot: "primary" | "secondary") => {
     setErrorMsg(null)
@@ -99,23 +126,19 @@ export function StepLogo() {
         }
       }
 
-      // Extract vivid colors from mark
-      const colors = await extractColorsFromSvg(text)
-      if (colors.length > 0) {
-        setExtractedColors(colors)
-      }
-
-      // Save to store
+      // Save to store and refresh dominant colors
       if (slot === "primary") {
         await brand.setLogoData({
           svgContent: text,
           isVector: true,
           aspectRatio,
         })
+        await refreshExtractedColors(text, brand.secondarySvgContent)
       } else {
         await brand.setSecondaryLogoData({
           svgContent: text,
         })
+        await refreshExtractedColors(brand.svgContent, text)
       }
     } catch (err) {
       console.error("SVG Processing Error:", err)
@@ -270,9 +293,7 @@ export function StepLogo() {
                     size="sm"
                     onClick={() => {
                       brand.removeLogo()
-                      if (!brand.secondarySvgContent) {
-                        setExtractedColors([])
-                      }
+                      refreshExtractedColors(null, brand.secondarySvgContent)
                     }}
                     className="cursor-pointer rounded-full text-xs text-destructive hover:bg-destructive/10"
                   >
@@ -372,9 +393,7 @@ export function StepLogo() {
                     size="sm"
                     onClick={() => {
                       brand.removeSecondaryLogo()
-                      if (!brand.svgContent) {
-                        setExtractedColors([])
-                      }
+                      refreshExtractedColors(brand.svgContent, null)
                     }}
                     className="cursor-pointer rounded-full text-xs text-destructive hover:bg-destructive/10"
                   >
