@@ -297,7 +297,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           {iconPlacement === "left" && iconElement}
           <span
             className={cn(
-              "bg-linear-to-b bg-clip-text font-semibold text-transparent",
+              "bg-linear-to-b bg-clip-text font-medium text-transparent",
               colors.light.text,
               colors.dark.text,
               `dark:drop-shadow-[0_0_12px_${colors.dark.textGlow}]`,
@@ -347,7 +347,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
         <span
           className={cn(
-            "relative z-10 text-sm font-bold text-current",
+            "relative z-10 text-sm font-medium text-current",
             labelClassName
           )}
         >

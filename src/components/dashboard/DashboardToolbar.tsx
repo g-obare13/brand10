@@ -61,22 +61,22 @@ export function DashboardToolbar() {
           noise
           noiseOpacity={0.02}
           contentClassName="flex flex-row items-center gap-1.5 sm:gap-2"
-          className="rounded-full border border-border/80 bg-card/85 p-2 backdrop-blur-xl"
+          className="rounded-full border border-border/80 bg-card/85 p-3 backdrop-blur-xl"
         >
-          <div className="flex flex-row items-center gap-1.5 sm:gap-2">
+          <div className="flex flex-row items-center gap-6">
             {DASHBOARD_NAV_ROUTES.map((item) => (
               <Tooltip key={item.to}>
                 <TooltipTrigger asChild>
                   <Link
                     to={item.to}
                     activeProps={{
-                      className: "scale-105 bg-foreground text-background",
+                      className: "scale-105 bg-primary-900 text-background",
                     }}
                     inactiveProps={{
                       className:
                         "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
                     }}
-                    className="flex size-8 cursor-pointer items-center justify-center rounded-full p-2 transition-all duration-300"
+                    className="flex size-9 cursor-pointer items-center justify-center rounded-full p-2 transition-all duration-300"
                     aria-label={item.label}
                   >
                     {item.icon}

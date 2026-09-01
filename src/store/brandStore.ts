@@ -47,9 +47,19 @@ export interface BrandState {
   baseFontSize: number
   typeScaleRatio: number
 
+  // Imagery & Photography System
+  imageryMood: 'minimal' | 'cinematic' | 'vibrant' | 'editorial'
+  imageryOverlay: 'none' | 'tint' | 'duotone'
+
+  // Iconography System
+  iconStyle: 'stroke' | 'solid' | 'duotone'
+  iconRadius: number
+  iconStroke: number
+
   // UI state
   activeTab: 'overview' | 'logo' | 'colors' | 'typography' | 'mockups'
   isSaving: boolean
+  isLoading: boolean
   lastSavedAt: string | null
 
   // Actions
@@ -88,6 +98,19 @@ export interface BrandState {
     monoFont?: string
     baseFontSize?: number
     typeScaleRatio?: number
+  }) => void
+
+  // Imagery actions
+  setImagery: (updates: {
+    mood?: 'minimal' | 'cinematic' | 'vibrant' | 'editorial'
+    overlay?: 'none' | 'tint' | 'duotone'
+  }) => void
+
+  // Iconography actions
+  setIconography: (updates: {
+    style?: 'stroke' | 'solid' | 'duotone'
+    radius?: number
+    stroke?: number
   }) => void
 
   setActiveTab: (tab: BrandState['activeTab']) => void
@@ -164,13 +187,13 @@ const defaultApex = PRESET_BRANDS.apex
 export const useBrandStore = create<BrandState>()(
   temporal(
     (set, get) => ({
-      projectId: 'demo-project',
-      brandName: defaultApex.brandName,
-      tagline: defaultApex.tagline,
-      mission: defaultApex.mission,
-      vision: defaultApex.vision,
-      coreValues: defaultApex.coreValues,
-      toneRatings: defaultApex.toneRatings,
+      projectId: '',
+      brandName: '',
+      tagline: '',
+      mission: '',
+      vision: '',
+      coreValues: ['Excellence', 'Innovation', 'Integrity', 'Velocity'],
+      toneRatings: { formal: 60, playful: 20, minimalist: 85, bold: 90 },
 
       // Logo
       isVector: true,
@@ -193,9 +216,19 @@ export const useBrandStore = create<BrandState>()(
       baseFontSize: defaultApex.baseFontSize,
       typeScaleRatio: defaultApex.typeScaleRatio,
 
+      // Imagery & Photography
+      imageryMood: 'minimal',
+      imageryOverlay: 'none',
+
+      // Iconography
+      iconStyle: 'stroke',
+      iconRadius: 4,
+      iconStroke: 2.0,
+
       // UI
       activeTab: 'overview',
       isSaving: false,
+      isLoading: false,
       lastSavedAt: null,
 
       setProjectId: (id) => set({ projectId: id }),
@@ -268,6 +301,21 @@ export const useBrandStore = create<BrandState>()(
         })
       },
 
+      setImagery: (updates) => {
+        set({
+          imageryMood: updates.mood ?? get().imageryMood,
+          imageryOverlay: updates.overlay ?? get().imageryOverlay,
+        })
+      },
+
+      setIconography: (updates) => {
+        set({
+          iconStyle: updates.style ?? get().iconStyle,
+          iconRadius: updates.radius ?? get().iconRadius,
+          iconStroke: updates.stroke ?? get().iconStroke,
+        })
+      },
+
       setActiveTab: (tab) => set({ activeTab: tab }),
 
       loadPreset: (presetKey) => {
@@ -291,6 +339,7 @@ export const useBrandStore = create<BrandState>()(
       loadFromProject: async (projectId) => {
         set({
           projectId,
+          isLoading: true,
           svgContent: undefined,
           rasterDataUri: undefined,
           logoUrl: undefined,
@@ -306,7 +355,7 @@ export const useBrandStore = create<BrandState>()(
           console.warn('Could not read images from IndexedDB', e)
         }
 
-        if (!supabase) {
+        if (!supabase || projectId.startsWith('project-') || projectId.startsWith('demo-')) {
           try {
             const localData = localStorage.getItem(`brandio_local_brand_${projectId}`)
             if (localData) {
@@ -314,6 +363,7 @@ export const useBrandStore = create<BrandState>()(
               set({
                 ...parsed,
                 projectId,
+                isLoading: false,
               })
               return
             }
@@ -338,9 +388,12 @@ export const useBrandStore = create<BrandState>()(
                 baseFontSize: defaultApex.baseFontSize,
                 typeScaleRatio: defaultApex.typeScaleRatio,
                 clearspaceMultiplier: 1.0,
+                isLoading: false,
               })
+              return
             }
           } catch {}
+          set({ isLoading: false })
           return
         }
 
@@ -371,6 +424,7 @@ export const useBrandStore = create<BrandState>()(
               baseFontSize: Number(data.base_font_size) || 16,
               typeScaleRatio: Number(data.type_scale_ratio) || 1.25,
               lastSavedAt: data.updated_at,
+              isLoading: false,
             })
           } else {
             // If no brand_data row exists yet, retrieve project name from brand_projects
@@ -398,16 +452,18 @@ export const useBrandStore = create<BrandState>()(
               typeScaleRatio: 1.25,
               clearspaceMultiplier: 1.0,
               lastSavedAt: new Date().toISOString(),
+              isLoading: false,
             })
           }
         } catch (err) {
           console.warn('Failed to load project from Supabase:', err)
+          set({ isLoading: false })
         }
       },
 
       saveToSupabase: async () => {
         const state = get()
-        if (!state.projectId) return
+        if (state.isLoading || !state.projectId || state.projectId === 'demo-project' || !state.brandName) return
 
         if (!supabase || state.projectId.startsWith('demo-') || state.projectId.startsWith('project-')) {
           set({ lastSavedAt: new Date().toISOString() })

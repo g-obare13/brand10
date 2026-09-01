@@ -44,7 +44,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const handleGuest = () => {
     auth.continueAsGuest()
     onOpenChange(false)
-    navigate({ to: "/dashboard" })
+    navigate({ to: "/dashboard/projects" })
   }
 
   return (

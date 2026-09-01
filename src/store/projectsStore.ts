@@ -27,7 +27,7 @@ interface ProjectsState {
 
 export const useProjectsStore = create<ProjectsState>((set, get) => ({
   projects: [],
-  loading: false,
+  loading: true,
   error: null,
   isCreateModalOpen: false,
 
@@ -101,12 +101,13 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
       return { project: null, error: 'Maximum of 2 projects allowed on this plan.' }
     }
 
+    const trimmedName = name.trim() || 'Untitled Brand'
     const newId = `project-${Math.random().toString(36).substring(2, 9)}`
     const now = new Date().toISOString()
     const newProject: BrandProjectItem = {
       id: newId,
-      name: name.trim() || 'Untitled Brand',
-      brand_name: name.trim() || 'Untitled Brand',
+      name: trimmedName,
+      brand_name: trimmedName,
       created_at: now,
       updated_at: now,
       primary_color: '#4f46e5',
@@ -117,6 +118,85 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
       set({ projects: updated })
       try {
         localStorage.setItem('brandio_local_projects', JSON.stringify(updated))
+        const initialBrandState = {
+          projectId: newId,
+          brandName: trimmedName,
+          tagline: '',
+          mission: '',
+          vision: '',
+          coreValues: ['Excellence', 'Innovation', 'Integrity', 'Velocity'],
+          toneRatings: { formal: 60, playful: 20, minimalist: 85, bold: 90 },
+          displayFont: 'Plus Jakarta Sans',
+          bodyFont: 'Inter',
+          monoFont: 'JetBrains Mono',
+          baseFontSize: 16,
+          typeScaleRatio: 1.25,
+          clearspaceMultiplier: 1.0,
+          dosAndDonts: [
+            { id: '1', type: 'do', rule: 'Maintain Clearspace', detail: 'Always leave at least 1x clear margin around the symbol.' },
+            { id: '2', type: 'do', rule: 'Use On High Contrast', detail: 'Ensure the logo is placed on backgrounds with WCAG AA compliance.' },
+            { id: '3', type: 'dont', rule: 'Do Not Distort', detail: 'Never stretch, skew, or alter the proportional aspect ratio.' },
+            { id: '4', type: 'dont', rule: 'Do Not Re-color Elements', detail: 'Do not apply unapproved gradient or shadow effects.' },
+          ],
+          colorPalette: [
+            {
+              id: 'primary',
+              hex: '#4f46e5',
+              name: 'Primary Indigo',
+              role: 'primary',
+              rgb: { r: 79, g: 70, b: 229 },
+              cmyk: { c: 66, m: 69, y: 0, k: 10 },
+              hsl: { h: 243, s: 75, l: 59 },
+              shades: {
+                50: '#eef2ff',
+                100: '#e0e7ff',
+                200: '#c7d2fe',
+                300: '#a5b4fc',
+                400: '#818cf8',
+                500: '#6366f1',
+                600: '#4f46e5',
+                700: '#4338ca',
+                800: '#3730a3',
+                900: '#312e81',
+                950: '#1e1b4b',
+              },
+            },
+            {
+              id: 'secondary',
+              hex: '#06b6d4',
+              name: 'Cyber Cyan',
+              role: 'secondary',
+              rgb: { r: 6, g: 182, b: 212 },
+              cmyk: { c: 97, m: 14, y: 0, k: 17 },
+              hsl: { h: 189, s: 94, l: 43 },
+              shades: {},
+            },
+            {
+              id: 'neutral',
+              hex: '#0f172a',
+              name: 'Midnight Slate',
+              role: 'neutral',
+              rgb: { r: 15, g: 23, b: 42 },
+              cmyk: { c: 64, m: 45, y: 0, k: 84 },
+              hsl: { h: 222, s: 47, l: 11 },
+              shades: {},
+            },
+            {
+              id: 'background',
+              hex: '#ffffff',
+              name: 'Pure Surface',
+              role: 'background',
+              rgb: { r: 255, g: 255, b: 255 },
+              cmyk: { c: 0, m: 0, y: 0, k: 0 },
+              hsl: { h: 0, s: 0, l: 100 },
+              shades: {},
+            },
+          ],
+          activeTab: 'overview',
+          isSaving: false,
+          lastSavedAt: now,
+        }
+        localStorage.setItem(`brandio_local_brand_${newId}`, JSON.stringify(initialBrandState))
       } catch {}
       return { project: newProject, error: null }
     }
@@ -124,7 +204,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
     try {
       const { data, error } = await supabase
         .from('brand_projects')
-        .insert([{ user_id: userId, name: name.trim() || 'Untitled Brand' }])
+        .insert([{ user_id: userId, name: trimmedName }])
         .select()
         .single()
 

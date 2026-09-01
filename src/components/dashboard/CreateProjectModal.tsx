@@ -4,9 +4,11 @@ import React, { useEffect, useRef, useState } from "react"
 import { animateFadeUp } from "../../lib/gsap-animations"
 import { useAuthStore } from "../../store/authStore"
 import { useProjectsStore } from "../../store/projectsStore"
+import { useBrandStore } from "../../store/brandStore"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
+import { Loader } from "../ui/loader"
 
 interface CreateProjectModalProps {
   isOpen: boolean
@@ -20,6 +22,7 @@ export function CreateProjectModal({
   const navigate = useNavigate()
   const auth = useAuthStore()
   const projectsStore = useProjectsStore()
+  const brand = useBrandStore()
 
   const [projectName, setProjectName] = useState("")
   const [createError, setCreateError] = useState<string | null>(null)
@@ -126,9 +129,11 @@ export function CreateProjectModal({
       if (error) {
         setCreateError(error)
       } else if (project) {
+        brand.setProjectId(project.id)
+        brand.setBrandName(project.name || projectName)
         triggerClose()
         navigate({
-          to: "/studio/$projectId",
+          to: "/studio/$projectId/wizard",
           params: { projectId: project.id },
         })
       }
@@ -146,15 +151,12 @@ export function CreateProjectModal({
           triggerClose()
         }
       }}
-      className="fixed inset-0 z-50 flex items-end justify-center bg-background/70 p-4 pb-20 sm:p-6 sm:pb-24 backdrop-blur-md"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-background/70 p-4 pb-20 backdrop-blur-md sm:p-6 sm:pb-24"
     >
       <div
         ref={sheetRef}
         className="w-full max-w-md space-y-6 rounded-3xl border border-border/80 bg-card/95 p-8 text-card-foreground shadow-2xl backdrop-blur-xl"
       >
-        {/* Subtle grab indicator */}
-        <div className="mx-auto -mt-3 mb-1 h-1 w-10 rounded-full bg-muted-foreground/30" />
-
         <div className="sheet-item-anim flex items-center gap-3">
           <div>
             <h5>Create New Brand Studio</h5>
@@ -188,7 +190,7 @@ export function CreateProjectModal({
               size="pill"
               gsapFill
               onClick={triggerClose}
-              className="rounded-full px-6 py-2 text-xs"
+              className="rounded-full"
             >
               Cancel
             </Button>
@@ -198,7 +200,8 @@ export function CreateProjectModal({
               size="pill"
               gsapFill
               disabled={isSubmitting}
-              className="rounded-full px-6 py-2 text-xs"
+              className="rounded-full"
+              icon={isSubmitting && <Loader />}
             >
               {isSubmitting ? "Creating..." : "Create Studio"}
             </Button>

@@ -1,6 +1,7 @@
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet, pdf } from '@react-pdf/renderer'
-import { saveAs } from 'file-saver'
+import fileSaver from 'file-saver'
+const saveAs = fileSaver.saveAs || fileSaver
 import type { ColorSwatch } from '../../lib/colorUtils'
 import { computeTypeScale } from '../../lib/fontLoader'
 

@@ -1,10 +1,38 @@
-import React, { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useBrandStore } from '../../../store/brandStore'
-import { IconSparkles, IconTarget, IconCompass, IconPlus, IconX, IconAdjustmentsHorizontal } from '@tabler/icons-react'
+import {
+  IconSparkles,
+  IconTarget,
+  IconCompass,
+  IconPlus,
+  IconX,
+  IconAdjustmentsHorizontal,
+} from '@tabler/icons-react'
+import { gsap } from 'gsap'
+import { animateFadeUp } from '@/lib/gsap-animations'
+import GlassPanel from '@/components/shared/GlassPanel'
 
 export const OverviewTab: React.FC = () => {
   const brand = useBrandStore()
   const [newValue, setNewValue] = useState('')
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    const ctx = gsap.context(() => {
+      const cards = containerRef.current?.querySelectorAll('.overview-card')
+      if (cards && cards.length > 0) {
+        animateFadeUp(cards, {
+          y: 25,
+          duration: 0.9,
+          stagger: 0.08,
+          ease: 'power3.out',
+        })
+      }
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [])
 
   const handleAddValue = (e: React.FormEvent) => {
     e.preventDefault()
@@ -14,50 +42,81 @@ export const OverviewTab: React.FC = () => {
     }
   }
 
-  const getToneDescriptor = (key: 'formal' | 'playful' | 'minimalist' | 'bold', val: number) => {
+  const getToneDescriptor = (
+    key: 'formal' | 'playful' | 'minimalist' | 'bold',
+    val: number
+  ) => {
     switch (key) {
       case 'formal':
-        return val > 65 ? 'Corporate & Traditional' : val < 35 ? 'Casual & Approachable' : 'Balanced Professional'
+        return val > 65
+          ? 'Corporate & Traditional'
+          : val < 35
+            ? 'Casual & Approachable'
+            : 'Balanced Professional'
       case 'playful':
-        return val > 65 ? 'Vibrant & Witty' : val < 35 ? 'Methodical & Serious' : 'Engaging & Grounded'
+        return val > 65
+          ? 'Vibrant & Witty'
+          : val < 35
+            ? 'Methodical & Serious'
+            : 'Engaging & Grounded'
       case 'minimalist':
-        return val > 65 ? 'Radically Simple' : val < 35 ? 'Ornate & Expressive' : 'Clean & Structured'
+        return val > 65
+          ? 'Radically Simple'
+          : val < 35
+            ? 'Ornate & Expressive'
+            : 'Clean & Structured'
       case 'bold':
-        return val > 65 ? 'Disruptive & Loud' : val < 35 ? 'Subtle & Sophisticated' : 'Confident Stature'
+        return val > 65
+          ? 'Disruptive & Loud'
+          : val < 35
+            ? 'Subtle & Sophisticated'
+            : 'Confident Stature'
     }
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div ref={containerRef} className="space-y-8">
       {/* Hero Brand Statement */}
-      <div className="rounded-2xl border border-border bg-card p-6 md:p-8 relative overflow-hidden shadow-xs">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 blur-3xl pointer-events-none rounded-full" />
+      <GlassPanel
+        blur="none"
+        noise
+        noiseOpacity={0.02}
+        className="overview-card relative overflow-hidden rounded-3xl border border-border/80 bg-card/85 p-6 shadow-xs backdrop-blur-xl md:p-8"
+      >
+        <div className="pointer-events-none absolute top-0 right-0 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
 
-        <div className="max-w-3xl space-y-4 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold">
+        <div className="relative z-10 max-w-3xl space-y-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
             <IconSparkles size={14} />
             Strategic Positioning
           </div>
 
-          <div>
-            <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-1 block">Brand Tagline</label>
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Brand Tagline
+            </label>
             <input
               type="text"
               value={brand.tagline}
               onChange={(e) => brand.setTagline(e.target.value)}
               placeholder="e.g. Next-Generation Autonomous Cloud Infrastructure"
-              className="w-full text-xl md:text-2xl font-bold text-foreground bg-transparent border-b border-border focus:border-primary outline-none pb-2 transition placeholder:text-muted-foreground"
+              className="w-full border-b border-border/80 bg-transparent pb-2 text-xl font-bold text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary md:text-2xl"
             />
           </div>
         </div>
-      </div>
+      </GlassPanel>
 
       {/* Mission & Vision Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Mission */}
-        <div className="rounded-2xl border border-border bg-card p-6 space-y-3 shadow-xs hover:border-primary/50 transition">
-          <div className="flex items-center gap-2 text-primary font-semibold text-sm">
-            <div className="p-1.5 rounded-md bg-primary/10 border border-primary/20">
+        <GlassPanel
+          blur="none"
+          noise
+          noiseOpacity={0.02}
+          className="overview-card space-y-3 rounded-3xl border border-border/80 bg-card/85 p-6 shadow-xs backdrop-blur-xl transition hover:border-primary/50"
+        >
+          <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+            <div className="rounded-lg border border-primary/20 bg-primary/10 p-1.5">
               <IconTarget size={16} />
             </div>
             Brand Mission
@@ -67,14 +126,19 @@ export const OverviewTab: React.FC = () => {
             onChange={(e) => brand.setMission(e.target.value)}
             rows={4}
             placeholder="What purpose does your brand exist to fulfill?"
-            className="w-full bg-background border border-border rounded-xl p-3 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary transition leading-relaxed placeholder:text-muted-foreground resize-none"
+            className="w-full resize-none rounded-2xl border border-border bg-background/50 p-3.5 text-sm leading-relaxed text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary"
           />
-        </div>
+        </GlassPanel>
 
         {/* Vision */}
-        <div className="rounded-2xl border border-border bg-card p-6 space-y-3 shadow-xs hover:border-emerald-500/50 transition">
-          <div className="flex items-center gap-2 text-emerald-500 font-semibold text-sm">
-            <div className="p-1.5 rounded-md bg-emerald-500/10 border border-emerald-500/20">
+        <GlassPanel
+          blur="none"
+          noise
+          noiseOpacity={0.02}
+          className="overview-card space-y-3 rounded-3xl border border-border/80 bg-card/85 p-6 shadow-xs backdrop-blur-xl transition hover:border-emerald-500/50"
+        >
+          <div className="flex items-center gap-2 text-sm font-semibold text-emerald-500">
+            <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-1.5">
               <IconCompass size={16} />
             </div>
             Brand Vision
@@ -84,30 +148,36 @@ export const OverviewTab: React.FC = () => {
             onChange={(e) => brand.setVision(e.target.value)}
             rows={4}
             placeholder="What future world is your brand actively building?"
-            className="w-full bg-background border border-border rounded-xl p-3 text-sm text-foreground outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition leading-relaxed placeholder:text-muted-foreground resize-none"
+            className="w-full resize-none rounded-2xl border border-border bg-background/50 p-3.5 text-sm leading-relaxed text-foreground outline-none transition placeholder:text-muted-foreground focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
           />
-        </div>
+        </GlassPanel>
       </div>
 
       {/* Core Values Tag Manager */}
-      <div className="rounded-2xl border border-border bg-card p-6 space-y-4 shadow-xs">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-base font-bold text-foreground">Core Values</h3>
-            <p className="text-xs text-muted-foreground">Guiding behavioral principles that define brand conduct.</p>
-          </div>
+      <GlassPanel
+        blur="none"
+        noise
+        noiseOpacity={0.02}
+        className="overview-card space-y-4 rounded-3xl border border-border/80 bg-card/85 p-6 shadow-xs backdrop-blur-xl"
+      >
+        <div className="space-y-1">
+          <h3 className="text-base font-bold text-foreground">Core Values</h3>
+          <p className="text-xs text-muted-foreground">
+            Guiding behavioral principles that define brand conduct.
+          </p>
         </div>
 
-        <div className="flex flex-wrap gap-2.5 items-center">
+        <div className="flex flex-wrap items-center gap-2.5">
           {brand.coreValues.map((val, idx) => (
             <span
               key={idx}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/60 border border-border text-xs font-medium text-foreground group hover:border-primary/50 transition"
+              className="group inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/60 px-3 py-1.5 text-xs font-medium text-foreground transition hover:border-primary/50"
             >
               {val}
               <button
+                type="button"
                 onClick={() => brand.removeCoreValue(idx)}
-                className="text-muted-foreground hover:text-destructive transition cursor-pointer"
+                className="cursor-pointer text-muted-foreground transition hover:text-destructive"
                 title="Remove value"
               >
                 <IconX size={13} />
@@ -121,38 +191,49 @@ export const OverviewTab: React.FC = () => {
               value={newValue}
               onChange={(e) => setNewValue(e.target.value)}
               placeholder="+ Add Core Value"
-              className="px-3 py-1.5 rounded-lg bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+              className="rounded-xl border border-border bg-background/60 px-3 py-1.5 text-xs text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary"
             />
             {newValue.trim() && (
               <button
                 type="submit"
-                className="ml-1.5 p-1.5 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition cursor-pointer"
+                className="ml-1.5 cursor-pointer rounded-xl bg-primary p-1.5 text-primary-foreground transition hover:opacity-90"
               >
                 <IconPlus size={14} />
               </button>
             )}
           </form>
         </div>
-      </div>
+      </GlassPanel>
 
       {/* Brand Tone Dimensions Sliders */}
-      <div className="rounded-2xl border border-border bg-card p-6 space-y-6 shadow-xs">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-500">
+      <GlassPanel
+        blur="none"
+        noise
+        noiseOpacity={0.02}
+        className="overview-card space-y-6 rounded-3xl border border-border/80 bg-card/85 p-6 shadow-xs backdrop-blur-xl"
+      >
+        <div className="flex items-center gap-2.5">
+          <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-1.5 text-amber-500">
             <IconAdjustmentsHorizontal size={16} />
           </div>
-          <div>
-            <h3 className="text-base font-bold text-foreground">Tone of Voice Dimensions</h3>
-            <p className="text-xs text-muted-foreground">Fine-tune the brand’s psychological register across 4 axes.</p>
+          <div className="space-y-0.5">
+            <h3 className="text-base font-bold text-foreground">
+              Tone of Voice Dimensions
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Fine-tune the brand’s psychological register across 4 axes.
+            </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Formal vs Casual */}
-          <div className="space-y-2 p-4 rounded-xl bg-muted/30 border border-border">
+          <div className="space-y-2.5 rounded-2xl border border-border/80 bg-muted/30 p-4">
             <div className="flex justify-between text-xs font-semibold text-foreground">
               <span>Casual &amp; Intimate</span>
-              <span className="text-primary">{getToneDescriptor('formal', brand.toneRatings.formal)}</span>
+              <span className="text-primary font-bold">
+                {getToneDescriptor('formal', brand.toneRatings.formal)}
+              </span>
               <span>Corporate Formal</span>
             </div>
             <input
@@ -160,16 +241,20 @@ export const OverviewTab: React.FC = () => {
               min="0"
               max="100"
               value={brand.toneRatings.formal}
-              onChange={(e) => brand.setToneRating('formal', Number(e.target.value))}
-              className="w-full accent-primary h-2 bg-muted rounded-lg cursor-pointer"
+              onChange={(e) =>
+                brand.setToneRating('formal', Number(e.target.value))
+              }
+              className="h-2 w-full cursor-pointer rounded-lg bg-muted accent-primary"
             />
           </div>
 
           {/* Playful vs Serious */}
-          <div className="space-y-2 p-4 rounded-xl bg-muted/30 border border-border">
+          <div className="space-y-2.5 rounded-2xl border border-border/80 bg-muted/30 p-4">
             <div className="flex justify-between text-xs font-semibold text-foreground">
               <span>Methodical &amp; Serious</span>
-              <span className="text-emerald-500">{getToneDescriptor('playful', brand.toneRatings.playful)}</span>
+              <span className="font-bold text-emerald-500">
+                {getToneDescriptor('playful', brand.toneRatings.playful)}
+              </span>
               <span>Playful &amp; Witty</span>
             </div>
             <input
@@ -177,16 +262,20 @@ export const OverviewTab: React.FC = () => {
               min="0"
               max="100"
               value={brand.toneRatings.playful}
-              onChange={(e) => brand.setToneRating('playful', Number(e.target.value))}
-              className="w-full accent-emerald-500 h-2 bg-muted rounded-lg cursor-pointer"
+              onChange={(e) =>
+                brand.setToneRating('playful', Number(e.target.value))
+              }
+              className="h-2 w-full cursor-pointer rounded-lg bg-muted accent-emerald-500"
             />
           </div>
 
           {/* Minimalist vs Ornate */}
-          <div className="space-y-2 p-4 rounded-xl bg-muted/30 border border-border">
+          <div className="space-y-2.5 rounded-2xl border border-border/80 bg-muted/30 p-4">
             <div className="flex justify-between text-xs font-semibold text-foreground">
               <span>Rich &amp; Detailed</span>
-              <span className="text-cyan-500">{getToneDescriptor('minimalist', brand.toneRatings.minimalist)}</span>
+              <span className="font-bold text-cyan-500">
+                {getToneDescriptor('minimalist', brand.toneRatings.minimalist)}
+              </span>
               <span>Ultra Minimalist</span>
             </div>
             <input
@@ -194,16 +283,20 @@ export const OverviewTab: React.FC = () => {
               min="0"
               max="100"
               value={brand.toneRatings.minimalist}
-              onChange={(e) => brand.setToneRating('minimalist', Number(e.target.value))}
-              className="w-full accent-cyan-500 h-2 bg-muted rounded-lg cursor-pointer"
+              onChange={(e) =>
+                brand.setToneRating('minimalist', Number(e.target.value))
+              }
+              className="h-2 w-full cursor-pointer rounded-lg bg-muted accent-cyan-500"
             />
           </div>
 
           {/* Bold vs Subtle */}
-          <div className="space-y-2 p-4 rounded-xl bg-muted/30 border border-border">
+          <div className="space-y-2.5 rounded-2xl border border-border/80 bg-muted/30 p-4">
             <div className="flex justify-between text-xs font-semibold text-foreground">
               <span>Subtle &amp; Understated</span>
-              <span className="text-amber-500">{getToneDescriptor('bold', brand.toneRatings.bold)}</span>
+              <span className="font-bold text-amber-500">
+                {getToneDescriptor('bold', brand.toneRatings.bold)}
+              </span>
               <span>Loud &amp; Disruptive</span>
             </div>
             <input
@@ -211,12 +304,14 @@ export const OverviewTab: React.FC = () => {
               min="0"
               max="100"
               value={brand.toneRatings.bold}
-              onChange={(e) => brand.setToneRating('bold', Number(e.target.value))}
-              className="w-full accent-amber-500 h-2 bg-muted rounded-lg cursor-pointer"
+              onChange={(e) =>
+                brand.setToneRating('bold', Number(e.target.value))
+              }
+              className="h-2 w-full cursor-pointer rounded-lg bg-muted accent-amber-500"
             />
           </div>
         </div>
-      </div>
+      </GlassPanel>
     </div>
   )
 }

@@ -38,7 +38,8 @@ export function Header({ action }: HeaderProps = {}) {
   const location = useLocation()
   const navigate = useNavigate()
   const currentPath = location.pathname
-  const isDashboard = action === "logout" || currentPath === "/dashboard"
+  const isDashboard =
+    action === "logout" || currentPath === "/dashboard/projects"
 
   useEffect(() => {
     initialize()
@@ -177,7 +178,7 @@ export function Header({ action }: HeaderProps = {}) {
                   variant="outline"
                   className="hidden cursor-pointer rounded-full p-6 lg:flex"
                   icon={<IconLock size={16} />}
-                  href="/dashboard"
+                  href="/dashboard/projects"
                   iconPlacement="right"
                 >
                   Dashboard

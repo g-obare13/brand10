@@ -137,7 +137,7 @@ export const SpotlightCard = React.forwardRef<
           aria-hidden="true"
           className={cn(
             "pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-300",
-            isHovered ? "opacity-100" : "opacity-0"
+            isHovered && interactive ? "opacity-100" : "opacity-0"
           )}
           style={{
             background: `radial-gradient(ellipse at ${mousePos.normX * 100}% ${mousePos.normY * 100}%, ${color}30, transparent 65%)`,
@@ -145,7 +145,7 @@ export const SpotlightCard = React.forwardRef<
         />
 
         {/* Shimmer sweep effect */}
-        {shimmer && (
+        {shimmer && interactive && (
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-y-0 left-0 w-[55%] -translate-x-full -skew-x-12 bg-linear-to-r from-transparent via-white/12 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[280%]"
