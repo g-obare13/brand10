@@ -117,7 +117,7 @@ function LandingPage() {
       <main className="relative z-10 flex-1 py-12 md:py-20">
         <Container className="space-y-16">
           {/* Hero Section */}
-          <div className="max-w-4xl space-y-6 pt-4 sm:pt-8">
+          <div className="max-w-4xl space-y-6 pt-12">
             <WordReveal as="h1" stagger={0.03} duration={1.4} start="top 90%">
               Create comprehensive brand guidelines in minutes with Brand
               <span className="font-heading text-5xl font-semibold text-primary lg:text-6xl">

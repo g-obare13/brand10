@@ -47,6 +47,7 @@ CREATE POLICY "Users can delete own projects" ON brand_projects FOR DELETE USING
 CREATE POLICY "Users can view own brand data" ON brand_data FOR SELECT USING (EXISTS (SELECT 1 FROM brand_projects WHERE brand_projects.id = brand_data.project_id AND brand_projects.user_id = auth.uid()));
 CREATE POLICY "Users can insert own brand data" ON brand_data FOR INSERT WITH CHECK (EXISTS (SELECT 1 FROM brand_projects WHERE brand_projects.id = brand_data.project_id AND brand_projects.user_id = auth.uid()));
 CREATE POLICY "Users can update own brand data" ON brand_data FOR UPDATE USING (EXISTS (SELECT 1 FROM brand_projects WHERE brand_projects.id = brand_data.project_id AND brand_projects.user_id = auth.uid()));
+CREATE POLICY "Users can delete own brand data" ON brand_data FOR DELETE USING (EXISTS (SELECT 1 FROM brand_projects WHERE brand_projects.id = brand_data.project_id AND brand_projects.user_id = auth.uid()));
 
 -- Storage Bucket for Logos
 INSERT INTO storage.buckets (id, name, public) 

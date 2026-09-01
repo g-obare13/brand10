@@ -15,10 +15,13 @@ interface ProjectsState {
   projects: BrandProjectItem[]
   loading: boolean
   error: string | null
+  isCreateModalOpen: boolean
+  openCreateModal: () => void
+  closeCreateModal: () => void
   fetchProjects: (userId?: string) => Promise<void>
   createProject: (name: string, userId?: string) => Promise<{ project: BrandProjectItem | null; error: string | null }>
-  deleteProject: (id: string) => Promise<void>
-  duplicateProject: (id: string) => Promise<void>
+  deleteProject: (id: string, userId?: string) => Promise<void>
+  duplicateProject: (id: string, userId?: string) => Promise<void>
   isLimitReached: () => boolean
 }
 
@@ -26,6 +29,10 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
   projects: [],
   loading: false,
   error: null,
+  isCreateModalOpen: false,
+
+  openCreateModal: () => set({ isCreateModalOpen: true }),
+  closeCreateModal: () => set({ isCreateModalOpen: false }),
 
   isLimitReached: () => {
     return get().projects.length >= 2
@@ -43,18 +50,8 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
         }
       } catch {}
 
-      // Default demo projects
-      const demoProjects: BrandProjectItem[] = [
-        {
-          id: 'demo-apex',
-          name: 'Apex Studio',
-          brand_name: 'Apex Studio',
-          created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-          updated_at: new Date(Date.now() - 86400000).toISOString(),
-          primary_color: '#4f46e5',
-        },
-      ]
-      set({ projects: demoProjects, loading: false })
+      // Default to empty for new users
+      set({ projects: [], loading: false })
       return
     }
 
@@ -76,7 +73,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
 
       if (error) throw error
 
-      const formatted: BrandProjectItem[] = (data || []).map((item: any) => {
+      const formatted: BrandProjectItem[] = data.map((item: any) => {
         const bd = Array.isArray(item.brand_data) ? item.brand_data[0] : item.brand_data
         const palette = bd?.color_palette || []
         const primaryColor = palette.find((c: any) => c.role === 'primary')?.hex || '#4f46e5'
@@ -133,11 +130,87 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
 
       if (error) throw error
 
+      const initialPalette = [
+        {
+          id: 'primary',
+          hex: '#4f46e5',
+          name: 'Primary Indigo',
+          role: 'primary',
+          rgb: { r: 79, g: 70, b: 229 },
+          cmyk: { c: 66, m: 69, y: 0, k: 10 },
+          hsl: { h: 243, s: 75, l: 59 },
+          shades: {
+            50: '#eef2ff',
+            100: '#e0e7ff',
+            200: '#c7d2fe',
+            300: '#a5b4fc',
+            400: '#818cf8',
+            500: '#6366f1',
+            600: '#4f46e5',
+            700: '#4338ca',
+            800: '#3730a3',
+            900: '#312e81',
+            950: '#1e1b4b',
+          },
+        },
+        {
+          id: 'secondary',
+          hex: '#06b6d4',
+          name: 'Cyber Cyan',
+          role: 'secondary',
+          rgb: { r: 6, g: 182, b: 212 },
+          cmyk: { c: 97, m: 14, y: 0, k: 17 },
+          hsl: { h: 189, s: 94, l: 43 },
+          shades: {},
+        },
+        {
+          id: 'neutral',
+          hex: '#0f172a',
+          name: 'Midnight Slate',
+          role: 'neutral',
+          rgb: { r: 15, g: 23, b: 42 },
+          cmyk: { c: 64, m: 45, y: 0, k: 84 },
+          hsl: { h: 222, s: 47, l: 11 },
+          shades: {},
+        },
+        {
+          id: 'background',
+          hex: '#ffffff',
+          name: 'Pure Surface',
+          role: 'background',
+          rgb: { r: 255, g: 255, b: 255 },
+          cmyk: { c: 0, m: 0, y: 0, k: 0 },
+          hsl: { h: 0, s: 0, l: 100 },
+          shades: {},
+        },
+      ]
+
+      // Initialize brand_data row with user-chosen name and sensible defaults
+      await supabase.from('brand_data').insert([
+        {
+          project_id: data.id,
+          brand_name: data.name,
+          tagline: '',
+          mission: '',
+          vision: '',
+          core_values: ['Excellence', 'Innovation', 'Integrity', 'Velocity'],
+          tone_ratings: { formal: 60, playful: 20, minimalist: 85, bold: 90 },
+          color_palette: initialPalette,
+          display_font: 'Plus Jakarta Sans',
+          body_font: 'Inter',
+          monospace_font: 'JetBrains Mono',
+          base_font_size: 16,
+          type_scale_ratio: 1.25,
+          clearspace_multiplier: 1.0,
+        },
+      ])
+
       const createdItem: BrandProjectItem = {
         id: data.id,
         name: data.name,
         created_at: data.created_at,
         updated_at: data.updated_at,
+        brand_name: data.name,
         primary_color: '#4f46e5',
       }
 
@@ -148,30 +221,64 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
     }
   },
 
-  deleteProject: async (id) => {
-    if (!supabase) {
-      const filtered = get().projects.filter((p) => p.id !== id)
-      set({ projects: filtered })
-      try {
-        localStorage.setItem('brandio_local_projects', JSON.stringify(filtered))
-      } catch {}
-      return
-    }
-
+  deleteProject: async (id: string, userId?: string) => {
+    const filtered = get().projects.filter((p) => p.id !== id)
+    set({ projects: filtered })
     try {
-      await supabase.from('brand_projects').delete().eq('id', id)
-      set({ projects: get().projects.filter((p) => p.id !== id) })
-    } catch (err) {
-      console.error('Failed to delete project:', err)
+      localStorage.setItem('brandio_local_projects', JSON.stringify(filtered))
+      localStorage.removeItem(`brandio_local_brand_${id}`)
+    } catch {}
+
+    if (supabase) {
+      try {
+        // Delete child brand_data explicitly and then brand_projects
+        await supabase.from('brand_data').delete().eq('project_id', id)
+        const { error } = await supabase.from('brand_projects').delete().eq('id', id)
+        if (error) {
+          console.error('Failed to delete project from Supabase:', error)
+          if (userId) {
+            get().fetchProjects(userId)
+          }
+        }
+      } catch (err) {
+        console.error('Failed to delete project:', err)
+      }
     }
   },
 
-  duplicateProject: async (id) => {
+  duplicateProject: async (id: string, userId?: string) => {
     if (get().isLimitReached()) {
       return
     }
     const source = get().projects.find((p) => p.id === id)
     if (!source) return
-    await get().createProject(`${source.name} (Copy)`)
+
+    const { project } = await get().createProject(`${source.name} (Copy)`, userId)
+    if (!project) return
+
+    // Copy brand_data if available
+    if (supabase && project.id) {
+      try {
+        const { data: sourceData } = await supabase
+          .from('brand_data')
+          .select('*')
+          .eq('project_id', id)
+          .maybeSingle()
+
+        if (sourceData) {
+          const { id: _unusedId, project_id: _unusedProjId, ...rest } = sourceData
+          await supabase
+            .from('brand_data')
+            .update({
+              ...rest,
+              brand_name: `${source.name} (Copy)`,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('project_id', project.id)
+        }
+      } catch (err) {
+        console.warn('Failed to copy full brand data for duplicate:', err)
+      }
+    }
   },
 }))

@@ -272,7 +272,6 @@ export const useBrandStore = create<BrandState>()(
 
       loadPreset: (presetKey) => {
         const preset = PRESET_BRANDS[presetKey]
-        if (!preset) return
         set({
           brandName: preset.brandName,
           tagline: preset.tagline,
@@ -290,7 +289,13 @@ export const useBrandStore = create<BrandState>()(
       },
 
       loadFromProject: async (projectId) => {
-        set({ projectId })
+        set({
+          projectId,
+          svgContent: undefined,
+          rasterDataUri: undefined,
+          logoUrl: undefined,
+        })
+
         // Load cached images from IndexedDB if available
         try {
           const cachedSvg = await idbGet<string>(`brand_svg_${projectId}`)
@@ -301,7 +306,43 @@ export const useBrandStore = create<BrandState>()(
           console.warn('Could not read images from IndexedDB', e)
         }
 
-        if (!supabase) return
+        if (!supabase) {
+          try {
+            const localData = localStorage.getItem(`brandio_local_brand_${projectId}`)
+            if (localData) {
+              const parsed = JSON.parse(localData)
+              set({
+                ...parsed,
+                projectId,
+              })
+              return
+            }
+
+            const localProjects = JSON.parse(
+              localStorage.getItem('brandio_local_projects') || '[]'
+            )
+            const found = localProjects.find((p: any) => p.id === projectId)
+            if (found) {
+              set({
+                projectId,
+                brandName: found.brand_name || found.name || 'Untitled Brand',
+                tagline: '',
+                mission: '',
+                vision: '',
+                coreValues: ['Excellence', 'Innovation', 'Integrity', 'Velocity'],
+                toneRatings: { formal: 60, playful: 20, minimalist: 85, bold: 90 },
+                colorPalette: defaultApex.colors,
+                displayFont: defaultApex.displayFont,
+                bodyFont: defaultApex.bodyFont,
+                monoFont: defaultApex.monoFont,
+                baseFontSize: defaultApex.baseFontSize,
+                typeScaleRatio: defaultApex.typeScaleRatio,
+                clearspaceMultiplier: 1.0,
+              })
+            }
+          } catch {}
+          return
+        }
 
         try {
           const { data, error } = await supabase
@@ -311,13 +352,15 @@ export const useBrandStore = create<BrandState>()(
             .maybeSingle()
 
           if (error) throw error
+
           if (data) {
             set({
+              projectId,
               brandName: data.brand_name || 'Untitled Brand',
               tagline: data.tagline || '',
               mission: data.mission || '',
               vision: data.vision || '',
-              coreValues: data.core_values || [],
+              coreValues: data.core_values || ['Excellence', 'Innovation', 'Integrity', 'Velocity'],
               toneRatings: data.tone_ratings || defaultApex.toneRatings,
               logoUrl: data.logo_url,
               clearspaceMultiplier: Number(data.clearspace_multiplier) || 1.0,
@@ -329,6 +372,33 @@ export const useBrandStore = create<BrandState>()(
               typeScaleRatio: Number(data.type_scale_ratio) || 1.25,
               lastSavedAt: data.updated_at,
             })
+          } else {
+            // If no brand_data row exists yet, retrieve project name from brand_projects
+            const { data: projData } = await supabase
+              .from('brand_projects')
+              .select('name')
+              .eq('id', projectId)
+              .maybeSingle()
+
+            const brandName = projData?.name || 'Untitled Brand'
+
+            set({
+              projectId,
+              brandName,
+              tagline: '',
+              mission: '',
+              vision: '',
+              coreValues: ['Excellence', 'Innovation', 'Integrity', 'Velocity'],
+              toneRatings: { formal: 60, playful: 20, minimalist: 85, bold: 90 },
+              colorPalette: defaultApex.colors,
+              displayFont: defaultApex.displayFont,
+              bodyFont: defaultApex.bodyFont,
+              monoFont: defaultApex.monoFont,
+              baseFontSize: 16,
+              typeScaleRatio: 1.25,
+              clearspaceMultiplier: 1.0,
+              lastSavedAt: new Date().toISOString(),
+            })
           }
         } catch (err) {
           console.warn('Failed to load project from Supabase:', err)
@@ -337,8 +407,27 @@ export const useBrandStore = create<BrandState>()(
 
       saveToSupabase: async () => {
         const state = get()
-        if (!supabase || !state.projectId || state.projectId.startsWith('demo-')) {
+        if (!state.projectId) return
+
+        if (!supabase || state.projectId.startsWith('demo-') || state.projectId.startsWith('project-')) {
           set({ lastSavedAt: new Date().toISOString() })
+          try {
+            localStorage.setItem(`brandio_local_brand_${state.projectId}`, JSON.stringify(state))
+            const localProjects = JSON.parse(
+              localStorage.getItem('brandio_local_projects') || '[]'
+            )
+            const updated = localProjects.map((p: any) =>
+              p.id === state.projectId
+                ? {
+                    ...p,
+                    name: state.brandName,
+                    brand_name: state.brandName,
+                    updated_at: new Date().toISOString(),
+                  }
+                : p
+            )
+            localStorage.setItem('brandio_local_projects', JSON.stringify(updated))
+          } catch {}
           return
         }
 
@@ -369,7 +458,7 @@ export const useBrandStore = create<BrandState>()(
 
           if (error) throw error
 
-          // Also update project updated_at
+          // Also update project updated_at and name
           await supabase
             .from('brand_projects')
             .update({ name: state.brandName, updated_at: new Date().toISOString() })

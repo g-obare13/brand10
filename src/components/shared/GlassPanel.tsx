@@ -7,6 +7,10 @@ import { NoiseTexture } from "@/components/shared/NoiseTexture"
 export interface GlassPanelProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
   /**
+   * Additional classes for the inner content container.
+   */
+  contentClassName?: string
+  /**
    * Backdrop blur level.
    * @default "md"
    */
@@ -70,6 +74,7 @@ export const GlassPanel = React.forwardRef<HTMLDivElement, GlassPanelProps>(
     {
       children,
       className,
+      contentClassName,
       blur = "md",
       backgroundClass = "bg-white/4 dark:bg-black/30",
       borderClass = "border-white/10 dark:border-white/5",
@@ -183,7 +188,9 @@ export const GlassPanel = React.forwardRef<HTMLDivElement, GlassPanelProps>(
 
         {/* Content Container */}
         {children && (
-          <div className="relative z-10 h-full w-full">{children}</div>
+          <div className={cn("relative z-10 h-full w-full", contentClassName)}>
+            {children}
+          </div>
         )}
       </Component>
     )
