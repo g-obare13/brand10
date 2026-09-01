@@ -193,7 +193,7 @@ export const PRESET_BRANDS = {
 }
 
 /**
- * Helper to upload SVG/raster logo directly to Supabase Storage bucket 'brand-assets'
+ * Helper to upload SVG/raster logo directly to Supabase Storage bucket 'brand-logos'
  */
 export async function uploadLogoToSupabase(
   contentOrUri: string,
@@ -206,9 +206,15 @@ export async function uploadLogoToSupabase(
   }
 
   try {
-    const bucket = 'brand-assets'
+    const bucket = 'brand-logos'
     const ext = isSvg ? 'svg' : 'png'
-    const fileName = `${projectId}/${slot}_logo_${Date.now()}.${ext}`
+    
+    // Check if authenticated to satisfy RLS: (storage.foldername(name))[1] = auth.uid()
+    const { data: authData } = await supabase.auth.getUser()
+    const userId = authData?.user?.id
+    const fileName = userId
+      ? `${userId}/${projectId}_${slot}_${Date.now()}.${ext}`
+      : `${projectId}/${slot}_logo_${Date.now()}.${ext}`
 
     let fileBody: Blob
     if (isSvg) {
@@ -549,9 +555,10 @@ export const useBrandStore = create<BrandState>()(
               } catch {}
             }
 
-            if (!secondarySvgContent && data.secondary_logo_url) {
+            const secondaryUrl = data.logo_variants?.secondary_url || data.secondary_logo_url
+            if (!secondarySvgContent && secondaryUrl) {
               try {
-                const res = await fetch(data.secondary_logo_url)
+                const res = await fetch(secondaryUrl)
                 if (res.ok) {
                   secondarySvgContent = await res.text()
                   await idbSet(`brand_secondary_svg_${id}`, secondarySvgContent)
@@ -568,7 +575,7 @@ export const useBrandStore = create<BrandState>()(
               coreValues: data.core_values || ['Excellence', 'Innovation', 'Integrity', 'Velocity'],
               toneRatings: data.tone_ratings || defaultApex.toneRatings,
               logoUrl: data.logo_url,
-              secondaryLogoUrl: data.secondary_logo_url,
+              secondaryLogoUrl: secondaryUrl,
               svgContent,
               secondarySvgContent,
               rasterDataUri: cachedRaster || undefined,
@@ -654,7 +661,9 @@ export const useBrandStore = create<BrandState>()(
             core_values: state.coreValues,
             tone_ratings: state.toneRatings,
             logo_url: state.logoUrl,
-            secondary_logo_url: state.secondaryLogoUrl,
+            logo_variants: {
+              secondary_url: state.secondaryLogoUrl,
+            },
             clearspace_multiplier: state.clearspaceMultiplier,
             color_palette: state.colorPalette,
             display_font: state.displayFont,
