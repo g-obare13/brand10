@@ -1,7 +1,10 @@
 import { useState, useRef, useEffect } from "react"
 import { useBrandStore } from "@/store/brandStore"
-import { extractColorsFromSvg, clusterDistinctColors } from "@/lib/extractor"
-import { createColorSwatch } from "@/lib/colorUtils"
+import {
+  extractColorsFromSvg,
+  clusterDistinctColors,
+  syncExtractedColorsToPalette,
+} from "@/lib/extractor"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -13,7 +16,6 @@ import {
   IconUpload,
   IconTrash,
   IconRefresh,
-  IconPalette,
   IconAlertCircle,
   IconCheck,
   IconSparkles,
@@ -27,8 +29,6 @@ const MAX_SVG_BYTES = 1 * 1024 * 1024 // 1MB
 
 export function StepLogo() {
   const brand = useBrandStore()
-  const primaryColor =
-    brand.colorPalette.find((c) => c.role === "primary")?.hex || "#6366f1"
 
   const [activeSlot, setActiveSlot] = useState<"primary" | "secondary">(
     "primary"
@@ -43,28 +43,34 @@ export function StepLogo() {
   const primaryInputRef = useRef<HTMLInputElement>(null)
   const secondaryInputRef = useRef<HTMLInputElement>(null)
 
-  // Extract up to 2 dominant colors from primary and secondary SVGs
+  // Extract dominant distinct colors from primary and secondary SVGs
   const refreshExtractedColors = async (
     primarySvg?: string | null,
-    secondarySvg?: string | null
+    secondarySvg?: string | null,
+    autoSync = false
   ) => {
     const primaryColors = primarySvg
-      ? await extractColorsFromSvg(primarySvg, 2)
+      ? await extractColorsFromSvg(primarySvg, 4)
       : []
     const secondaryColors = secondarySvg
-      ? await extractColorsFromSvg(secondarySvg, 2)
+      ? await extractColorsFromSvg(secondarySvg, 4)
       : []
 
     const combined = clusterDistinctColors(
       [...primaryColors, ...secondaryColors],
-      4
+      5
     )
     setExtractedColors(combined)
+
+    if (autoSync && combined.length > 0) {
+      const updated = syncExtractedColorsToPalette(combined, brand.colorPalette)
+      brand.setColorPalette(updated)
+    }
   }
 
   useEffect(() => {
     if (brand.svgContent || brand.secondarySvgContent) {
-      refreshExtractedColors(brand.svgContent, brand.secondarySvgContent)
+      refreshExtractedColors(brand.svgContent, brand.secondarySvgContent, false)
     } else {
       setExtractedColors([])
     }
@@ -126,19 +132,19 @@ export function StepLogo() {
         }
       }
 
-      // Save to store and refresh dominant colors
+      // Save to store and refresh dominant colors (auto-sync to palette)
       if (slot === "primary") {
         await brand.setLogoData({
           svgContent: text,
           isVector: true,
           aspectRatio,
         })
-        await refreshExtractedColors(text, brand.secondarySvgContent)
+        await refreshExtractedColors(text, brand.secondarySvgContent, true)
       } else {
         await brand.setSecondaryLogoData({
           svgContent: text,
         })
-        await refreshExtractedColors(brand.svgContent, text)
+        await refreshExtractedColors(brand.svgContent, text, true)
       }
     } catch (err) {
       console.error("SVG Processing Error:", err)
@@ -146,43 +152,6 @@ export function StepLogo() {
     } finally {
       setIsProcessing(false)
     }
-  }
-
-  const handleApplySingleColor = (
-    hex: string,
-    role: "primary" | "secondary" | "accent" | "neutral" | "background"
-  ) => {
-    const existingIndex = brand.colorPalette.findIndex((c) => c.role === role)
-    if (existingIndex >= 0) {
-      brand.updateColorSwatch(brand.colorPalette[existingIndex].id, { hex })
-    } else {
-      brand.addColorSwatch(hex, role)
-    }
-  }
-
-  const handleSyncAllExtractedColors = () => {
-    if (!extractedColors.length) return
-    const roles: Array<
-      "primary" | "secondary" | "accent" | "neutral" | "background"
-    > = ["primary", "secondary", "accent", "neutral", "background"]
-    const updatedPalette = extractedColors.map((hex, index) => {
-      const role = roles[index] || "custom"
-      return createColorSwatch(hex, role)
-    })
-    // Ensure we preserve background and neutral if few colors
-    if (updatedPalette.length < 4) {
-      if (!updatedPalette.some((c) => c.role === "neutral")) {
-        updatedPalette.push(
-          createColorSwatch("#0f172a", "neutral", "Midnight Neutral")
-        )
-      }
-      if (!updatedPalette.some((c) => c.role === "background")) {
-        updatedPalette.push(
-          createColorSwatch("#ffffff", "background", "Clean Canvas")
-        )
-      }
-    }
-    brand.setColorPalette(updatedPalette)
   }
 
   const primarySvgUri = brand.svgContent
@@ -437,25 +406,22 @@ export function StepLogo() {
         </TabsContent>
       </Tabs>
 
-      {/* 3. COLOR EXTRACTION & PALETTE PICKER */}
+      {/* 3. EXTRACTED COLORS PREVIEW */}
       {extractedColors.length > 0 &&
         Boolean(brand.svgContent || brand.secondarySvgContent) && (
-          <div className="space-y-3 rounded-2xl">
+          <div className="space-y-3 rounded-2xl border border-border/70 bg-card/60 p-4 shadow-xs">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
-                <span>Extracted Colors from SVG</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-foreground">
+                  Extracted Colors from SVG
+                </span>
+                <Badge className="border-primary/20 bg-primary/10 py-0 text-[10px] font-semibold text-primary">
+                  Auto-synced
+                </Badge>
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleSyncAllExtractedColors}
-                className="cursor-pointer rounded-full border-primary/30 text-[11px] font-semibold text-primary hover:bg-primary/10"
-                icon={<IconPalette size={13} />}
-                iconPlacement="left"
-              >
-                Sync All to Palette
-              </Button>
+              <span className="text-[11px] text-muted-foreground">
+                Syncs to Color Matrix automatically
+              </span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
@@ -463,10 +429,10 @@ export function StepLogo() {
                 return (
                   <div
                     key={idx}
-                    className="group relative flex flex-col items-center rounded-xl text-center transition-all hover:border-primary/50"
+                    className="group relative flex flex-col items-center rounded-xl border border-border/50 bg-background/50 p-2 text-center transition-all hover:border-primary/40"
                   >
                     <div
-                      className="size-8 rounded-lg shadow-xs transition-transform group-hover:scale-105"
+                      className="size-7 rounded-lg shadow-xs transition-transform group-hover:scale-105"
                       style={{ backgroundColor: hex }}
                     />
                     <span className="mt-1.5 font-mono text-[10px] font-bold text-foreground uppercase">

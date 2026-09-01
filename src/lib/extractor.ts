@@ -22,13 +22,15 @@ function normalizeColor(colorStr: string): string | null {
     cleaned === 'none' ||
     cleaned === 'transparent' ||
     cleaned === 'currentcolor' ||
-    cleaned === 'inherit'
+    cleaned === 'inherit' ||
+    cleaned === 'url' ||
+    cleaned.startsWith('url(')
   ) {
     return null
   }
   try {
     if (chroma.valid(cleaned)) {
-      return chroma(cleaned).hex()
+      return chroma(cleaned).hex().toLowerCase()
     }
   } catch {
     return null
@@ -37,16 +39,15 @@ function normalizeColor(colorStr: string): string | null {
 }
 
 /**
- * Filter out near-white and near-black colors to find vivid brand accents
+ * Filter out pure canvas white or near-invisible colors.
+ * Keeps dark tones (black, dark navy, slate) and vivid colors as they are core logo colors.
  */
-function isInterestingColor(hex: string): boolean {
+function isMeaningfulColor(hex: string): boolean {
   try {
     const color = chroma(hex)
     const lum = color.luminance()
-    const sat = color.get('hsl.s')
-    // Exclude absolute whites/blacks unless no other colors exist
-    if (lum > 0.96 || lum < 0.04) return false
-    if (sat < 0.05 && (lum > 0.9 || lum < 0.1)) return false
+    // Exclude near-pure canvas white (e.g. #ffffff)
+    if (lum > 0.985) return false
     return true
   } catch {
     return false
@@ -56,7 +57,7 @@ function isInterestingColor(hex: string): boolean {
 /**
  * Cluster similar colors together and return top distinct colors
  */
-export function clusterDistinctColors(hexColors: string[], maxCount = 2): string[] {
+export function clusterDistinctColors(hexColors: string[], maxCount = 4): string[] {
   if (!hexColors.length) return []
 
   const distinct: string[] = []
@@ -64,7 +65,7 @@ export function clusterDistinctColors(hexColors: string[], maxCount = 2): string
   for (const hex of hexColors) {
     const isClose = distinct.some((existing) => {
       try {
-        return chroma.deltaE(hex, existing) < 14
+        return chroma.deltaE(hex, existing) < 9
       } catch {
         return false
       }
@@ -80,11 +81,11 @@ export function clusterDistinctColors(hexColors: string[], maxCount = 2): string
 
 /**
  * Dual Path 1: Vector (SVG) Dominant Color Extractor
- * Extracts only the most dominant colors present in the SVG (default max 2)
+ * Extracts dominant distinct colors present in the SVG mark geometry and styles
  */
 export async function extractColorsFromSvg(
   svgText: string,
-  maxCount = 2
+  maxCount = 4
 ): Promise<string[]> {
   if (!svgText) return []
   try {
@@ -94,20 +95,22 @@ export async function extractColorsFromSvg(
 
     const colorCounts = new Map<string, number>()
 
-    const recordColor = (raw: string | null) => {
+    const recordColor = (raw: string | null | undefined, weight = 1) => {
       if (!raw) return
       const hex = normalizeColor(raw)
       if (hex) {
-        colorCounts.set(hex, (colorCounts.get(hex) || 0) + 1)
+        colorCounts.set(hex, (colorCounts.get(hex) || 0) + weight)
       }
     }
 
-    // 1. Traverse all elements and tally color occurrences
+    // 1. Traverse all DOM elements and tally attribute & style colors
     const elements = doc.querySelectorAll('*')
     elements.forEach((el) => {
       recordColor(el.getAttribute('fill'))
       recordColor(el.getAttribute('stroke'))
       recordColor(el.getAttribute('stop-color'))
+      recordColor(el.getAttribute('flood-color'))
+      recordColor(el.getAttribute('color'))
 
       const style = el.getAttribute('style')
       if (style) {
@@ -117,26 +120,88 @@ export async function extractColorsFromSvg(
         if (strokeMatch) recordColor(strokeMatch[1])
         const stopMatch = style.match(/stop-color\s*:\s*([^;]+)/i)
         if (stopMatch) recordColor(stopMatch[1])
+        const colorMatch = style.match(/(?:^|;)\s*color\s*:\s*([^;]+)/i)
+        if (colorMatch) recordColor(colorMatch[1])
       }
     })
 
+    // 2. Parse <style> tags embedded inside the SVG
+    const styleTags = doc.querySelectorAll('style')
+    styleTags.forEach((st) => {
+      const content = st.textContent || ''
+      const colorRegex = /(?:fill|stroke|stop-color|color|background-color)\s*:\s*([^;!}]+)/gi
+      let match: RegExpExecArray | null
+      while ((match = colorRegex.exec(content)) !== null) {
+        recordColor(match[1])
+      }
+    })
+
+    // 3. Fallback regex sweep across SVG raw text to ensure no hex/rgb definitions were missed
+    const hexMatches = svgText.match(/#[0-9a-fA-F]{3,8}\b/g)
+    if (hexMatches) {
+      hexMatches.forEach((h) => recordColor(h, 0.5))
+    }
+    const rgbMatches = svgText.match(/rgba?\([^)]+\)/gi)
+    if (rgbMatches) {
+      rgbMatches.forEach((rgb) => recordColor(rgb, 0.5))
+    }
+
     if (!colorCounts.size) return []
 
-    // 2. Sort colors by frequency/dominance (most used first)
+    // 4. Sort colors by frequency/dominance (most used first)
     const sortedColors = Array.from(colorCounts.entries())
       .sort((a, b) => b[1] - a[1])
       .map(([color]) => color)
 
-    // 3. Separate vivid/saturated brand colors from pure black/white/grays
-    const vividColors = sortedColors.filter(isInterestingColor)
-    const candidateColors = vividColors.length > 0 ? vividColors : sortedColors
+    // 5. Exclude canvas white if other meaningful colors exist
+    const meaningful = sortedColors.filter(isMeaningfulColor)
+    const candidateColors = meaningful.length > 0 ? meaningful : sortedColors
 
-    // 4. Return top distinct dominant colors (no artificial filler colors)
+    // 6. Return top distinct dominant colors
     return clusterDistinctColors(candidateColors, maxCount)
   } catch (err) {
     console.error('Failed to extract SVG colors:', err)
     return []
   }
+}
+
+/**
+ * Synchronize an array of extracted hex colors into a full brand ColorSwatch array
+ */
+export function syncExtractedColorsToPalette(
+  extractedColors: string[],
+  existingPalette: ColorSwatch[] = []
+): ColorSwatch[] {
+  if (!extractedColors.length) return existingPalette
+
+  const roles: Array<'primary' | 'secondary' | 'accent' | 'neutral' | 'background'> = [
+    'primary',
+    'secondary',
+    'accent',
+    'neutral',
+    'background',
+  ]
+
+  const updatedPalette = extractedColors.map((hex, index) => {
+    const role = roles[index] || 'custom'
+    return createColorSwatch(hex, role)
+  })
+
+  // Ensure neutral and background exist
+  if (!updatedPalette.some((c) => c.role === 'neutral')) {
+    const existingNeutral = existingPalette.find((c) => c.role === 'neutral')
+    updatedPalette.push(
+      existingNeutral || createColorSwatch('#0f172a', 'neutral', 'Midnight Neutral')
+    )
+  }
+  if (!updatedPalette.some((c) => c.role === 'background')) {
+    const existingBg = existingPalette.find((c) => c.role === 'background')
+    updatedPalette.push(
+      existingBg || createColorSwatch('#ffffff', 'background', 'Clean Canvas')
+    )
+  }
+
+  return updatedPalette
 }
 
 /**

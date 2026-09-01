@@ -14,7 +14,13 @@ import { StepImagery } from "@/components/wizard/steps/StepImagery"
 import { StepIconography } from "@/components/wizard/steps/StepIconography"
 import { StepSummary } from "@/components/wizard/steps/StepSummary"
 import { Button } from "@/components/ui/button"
+import { Loader } from "@/components/ui/loader"
 import GlassPanel from "@/components/shared/GlassPanel"
+import {
+  extractColorsFromSvg,
+  clusterDistinctColors,
+  syncExtractedColorsToPalette,
+} from "@/lib/extractor"
 import {
   IconArrowLeft,
   IconArrowRight,
@@ -30,6 +36,7 @@ function StudioWizardRoute() {
   const brand = useBrandStore()
   const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(1)
+  const [isSaving, setIsSaving] = useState(false)
 
   const isProjectLoading =
     brand.isLoading || (!!projectId && brand.projectId !== projectId)
@@ -41,16 +48,47 @@ function StudioWizardRoute() {
   }, [projectId, brand.projectId])
 
   const handleNext = async () => {
-    if (isProjectLoading) return
+    if (isProjectLoading || isSaving) return
     if (currentStep < 7) {
-      await brand.saveToSupabase()
-      setCurrentStep((prev) => prev + 1)
-      window.scrollTo({ top: 0, behavior: "smooth" })
+      try {
+        setIsSaving(true)
+        // Automatically sync logo colors to color matrix when leaving Step 2 (Logo step)
+        if (
+          currentStep === 2 &&
+          (brand.svgContent || brand.secondarySvgContent)
+        ) {
+          const primaryColors = brand.svgContent
+            ? await extractColorsFromSvg(brand.svgContent, 4)
+            : []
+          const secondaryColors = brand.secondarySvgContent
+            ? await extractColorsFromSvg(brand.secondarySvgContent, 4)
+            : []
+          const combined = clusterDistinctColors(
+            [...primaryColors, ...secondaryColors],
+            5
+          )
+          if (combined.length > 0) {
+            const updatedPalette = syncExtractedColorsToPalette(
+              combined,
+              brand.colorPalette
+            )
+            brand.setColorPalette(updatedPalette)
+          }
+        }
+
+        await brand.saveToSupabase()
+        setCurrentStep((prev) => prev + 1)
+        window.scrollTo({ top: 0, behavior: "smooth" })
+      } catch (err) {
+        console.error("Failed to advance wizard step:", err)
+      } finally {
+        setIsSaving(false)
+      }
     }
   }
 
   const handleBack = () => {
-    if (isProjectLoading) return
+    if (isProjectLoading || isSaving) return
     if (currentStep > 1) {
       setCurrentStep((prev) => prev - 1)
       window.scrollTo({ top: 0, behavior: "smooth" })
@@ -104,15 +142,15 @@ function StudioWizardRoute() {
                   {currentStep === 7 && <StepSummary projectId={projectId} />}
                 </div>
 
-                {/* Bottom Step Actions */}
+                {/* Bottom Step Actions - Pinned to bottom of the card */}
                 {currentStep < 7 && (
-                  <div className="mt-8 flex items-center justify-between pt-5">
+                  <div className="mt-auto flex items-center justify-between border-t border-border/40 pt-6">
                     <Button
                       variant="outline"
                       size="pill"
                       gsapFill
                       onClick={handleBack}
-                      disabled={currentStep === 1 || isProjectLoading}
+                      disabled={currentStep === 1 || isProjectLoading || isSaving}
                       className="cursor-pointer rounded-full px-4 text-xs font-semibold disabled:opacity-30"
                       icon={<IconArrowLeft size={14} />}
                       iconPlacement="left"
@@ -126,7 +164,7 @@ function StudioWizardRoute() {
                         size="pill"
                         gsapFill
                         onClick={handleSkipToStudio}
-                        disabled={isProjectLoading}
+                        disabled={isProjectLoading || isSaving}
                         className="cursor-pointer rounded-full px-4 text-xs font-semibold text-muted-foreground hover:text-foreground disabled:opacity-30"
                       >
                         Skip Step
@@ -137,10 +175,12 @@ function StudioWizardRoute() {
                         size="pill"
                         gsapFill
                         onClick={handleNext}
-                        disabled={isProjectLoading}
+                        disabled={isProjectLoading || isSaving}
                         className="cursor-pointer rounded-full px-6 text-xs font-semibold disabled:opacity-30"
                         icon={
-                          currentStep === 6 ? (
+                          isSaving ? (
+                            <Loader size="sm" />
+                          ) : currentStep === 6 ? (
                             <IconSparkles size={14} />
                           ) : (
                             <IconArrowRight size={14} />
@@ -148,7 +188,11 @@ function StudioWizardRoute() {
                         }
                         iconPlacement="right"
                       >
-                        {currentStep === 6 ? "Generate Identity" : "Continue"}
+                        {isSaving
+                          ? "Saving..."
+                          : currentStep === 6
+                            ? "Generate Identity"
+                            : "Continue"}
                       </Button>
                     </div>
                   </div>
