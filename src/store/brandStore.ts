@@ -211,7 +211,7 @@ export async function uploadLogoToSupabase(
     
     // Check if authenticated to satisfy RLS: (storage.foldername(name))[1] = auth.uid()
     const { data: authData } = await supabase.auth.getUser()
-    const userId = authData?.user?.id
+    const userId = authData.user?.id
     const fileName = userId
       ? `${userId}/${projectId}_${slot}_${Date.now()}.${ext}`
       : `${projectId}/${slot}_logo_${Date.now()}.${ext}`
@@ -237,7 +237,7 @@ export async function uploadLogoToSupabase(
     }
 
     const { data } = supabase.storage.from(bucket).getPublicUrl(fileName)
-    return data?.publicUrl || null
+    return data.publicUrl || null
   } catch (err) {
     console.warn('Failed to upload logo to Supabase storage:', err)
     return null
@@ -466,7 +466,7 @@ export const useBrandStore = create<BrandState>()(
       setActiveTab: (tab) => set({ activeTab: tab }),
 
       loadPreset: (presetName) => {
-        const preset = PRESET_BRANDS[presetName] || defaultApex
+        const preset = PRESET_BRANDS[presetName]
         set({
           brandName: preset.brandName,
           tagline: preset.tagline,
