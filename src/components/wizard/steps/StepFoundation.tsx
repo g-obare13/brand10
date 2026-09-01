@@ -10,6 +10,49 @@ import WordReveal from "@/components/shared/WordReveal"
 import { animateFadeUp } from "@/lib/gsap-animations"
 import { gsap } from "gsap"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
+import { XCircle } from "@boxicons/react"
+import GlassPanel from "@/components/shared/GlassPanel"
+
+export function StepFoundationSkeleton() {
+  return (
+    <div className="animate-pulse space-y-6">
+      <div className="space-y-2">
+        <Skeleton className="h-8 w-56 rounded-xl" />
+      </div>
+
+      <div className="space-y-5">
+        {/* Brand Name Skeleton */}
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-40 rounded-md" />
+          <Skeleton className="h-10 w-full rounded-xl" />
+        </div>
+
+        {/* Movement Badges Skeleton */}
+        <div className="space-y-2.5 pt-1">
+          <Skeleton className="h-4 w-36 rounded-md" />
+          <div className="flex flex-wrap gap-2">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Skeleton key={i} className="h-9 w-28 rounded-full" />
+            ))}
+          </div>
+        </div>
+
+        {/* Mission Skeleton */}
+        <div className="space-y-2 pt-1">
+          <Skeleton className="h-4 w-28 rounded-md" />
+          <Skeleton className="h-20 w-full rounded-xl" />
+        </div>
+
+        {/* Vision Skeleton */}
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-28 rounded-md" />
+          <Skeleton className="h-20 w-full rounded-xl" />
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export function StepFoundation() {
   const brand = useBrandStore()
@@ -20,17 +63,15 @@ export function StepFoundation() {
   const xTo = useRef<((val: number) => void) | null>(null)
   const yTo = useRef<((val: number) => void) | null>(null)
 
-  // Track selected movement id
-  const [selectedMovementId, setSelectedMovementId] = useState<string | null>(
-    () => {
-      const match = DESIGN_MOVEMENTS.find((m) =>
-        Object.entries(m.tones).every(
-          ([k, v]) => brand.toneRatings[k as keyof BrandToneRatings] === v
-        )
+  // Track selected movement id from store with fallback to tone matching
+  const selectedMovementId =
+    brand.designMovement ??
+    DESIGN_MOVEMENTS.find((m) =>
+      Object.entries(m.tones).every(
+        ([k, v]) => brand.toneRatings[k as keyof BrandToneRatings] === v
       )
-      return match ? match.id : null
-    }
-  )
+    )?.id ??
+    null
 
   useEffect(() => {
     if (floatingRef.current) {
@@ -73,32 +114,43 @@ export function StepFoundation() {
 
   const handleToggleMovement = (movement: DesignMovement) => {
     if (selectedMovementId === movement.id) {
-      setSelectedMovementId(null)
+      brand.setDesignMovement(null)
     } else {
-      setSelectedMovementId(movement.id)
+      brand.setDesignMovement(movement.id)
       Object.entries(movement.tones).forEach(([key, val]) => {
         brand.setToneRating(key as keyof BrandToneRatings, val)
       })
     }
   }
 
+  if (brand.isLoading) {
+    return <StepFoundationSkeleton />
+  }
+
   return (
-    <div
+    <GlassPanel
+      blur="none"
+      noise
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="relative space-y-6"
+      noiseOpacity={0.02}
+      className="relative flex h-full items-center justify-center space-y-6"
     >
       {/* Title Header */}
-      <div className="space-y-2">
-        <WordReveal as="h2" stagger={0.03} duration={1.2} start="top 90%">
-          {brand.brandName || "Strategic Foundation"}
-        </WordReveal>
-      </div>
+      <WordReveal
+        as="h2"
+        stagger={0.03}
+        duration={1.2}
+        start="top 90%"
+        className="mb-2"
+      >
+        {brand.brandName || "Strategic Foundation"}
+      </WordReveal>
 
-      <div className="space-y-5">
+      <div className="space-y-6">
         {/* Brand Name Input */}
         <div className="foundation-item space-y-2">
-          <Label>Brand Workspace Name *</Label>
+          <Label>Brand Workspace Name</Label>
           <Input
             value={brand.brandName}
             onChange={(e) => brand.setBrandName(e.target.value)}
@@ -121,7 +173,10 @@ export function StepFoundation() {
                 <Badge
                   key={movement.id}
                   variant={isSelected ? "default" : "outline"}
+                  className="cursor-pointer rounded-full! transition-all select-none"
                   onClick={() => handleToggleMovement(movement)}
+                  icon={isSelected ? <XCircle /> : null}
+                  showDivider={true}
                   onMouseEnter={() => {
                     setHoveredIndex(index)
                     if (floatingRef.current) {
@@ -145,7 +200,6 @@ export function StepFoundation() {
                       })
                     }
                   }}
-                  className="cursor-pointer rounded-full! p-4! text-foreground transition-all select-none hover:scale-105"
                 >
                   {movement.label}
                 </Badge>
@@ -216,6 +270,6 @@ export function StepFoundation() {
           ))}
         </div>
       </div>
-    </div>
+    </GlassPanel>
   )
 }

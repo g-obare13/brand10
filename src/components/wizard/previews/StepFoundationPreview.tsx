@@ -1,6 +1,107 @@
-import GlassPanel from "@/components/shared/GlassPanel"
 import { DESIGN_MOVEMENTS } from "@/data/wizard"
 import { useBrandStore } from "@/store/brandStore"
+import { getPreviewTheme } from "./previewTheme"
+import type { PreviewStyleConfig } from "./previewTheme"
+import { Skeleton } from "@/components/ui/skeleton"
+import {
+  MovementClaimableBalance,
+  MovementNewMilestone,
+} from "./FoundationDemoCards"
+import GlassPanel from "@/components/shared/GlassPanel"
+import { Badge } from "@/components/ui/badge"
+import { Circle } from "@boxicons/react"
+
+export function StepFoundationPreviewSkeleton({
+  theme,
+}: {
+  theme: PreviewStyleConfig
+}) {
+  return (
+    <div className={theme.container}>
+      {/* 1. Hero Identity Skeleton */}
+      <div className={theme.heroCard}>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-6 w-32 rounded-full" />
+            <Skeleton className="h-5 w-20 rounded-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-2/3 rounded-xl" />
+            <Skeleton className="h-4 w-5/6 rounded-md" />
+            <Skeleton className="h-4 w-1/2 rounded-md" />
+          </div>
+          <div className="flex items-center gap-2 pt-1">
+            <Skeleton className="h-3 w-12 rounded-md" />
+            <Skeleton className="h-3 w-48 rounded-md" />
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Mission & Vision Dual Tiles Skeleton */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className={theme.tileCard}>
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-4 w-24 rounded-md" />
+            <Skeleton className="h-4 w-16 rounded-full" />
+          </div>
+          <div className="space-y-2 py-2">
+            <Skeleton className="h-4 w-full rounded-md" />
+            <Skeleton className="h-4 w-4/5 rounded-md" />
+          </div>
+          <Skeleton className="h-3 w-24 rounded-md" />
+        </div>
+
+        <div className={theme.tileCard}>
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-4 w-24 rounded-md" />
+            <Skeleton className="h-4 w-16 rounded-full" />
+          </div>
+          <div className="space-y-2 py-2">
+            <Skeleton className="h-4 w-full rounded-md" />
+            <Skeleton className="h-4 w-4/5 rounded-md" />
+          </div>
+          <Skeleton className="h-3 w-24 rounded-md" />
+        </div>
+      </div>
+
+      {/* 3. Live UI Component Demos Skeleton */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className={theme.interactiveCard}>
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-4 w-28 rounded-md" />
+            <Skeleton className="h-5 w-20 rounded-full" />
+          </div>
+          <Skeleton className="h-10 w-40 rounded-xl" />
+          <div className="space-y-2 pt-2">
+            <Skeleton className="h-3 w-full rounded-md" />
+            <Skeleton className="h-3 w-full rounded-md" />
+            <Skeleton className="h-3 w-full rounded-md" />
+          </div>
+          <Skeleton className="h-9 w-full rounded-xl" />
+        </div>
+
+        <div className={theme.interactiveCard}>
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-4 w-28 rounded-md" />
+            <Skeleton className="h-5 w-16 rounded-full" />
+          </div>
+          <Skeleton className="h-5 w-44 rounded-md" />
+          <div className="space-y-2 pt-1">
+            <Skeleton className="h-8 w-full rounded-xl" />
+            <div className="grid grid-cols-2 gap-2">
+              <Skeleton className="h-8 w-full rounded-xl" />
+              <Skeleton className="h-8 w-full rounded-xl" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            <Skeleton className="h-9 w-full rounded-xl" />
+            <Skeleton className="h-9 w-full rounded-xl" />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export function StepFoundationPreview() {
   const brand = useBrandStore()
@@ -8,153 +109,94 @@ export function StepFoundationPreview() {
   const primaryColor =
     brand.colorPalette.find((c) => c.role === "primary")?.hex || "#6366f1"
 
-  const monogramLetter = (brand.brandName || "Brand").charAt(0).toUpperCase()
+  // Determine active movement id from store or tone matching fallback
+  const activeMovement =
+    (brand.designMovement
+      ? DESIGN_MOVEMENTS.find((m) => m.id === brand.designMovement)
+      : null) ||
+    DESIGN_MOVEMENTS.find((m) =>
+      Object.entries(m.tones).every(
+        ([k, v]) => brand.toneRatings[k as keyof typeof brand.toneRatings] === v
+      )
+    ) ||
+    DESIGN_MOVEMENTS[0]
 
-  // Find active movement if tone ratings match
-  const activeMovement = DESIGN_MOVEMENTS.find((m) =>
-    Object.entries(m.tones).every(
-      ([k, v]) => brand.toneRatings[k as keyof typeof brand.toneRatings] === v
-    )
-  )
+  const theme = getPreviewTheme(activeMovement.id)
 
-  const toneMetrics = [
-    {
-      label: "Formal",
-      left: "Casual",
-      right: "Formal",
-      val: brand.toneRatings.formal,
-    },
-    {
-      label: "Playful",
-      left: "Serious",
-      right: "Playful",
-      val: brand.toneRatings.playful,
-    },
-    {
-      label: "Minimalist",
-      left: "Ornate",
-      right: "Minimal",
-      val: brand.toneRatings.minimalist,
-    },
-    {
-      label: "Bold",
-      left: "Subtle",
-      right: "Disruptive",
-      val: brand.toneRatings.bold,
-    },
-  ]
+  if (brand.isLoading) {
+    return <StepFoundationPreviewSkeleton theme={theme} />
+  }
 
   return (
-    <div className="space-y-4">
+    <div className={theme.container}>
       {/* 1. Brand Workspace Hero Identity Tile */}
       <GlassPanel
         blur="none"
         noise
         noiseOpacity={0.02}
-        className="relative overflow-hidden rounded-3xl border border-border/80 bg-card/90 p-6 shadow-sm"
+        className={theme.heroCard}
       >
-        <div
-          className="pointer-events-none absolute -top-12 -right-12 size-48 rounded-full opacity-30 blur-3xl transition-all duration-500"
-          style={{ backgroundColor: primaryColor }}
-        />
+        {/* Glow / Backdrop Accent */}
+        {theme.heroGlow !== "hidden" && (
+          <div
+            className={theme.heroGlow}
+            style={{ backgroundColor: primaryColor }}
+          />
+        )}
 
         <div className="relative z-10 space-y-4">
-          <div>
-            <h2
-              className="text-2xl font-bold tracking-tight text-foreground transition-all sm:text-3xl"
-              style={{ fontFamily: `"${brand.displayFont}", sans-serif` }}
-            >
-              {brand.brandName || "Your Brand Workspace"}
-            </h2>
-            <p>
-              {activeMovement
-                ? activeMovement.vibe
-                : "Configure your core brand essence, mission, and calibrated tones."}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <Badge className={theme.badge} showDivider={true} icon={<Circle />}>
+              {activeMovement.label} Style
+            </Badge>
+            <span className={theme.accentPill}>{activeMovement.badge}</span>
+          </div>
+
+          <div className="space-y-1.5">
+            <h2>{brand.brandName || "Your Brand Workspace"}</h2>
+            <p className="max-w-xl">
+              {activeMovement.vibe ||
+                "Configure your core brand essence, mission, and calibrated tones."}
             </p>
           </div>
         </div>
       </GlassPanel>
 
-      {/* 2. Tone Calibration Matrix */}
-      <GlassPanel
-        blur="none"
-        noise
-        noiseOpacity={0.02}
-        className="space-y-4 rounded-3xl border border-border/80 bg-card/90 p-5 shadow-sm"
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center py-2">
-            <span className="font-heading">
-              Calibrated Brand Voice &amp; Tones
-            </span>
-          </div>
-          <span className="text-xs text-foreground">
-            {activeMovement ? activeMovement.label : "Custom Tone Balance"}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {toneMetrics.map((metric) => (
-            <div
-              key={metric.label}
-              className="space-y-2 rounded-xl border border-border/60 bg-muted/30 p-3"
-            >
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-foreground">{metric.label}</span>
-                <span className="font-medium text-primary">{metric.val}%</span>
-              </div>
-              <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-border/60">
-                <div
-                  className="h-full rounded-full bg-primary transition-all duration-500"
-                  style={{ width: `${metric.val}%` }}
-                />
-              </div>
-              <div className="flex justify-between text-xs text-foreground">
-                <span>{metric.left}</span>
-                <span>{metric.right}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </GlassPanel>
-
-      {/* 3. Mission & Vision Statement Dual Tiles */}
+      {/* 2. Mission & Vision Statement Dual Tiles */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {/* Mission Preview */}
-        <GlassPanel
-          blur="none"
-          noise
-          noiseOpacity={0.02}
-          className="flex flex-col justify-between space-y-2.5 rounded-3xl border border-border/80 bg-card/90 p-5 shadow-sm"
-        >
-          <div className="flex items-center gap-2">
-            <span className="font-heading">Brand Mission</span>
-          </div>
-          <p className="text-foreground/90">
-            "
-            {brand.mission ||
-              "Define the fundamental problem your brand solves for the world."}
-            "
-          </p>
-        </GlassPanel>
-
-        {/* Vision Preview */}
-        <GlassPanel
-          blur="none"
-          noise
-          noiseOpacity={0.02}
-          className="flex flex-col justify-between space-y-2.5 rounded-3xl border border-border/80 bg-card/90 p-5 shadow-sm"
-        >
-          <div className="flex items-center gap-2">
-            <span className="font-heading">Brand Vision</span>
+        <div className={theme.tileCard}>
+          <div className="flex items-center justify-between">
+            <span className="font-medium">Brand Mission</span>
+            <Badge className={theme.badge}>Core Purpose</Badge>
           </div>
           <p>
-            "
+            &ldquo;
+            {brand.mission ||
+              "Define the fundamental problem your brand solves for the world."}
+            &rdquo;
+          </p>
+        </div>
+
+        {/* Vision Preview */}
+        <div className={theme.tileCard}>
+          <div className="flex items-center justify-between">
+            <span className="font-medium">Brand Vision</span>
+            <Badge className={theme.badge}>Long Horizon</Badge>
+          </div>
+          <p>
+            &ldquo;
             {brand.vision ||
               "Define the future world your brand is actively shaping over the next decade."}
-            "
+            &rdquo;
           </p>
-        </GlassPanel>
+        </div>
+      </div>
+
+      {/* 3. Live UI Component Theme Simulation */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <MovementClaimableBalance theme={theme} primaryColor={primaryColor} />
+        <MovementNewMilestone theme={theme} primaryColor={primaryColor} />
       </div>
     </div>
   )

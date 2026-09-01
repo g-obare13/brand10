@@ -27,6 +27,7 @@ export interface BrandState {
   vision: string
   coreValues: string[]
   toneRatings: BrandToneRatings
+  designMovement?: string
 
   // Logo System
   logoUrl?: string
@@ -72,6 +73,7 @@ export interface BrandState {
   addCoreValue: (val: string) => void
   removeCoreValue: (index: number) => void
   setToneRating: (key: keyof BrandToneRatings, value: number) => void
+  setDesignMovement: (movementId: string | null) => void
 
   // Logo actions
   setLogoData: (data: {
@@ -194,6 +196,7 @@ export const useBrandStore = create<BrandState>()(
       vision: '',
       coreValues: ['Excellence', 'Innovation', 'Integrity', 'Velocity'],
       toneRatings: { formal: 60, playful: 20, minimalist: 85, bold: 90 },
+      designMovement: 'semi-flat',
 
       // Logo
       isVector: true,
@@ -246,6 +249,9 @@ export const useBrandStore = create<BrandState>()(
       },
       setToneRating: (key, value) => {
         set({ toneRatings: { ...get().toneRatings, [key]: value } })
+      },
+      setDesignMovement: (movementId) => {
+        set({ designMovement: movementId || undefined })
       },
 
       setLogoData: async ({ svgContent, rasterDataUri, isVector, aspectRatio, logoUrl }) => {
