@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { IconCheck } from "@tabler/icons-react"
 import { toast } from "sonner"
 import { ColorInfoDialog } from "./ColorInfoDialog"
+import { cn } from "@/lib/utils"
 
 const SHADE_KEYS = [
   "50",
@@ -287,8 +288,21 @@ export function StepColorsPreview() {
         blur="none"
         noise
         noiseOpacity={0.02}
-        className="preview-card-anim flex space-y-8 rounded-3xl bg-card/90 p-6"
+        className={cn(
+          "preview-card-anim relative flex flex-col space-y-8 overflow-hidden",
+          theme.heroCard
+        )}
       >
+        {/* Ambient Glow */}
+        {theme.heroGlow !== "hidden" && (
+          <div
+            className={theme.heroGlow}
+            style={{
+              backgroundColor: primary.hex,
+            }}
+          />
+        )}
+
         {/* Dominant Color 1 (Primary) Monochrome Scale */}
         <ColorShadeScaleRow
           label={primaryName}

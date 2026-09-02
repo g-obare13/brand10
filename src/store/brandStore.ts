@@ -49,6 +49,8 @@ export interface BrandState {
   monoFont: string
   baseFontSize: number
   typeScaleRatio: number
+  customFonts?: { family: string; url: string; target: 'display' | 'body' }[]
+  stagedFontFiles?: { file: File; family: string; target: 'display' | 'body' }[]
 
   // Imagery & Photography System
   imageryMood: 'minimal' | 'cinematic' | 'vibrant' | 'editorial'
@@ -108,7 +110,11 @@ export interface BrandState {
     monoFont?: string
     baseFontSize?: number
     typeScaleRatio?: number
+    customFonts?: { family: string; url: string; target: 'display' | 'body' }[]
   }) => void
+  addCustomFont: (font: { family: string; url: string; target: 'display' | 'body' }) => void
+  stageFontFile: (staged: { file: File; family: string; target: 'display' | 'body' }) => void
+  uploadStagedFonts: () => Promise<void>
 
   // Imagery actions
   setImagery: (updates: {
@@ -243,6 +249,51 @@ export async function uploadLogoToSupabase(
     return null
   }
 }
+
+/**
+ * Helper to upload custom font files (woff2, woff, ttf, otf) directly to Supabase Storage bucket 'brand-fonts'
+ */
+export async function uploadCustomFontToSupabase(
+  file: File,
+  projectId: string,
+  fontFamily: string
+): Promise<string | null> {
+  if (!supabase || !projectId || projectId.startsWith('demo-') || projectId === 'current') {
+    return null
+  }
+
+  try {
+    const bucket = 'brand-fonts'
+    const ext = file.name.split('.').pop()?.toLowerCase() || 'woff2'
+    const cleanFamily = fontFamily.toLowerCase().replace(/[^a-z0-9]/g, '_')
+    
+    // Check if authenticated to satisfy RLS: (storage.foldername(name))[1] = auth.uid()
+    const { data: authData } = await supabase.auth.getUser()
+    const userId = authData.user?.id
+    const fileName = userId
+      ? `${userId}/${projectId}_font_${cleanFamily}_${Date.now()}.${ext}`
+      : `${projectId}/font_${cleanFamily}_${Date.now()}.${ext}`
+
+    const { error: uploadError } = await supabase.storage
+      .from(bucket)
+      .upload(fileName, file, {
+        contentType: file.type || 'font/woff2',
+        upsert: true,
+      })
+
+    if (uploadError) {
+      console.warn(`Supabase Storage upload to '${bucket}' returned:`, uploadError.message)
+      return null
+    }
+
+    const { data } = supabase.storage.from(bucket).getPublicUrl(fileName)
+    return data.publicUrl || null
+  } catch (err) {
+    console.warn('Failed to upload custom font to Supabase storage:', err)
+    return null
+  }
+}
+
 
 const defaultApex = PRESET_BRANDS.apex
 
@@ -445,7 +496,48 @@ export const useBrandStore = create<BrandState>()(
           monoFont: updates.monoFont || state.monoFont,
           baseFontSize: updates.baseFontSize || state.baseFontSize,
           typeScaleRatio: updates.typeScaleRatio || state.typeScaleRatio,
+          customFonts: updates.customFonts || state.customFonts,
         }))
+      },
+
+      addCustomFont: (font) => {
+        set((state) => {
+          const current = state.customFonts || []
+          const filtered = current.filter((f) => f.family !== font.family)
+          return {
+            customFonts: [...filtered, font],
+            ...(font.target === 'display' ? { displayFont: font.family } : { bodyFont: font.family }),
+          }
+        })
+      },
+
+      stageFontFile: (staged) => {
+        set((state) => {
+          const current = state.stagedFontFiles || []
+          const filtered = current.filter((f) => f.family !== staged.family)
+          return {
+            stagedFontFiles: [...filtered, staged],
+            ...(staged.target === 'display' ? { displayFont: staged.family } : { bodyFont: staged.family }),
+          }
+        })
+      },
+
+      uploadStagedFonts: async () => {
+        const state = get()
+        if (!state.stagedFontFiles || state.stagedFontFiles.length === 0) return
+        if (!state.projectId || state.projectId.startsWith('demo-') || state.projectId === 'current') return
+
+        for (const staged of state.stagedFontFiles) {
+          const publicUrl = await uploadCustomFontToSupabase(staged.file, state.projectId, staged.family)
+          if (publicUrl) {
+            get().addCustomFont({
+              family: staged.family,
+              url: publicUrl,
+              target: staged.target,
+            })
+          }
+        }
+        set({ stagedFontFiles: [] })
       },
 
       setImagery: (updates) => {
@@ -587,6 +679,7 @@ export const useBrandStore = create<BrandState>()(
               monoFont: data.monospace_font || defaultApex.monoFont,
               baseFontSize: Number(data.base_font_size) || 16,
               typeScaleRatio: Number(data.type_scale_ratio) || 1.25,
+              customFonts: data.logo_variants?.custom_fonts || [],
               lastSavedAt: data.updated_at,
               isLoading: false,
             })
@@ -669,6 +762,7 @@ export const useBrandStore = create<BrandState>()(
             logo_url: state.logoUrl,
             logo_variants: {
               secondary_url: state.secondaryLogoUrl,
+              custom_fonts: state.customFonts || [],
             },
             clearspace_multiplier: state.clearspaceMultiplier,
             color_palette: state.colorPalette,

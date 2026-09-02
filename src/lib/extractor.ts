@@ -231,7 +231,7 @@ export async function extractColorsFromRaster(imageSrc: string): Promise<string[
           }
           return chroma(colorItem).hex()
         })
-        const interestingColors = hexColors.filter(isInterestingColor)
+        const interestingColors = hexColors.filter(isMeaningfulColor)
         const candidateColors = interestingColors.length > 0 ? interestingColors : hexColors
         resolve(clusterDistinctColors(candidateColors, 5))
       } catch (err) {

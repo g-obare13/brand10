@@ -3,8 +3,9 @@ import { useBrandStore } from "@/store/brandStore"
 import { generateTonalShades } from "@/lib/colorUtils"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { IconShieldCheck } from "@tabler/icons-react"
+import { IconShieldCheck, IconSparkles } from "@tabler/icons-react"
 import WordReveal from "@/components/shared/WordReveal"
+import { DESIGN_MOVEMENTS } from "@/data/wizard"
 import { gsap } from "gsap"
 import chroma from "chroma-js"
 
@@ -18,6 +19,17 @@ export function StepColors() {
   const secondarySwatch =
     brand.colorPalette.find((c) => c.role === "secondary") ||
     brand.colorPalette[1]
+
+  const activeMovement =
+    (brand.designMovement
+      ? DESIGN_MOVEMENTS.find((m) => m.id === brand.designMovement)
+      : null) ||
+    DESIGN_MOVEMENTS.find((m) =>
+      Object.entries(m.tones).every(
+        ([k, v]) => brand.toneRatings[k as keyof typeof brand.toneRatings] === v
+      )
+    ) ||
+    DESIGN_MOVEMENTS[0]
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -51,15 +63,21 @@ export function StepColors() {
   return (
     <div ref={containerRef} className="space-y-6">
       <div className="space-y-1">
-        <WordReveal
-          as="h4"
-          stagger={0.03}
-          duration={1.2}
-          disableScrollTrigger={true}
-          className="mb-2"
-        >
-          Palette &amp; Accessibility Scale
-        </WordReveal>
+        <div className="flex items-center justify-between">
+          <WordReveal
+            as="h4"
+            stagger={0.03}
+            duration={1.2}
+            disableScrollTrigger={true}
+            className="mb-2"
+          >
+            Palette &amp; Accessibility Scale
+          </WordReveal>
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+            <span className="size-1.5 rounded-full bg-primary animate-pulse" />
+            <span>{activeMovement.label}</span>
+          </div>
+        </div>
         <WordReveal
           as="p"
           stagger={0.03}
@@ -140,6 +158,26 @@ export function StepColors() {
                   className="h-8 rounded-lg font-mono text-xs uppercase"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Style Guidance Micro-Tip */}
+          <div className="colors-item-anim flex items-start gap-2.5 rounded-xl border border-border/70 bg-muted/30 p-3 text-[11px] text-muted-foreground">
+            <IconSparkles size={14} className="mt-0.5 shrink-0 text-primary" />
+            <div>
+              <span className="mr-1 font-semibold text-foreground">
+                {activeMovement.label} Style:
+              </span>
+              {activeMovement.id === "minimalism" &&
+                "Minimalism thrives on quiet, muted palettes with high contrast against spacious canvas backgrounds."}
+              {activeMovement.id === "neo-brutalism" &&
+                "Neo-brutalism works best with bold, saturated primary accents paired with stark high-contrast boundaries."}
+              {activeMovement.id === "neumorphism" &&
+                "Neumorphism relies on gentle, low-contrast tonal steps to simulate soft physical extrusion and indentations."}
+              {activeMovement.id === "maximalism" &&
+                "Maximalism embraces hyper-vibrant saturation, energetic secondary accents, and vivid contrast."}
+              {activeMovement.id === "semi-flat" &&
+                "Clean, balanced primary and secondary tones offer maximum clarity and interface readability across modern devices."}
             </div>
           </div>
         </div>

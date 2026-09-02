@@ -103,18 +103,42 @@ export const MODULAR_SCALES = [
 /**
  * Inject Google Font into DOM <head> dynamically if not already loaded
  */
-export function loadGoogleFont(fontFamily: string): void {
+export function loadGoogleFont(fontFamily: string, variants?: string[]): void {
   if (typeof document === 'undefined' || !fontFamily) return
 
-  const fontSlug = fontFamily.replace(/\s+/g, '+')
-  const elementId = `google-font-${fontFamily.toLowerCase().replace(/[^a-z0-9]/g, '-')}`
+  const cleanFamily = fontFamily.trim()
+  const fontSlug = cleanFamily.replace(/\s+/g, '+')
+  const elementId = `google-font-${cleanFamily.toLowerCase().replace(/[^a-z0-9]/g, '-')}`
 
   if (document.getElementById(elementId)) return
 
   const link = document.createElement('link')
   link.id = elementId
   link.rel = 'stylesheet'
-  link.href = `https://fonts.googleapis.com/css2?family=${fontSlug}:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap`
+  link.crossOrigin = 'anonymous'
+
+  // If specific variants are known, build custom weight string, otherwise use safe fallback
+  if (variants && variants.length > 0) {
+    const numericWeights = variants
+      .map((v) => (v === 'regular' ? '400' : v.replace(/italic/, '')))
+      .filter((v) => /^\d+$/.test(v))
+      .sort((a, b) => Number(a) - Number(b))
+    const uniqueWeights = Array.from(new Set(numericWeights))
+
+    if (uniqueWeights.length > 0) {
+      link.href = `https://fonts.googleapis.com/css2?family=${fontSlug}:wght@${uniqueWeights.join(';')}&display=swap`
+    } else {
+      link.href = `https://fonts.googleapis.com/css2?family=${fontSlug}&display=swap`
+    }
+  } else {
+    // Default standard request without hardcoded weight constraints that cause 400s
+    link.href = `https://fonts.googleapis.com/css2?family=${fontSlug}:wght@400;500;600;700&display=swap`
+    link.onerror = () => {
+      // If weight range doesn't exist for this font, load without constraints
+      link.href = `https://fonts.googleapis.com/css2?family=${fontSlug}&display=swap`
+    }
+  }
+
   document.head.appendChild(link)
 }
 

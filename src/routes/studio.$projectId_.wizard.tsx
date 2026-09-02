@@ -76,6 +76,11 @@ function StudioWizardRoute() {
           }
         }
 
+        // Upload any staged custom fonts to Supabase when leaving Step 4 (Typography step)
+        if (currentStep === 4 && brand.stagedFontFiles && brand.stagedFontFiles.length > 0) {
+          await brand.uploadStagedFonts()
+        }
+
         await brand.saveToSupabase()
         setCurrentStep((prev) => prev + 1)
         window.scrollTo({ top: 0, behavior: "smooth" })
