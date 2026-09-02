@@ -8,14 +8,14 @@ import {
 import { GeneralErrorComponent } from "@/components/shared/ErrorComponent"
 import { NotFoundComponent } from "@/components/shared/NotFoundComponent"
 import { ThemeProvider } from "@/components/shared/theme-provider"
-// import { initConsole } from "@/lib/console"
+import { initConsole } from "@/lib/console"
 import { supabase } from "@/lib/supabase"
 import { useAuthStore } from "@/store/authStore"
 import { Toaster } from "sonner"
 import "sonner/dist/styles.css"
 import appCss from "../styles.css?url"
 
-// initConsole()
+initConsole()
 
 /** Routes that do NOT require authentication */
 export const PUBLIC_ROUTES = ["/", "/login", "/auth/callback"]
