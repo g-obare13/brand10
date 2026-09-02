@@ -10,6 +10,28 @@ import Container from "../components/ui/container"
 import { useBrandStore } from "../store/brandStore"
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      {
+        title: "Brandio - Modern Brand Identity Studio & Living Design Systems",
+      },
+      {
+        name: "description",
+        content:
+          "Transform brand assets into living design systems. Real-time token synchronization, responsive typography calculators, SVG palette clustering, and exportable PDF decks.",
+      },
+      {
+        property: "og:title",
+        content:
+          "Brandio - Modern Brand Identity Studio & Living Design Systems",
+      },
+      {
+        property: "og:description",
+        content:
+          "Transform brand assets into living design systems. Real-time token synchronization, responsive typography calculators, SVG palette clustering, and exportable PDF decks.",
+      },
+    ],
+  }),
   component: LandingPage,
 })
 

@@ -12,6 +12,18 @@ import { useAuthStore } from "../store/authStore"
 import { useProjectsStore } from "../store/projectsStore"
 
 export const Route = createFileRoute("/dashboard")({
+  head: () => ({
+    meta: [
+      {
+        title: "Dashboard | Brandio",
+      },
+      {
+        name: "description",
+        content:
+          "Manage, customize, and view all your brand guidelines, design projects, and live tokens in one central dashboard.",
+      },
+    ],
+  }),
   component: DashboardLayout,
 })
 

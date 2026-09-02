@@ -168,7 +168,7 @@ export function Header({ action }: HeaderProps = {}) {
                   icon={<IconLogout size={16} />}
                   onClick={async () => {
                     await signOut()
-                    navigate({ to: "/auth/login" })
+                    navigate({ to: "/" })
                   }}
                   iconPlacement="right"
                 >

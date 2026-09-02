@@ -27,6 +27,18 @@ import {
 } from "@tabler/icons-react"
 
 export const Route = createFileRoute("/studio/$projectId")({
+  head: () => ({
+    meta: [
+      {
+        title: "Brand Studio & Guidelines Wizard | Brandio",
+      },
+      {
+        name: "description",
+        content:
+          "Configure visual foundations, color palettes, typography scales, iconography, and export production-ready brand guidelines.",
+      },
+    ],
+  }),
   component: StudioPage,
 })
 
