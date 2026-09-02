@@ -3,7 +3,6 @@ import { StepLogoPreview } from "./previews/StepLogoPreview"
 import { StepColorsPreview } from "./previews/StepColorsPreview"
 import { StepTypographyPreview } from "./previews/StepTypographyPreview"
 import { StepImageryPreview } from "./previews/StepImageryPreview"
-import { StepIconographyPreview } from "./previews/StepIconographyPreview"
 import { StepSummaryPreview } from "./previews/StepSummaryPreview"
 
 export interface WizardBentoPreviewProps {
@@ -17,8 +16,7 @@ const STEP_TITLES: Record<number, string> = {
   3: "Color Palette & Contrast Preview",
   4: "Typography Hierarchy Preview",
   5: "Imagery & Mood Preview",
-  6: "Iconography System Preview",
-  7: "Brand System Master Overview",
+  6: "Brand System Master Overview",
 }
 
 export function WizardBentoPreview({
@@ -34,8 +32,7 @@ export function WizardBentoPreview({
         {currentStep === 3 && <StepColorsPreview />}
         {currentStep === 4 && <StepTypographyPreview />}
         {currentStep === 5 && <StepImageryPreview />}
-        {currentStep === 6 && <StepIconographyPreview />}
-        {currentStep === 7 && <StepSummaryPreview />}
+        {currentStep === 6 && <StepSummaryPreview />}
       </div>
     </div>
   )

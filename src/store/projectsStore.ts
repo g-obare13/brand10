@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
+import { get as idbGet } from 'idb-keyval'
 
 export interface BrandProjectItem {
   id: string
@@ -9,6 +10,7 @@ export interface BrandProjectItem {
   logo_url?: string
   brand_name?: string
   primary_color?: string
+  vision?: string
 }
 
 interface ProjectsState {
@@ -45,7 +47,30 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
       try {
         const saved = localStorage.getItem('brandio_local_projects')
         if (saved) {
-          set({ projects: JSON.parse(saved), loading: false })
+          const parsed: BrandProjectItem[] = JSON.parse(saved)
+          const withLogos = await Promise.all(
+            parsed.map(async (p) => {
+              if (p.logo_url) return p
+              try {
+                const cachedSvg = await idbGet(`brand_svg_${p.id}`)
+                if (cachedSvg) {
+                  return {
+                    ...p,
+                    logo_url: `data:image/svg+xml;utf8,${encodeURIComponent(cachedSvg)}`,
+                  }
+                }
+                const cachedRaster = await idbGet(`brand_raster_${p.id}`)
+                if (cachedRaster) {
+                  return {
+                    ...p,
+                    logo_url: cachedRaster,
+                  }
+                }
+              } catch {}
+              return p
+            })
+          )
+          set({ projects: withLogos, loading: false })
           return
         }
       } catch {}
@@ -66,28 +91,47 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
           brand_data (
             brand_name,
             logo_url,
-            color_palette
+            color_palette,
+            vision
           )
         `)
         .order('updated_at', { ascending: false })
 
       if (error) throw error
 
-      const formatted: BrandProjectItem[] = data.map((item: any) => {
-        const bd = Array.isArray(item.brand_data) ? item.brand_data[0] : item.brand_data
-        const palette = bd?.color_palette || []
-        const primaryColor = palette.find((c: any) => c.role === 'primary')?.hex || '#4f46e5'
+      const formatted: BrandProjectItem[] = await Promise.all(
+        data.map(async (item: any) => {
+          const bd = Array.isArray(item.brand_data) ? item.brand_data[0] : item.brand_data
+          const palette = bd?.color_palette || []
+          const primaryColor = palette.find((c: any) => c.role === 'primary')?.hex || '#4f46e5'
 
-        return {
-          id: item.id,
-          name: item.name || 'Untitled Brand',
-          created_at: item.created_at,
-          updated_at: item.updated_at,
-          logo_url: bd?.logo_url,
-          brand_name: bd?.brand_name || item.name,
-          primary_color: primaryColor,
-        }
-      })
+          let logoUrl = bd?.logo_url
+          if (!logoUrl) {
+            try {
+              const cachedSvg = await idbGet(`brand_svg_${item.id}`)
+              if (cachedSvg) {
+                logoUrl = `data:image/svg+xml;utf8,${encodeURIComponent(cachedSvg)}`
+              } else {
+                const cachedRaster = await idbGet(`brand_raster_${item.id}`)
+                if (cachedRaster) {
+                  logoUrl = cachedRaster
+                }
+              }
+            } catch {}
+          }
+
+          return {
+            id: item.id,
+            name: item.name || 'Untitled Brand',
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+            logo_url: logoUrl,
+            brand_name: bd?.brand_name || item.name,
+            primary_color: primaryColor,
+            vision: bd?.vision || undefined,
+          }
+        })
+      )
 
       set({ projects: formatted, loading: false })
     } catch (err: any) {

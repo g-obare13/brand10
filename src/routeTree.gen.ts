@@ -19,7 +19,6 @@ import { Route as DashboardProjectsRouteImport } from './routes/dashboard/projec
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardTemplatesRouteImport } from './routes/dashboard/templates'
 import { Route as StudioProjectIdRouteImport } from './routes/studio.$projectId'
-import { Route as StudioProjectIdWizardRouteImport } from './routes/studio.$projectId_.wizard'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -71,11 +70,6 @@ const StudioProjectIdRoute = StudioProjectIdRouteImport.update({
   path: '/studio/$projectId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StudioProjectIdWizardRoute = StudioProjectIdWizardRouteImport.update({
-  id: '/studio/$projectId_/wizard',
-  path: '/studio/$projectId/wizard',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -88,7 +82,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/templates': typeof DashboardTemplatesRoute
   '/studio/$projectId': typeof StudioProjectIdRoute
   '/dashboard/': typeof DashboardIndexRoute
-  '/studio/$projectId/wizard': typeof StudioProjectIdWizardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -100,7 +93,6 @@ export interface FileRoutesByTo {
   '/dashboard/templates': typeof DashboardTemplatesRoute
   '/studio/$projectId': typeof StudioProjectIdRoute
   '/dashboard': typeof DashboardIndexRoute
-  '/studio/$projectId/wizard': typeof StudioProjectIdWizardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -114,7 +106,6 @@ export interface FileRoutesById {
   '/dashboard/templates': typeof DashboardTemplatesRoute
   '/studio/$projectId': typeof StudioProjectIdRoute
   '/dashboard/': typeof DashboardIndexRoute
-  '/studio/$projectId_/wizard': typeof StudioProjectIdWizardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -129,7 +120,6 @@ export interface FileRouteTypes {
     | '/dashboard/templates'
     | '/studio/$projectId'
     | '/dashboard/'
-    | '/studio/$projectId/wizard'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -141,7 +131,6 @@ export interface FileRouteTypes {
     | '/dashboard/templates'
     | '/studio/$projectId'
     | '/dashboard'
-    | '/studio/$projectId/wizard'
   id:
     | '__root__'
     | '/'
@@ -154,7 +143,6 @@ export interface FileRouteTypes {
     | '/dashboard/templates'
     | '/studio/$projectId'
     | '/dashboard/'
-    | '/studio/$projectId_/wizard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -162,7 +150,6 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRouteWithChildren
   AuthLoginRoute: typeof AuthLoginRoute
   StudioProjectIdRoute: typeof StudioProjectIdRoute
-  StudioProjectIdWizardRoute: typeof StudioProjectIdWizardRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -237,13 +224,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudioProjectIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/studio/$projectId_/wizard': {
-      id: '/studio/$projectId_/wizard'
-      path: '/studio/$projectId/wizard'
-      fullPath: '/studio/$projectId/wizard'
-      preLoaderRoute: typeof StudioProjectIdWizardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -274,7 +254,6 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRouteWithChildren,
   AuthLoginRoute: AuthLoginRoute,
   StudioProjectIdRoute: StudioProjectIdRoute,
-  StudioProjectIdWizardRoute: StudioProjectIdWizardRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -16,7 +16,7 @@ export const WIZARD_STEPS = [
   { id: 3, title: "Color Matrix", subtitle: "Palette & Contrast" },
   { id: 4, title: "Typography", subtitle: "Pairings & Scale" },
   { id: 5, title: "Imagery", subtitle: "Mood & Photography" },
-  { id: 6, title: "Iconography", subtitle: "Style & Radius" },
+  { id: 6, title: "Preview", subtitle: "Brand System Master Overview" },
 ] as const
 
 interface WizardHeaderProps {

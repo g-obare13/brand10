@@ -17,7 +17,11 @@ import {
   ComboboxItem,
   ComboboxEmpty,
 } from "@/components/ui/combobox"
-import { Check } from "@boxicons/react"
+import { Check, X } from "@boxicons/react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Slider } from "@/components/ui/slider"
+import { gsap } from "gsap"
 
 interface FontComboboxProps {
   label: string
@@ -52,10 +56,7 @@ function FontCombobox({
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
-        <label className="text-xs font-semibold text-foreground">{label}</label>
-        {subtitle && (
-          <span className="text-[10px] text-muted-foreground">{subtitle}</span>
-        )}
+        <Label>{label}</Label>
       </div>
 
       <Combobox
@@ -65,10 +66,10 @@ function FontCombobox({
       >
         <ComboboxInput
           placeholder={value || "Search font..."}
-          className="h-10 w-full rounded-xl bg-card text-xs font-medium"
+          className="px-4"
           style={{ fontFamily: value ? `"${value}", sans-serif` : undefined }}
         />
-        <ComboboxContent className="z-50 w-[300px] sm:w-[340px]">
+        <ComboboxContent className="z-50 w-full">
           <ComboboxList className="max-h-60 overflow-y-auto p-1">
             {isLoading && fonts.length === 0 ? (
               <div className="p-3 text-center text-xs text-muted-foreground">
@@ -101,6 +102,10 @@ function FontCombobox({
           </ComboboxList>
         </ComboboxContent>
       </Combobox>
+
+      {subtitle && (
+        <span className="text-sm text-muted-foreground">{subtitle}</span>
+      )}
     </div>
   )
 }
@@ -113,6 +118,29 @@ export function StepTypography() {
     "display"
   )
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const stepContainerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!stepContainerRef.current) return
+    const ctx = gsap.context(() => {
+      const cards = stepContainerRef.current?.querySelectorAll(".step-typo-anim")
+      if (cards && cards.length > 0) {
+        gsap.fromTo(
+          cards,
+          { y: 16, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.08,
+            ease: "power2.out",
+          }
+        )
+      }
+    }, stepContainerRef)
+
+    return () => ctx.revert()
+  }, [])
 
   useEffect(() => {
     let isMounted = true
@@ -185,7 +213,7 @@ export function StepTypography() {
   }
 
   return (
-    <div className="space-y-6">
+    <div ref={stepContainerRef} className="space-y-6">
       <div className="space-y-1">
         <WordReveal
           as="h4"
@@ -210,12 +238,7 @@ export function StepTypography() {
 
       <div className="space-y-5">
         {/* Searchable Google Font Selectors */}
-        <div className="space-y-3 rounded-2xl border border-border/80 bg-card/60 p-4">
-          <Label className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-muted-foreground uppercase">
-            <IconSparkles size={14} className="text-primary" />
-            Live Google Fonts Catalog
-          </Label>
-
+        <div className="step-typo-anim space-y-3">
           <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
             <FontCombobox
               label="Primary / Display Font"
@@ -240,39 +263,29 @@ export function StepTypography() {
         </div>
 
         {/* Custom Font Upload Area */}
-        <div className="space-y-3 rounded-2xl border border-dashed border-border/90 bg-card/40 p-4">
+        <div className="step-typo-anim space-y-3 rounded-2xl border border-dashed border-border/90 bg-card/40 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <IconUpload size={16} className="text-primary" />
-              <Label className="text-xs font-bold tracking-wider text-foreground uppercase">
-                Upload Custom Font
-              </Label>
+              <Label>Upload Custom Font</Label>
             </div>
-            <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/40 p-0.5 text-[10px]">
-              <button
-                type="button"
+            <div className="flex items-center gap-1 rounded-full border border-border bg-muted/40 p-0.5 text-[10px]">
+              <Button
+                variant={uploadTarget === "display" ? "default" : "outline"}
                 onClick={() => setUploadTarget("display")}
-                className={cn(
-                  "cursor-pointer rounded-md px-2 py-0.5 font-medium transition-colors",
-                  uploadTarget === "display"
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
+                size={"sm"}
+                className={"rounded-full"}
               >
                 Apply to Display
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                variant={uploadTarget === "body" ? "default" : "outline"}
                 onClick={() => setUploadTarget("body")}
-                className={cn(
-                  "cursor-pointer rounded-md px-2 py-0.5 font-medium transition-colors",
-                  uploadTarget === "body"
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
+                size={"sm"}
+                className={"rounded-full"}
               >
                 Apply to Body
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -299,18 +312,20 @@ export function StepTypography() {
 
           {brand.stagedFontFiles && brand.stagedFontFiles.length > 0 && (
             <div className="space-y-1">
-              <span className="text-[10px] font-semibold text-muted-foreground">
-                Ready to save with project:
-              </span>
               <div className="flex flex-wrap gap-1.5">
                 {brand.stagedFontFiles.map((staged) => (
-                  <span
+                  <Badge
                     key={staged.family}
-                    className="inline-flex items-center gap-1 rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400"
+                    variant={"outline"}
+                    icon={<X className="cursor-pointer transition hover:text-destructive" />}
+                    onClick={() => {
+                      brand.removeStagedFontFile(staged.family)
+                      toast.info(`Removed custom font "${staged.family}" (reset to Inter)`)
+                    }}
+                    className="cursor-pointer transition hover:border-destructive/50 hover:bg-destructive/10"
                   >
-                    <Check />
                     {staged.family} ({staged.target})
-                  </span>
+                  </Badge>
                 ))}
               </div>
             </div>
@@ -318,12 +333,10 @@ export function StepTypography() {
         </div>
 
         {/* Type Scale Ratio Slider */}
-        <div className="space-y-3 rounded-2xl border border-border/80 bg-card/60 p-4">
+        <div className="step-typo-anim space-y-3 rounded-2xl border border-border/80 bg-card/60 p-4">
           <div className="flex items-center justify-between text-xs font-bold text-foreground">
-            <span className="tracking-wider text-muted-foreground uppercase">
-              Modular Scale Multiplier
-            </span>
-            <span className="font-mono text-primary">
+            <span>Modular Scale Multiplier</span>
+            <span className="text-primary">
               {brand.typeScaleRatio} (
               {brand.typeScaleRatio >= 1.333
                 ? "Perfect Fourth"
@@ -334,21 +347,19 @@ export function StepTypography() {
             </span>
           </div>
 
-          <input
-            type="range"
-            min="1.15"
-            max="1.414"
-            step="0.025"
+          <Slider
+            min={1.15}
+            max={1.414}
+            step={0.025}
             value={brand.typeScaleRatio}
-            onChange={(e) =>
-              brand.setTypography({
-                typeScaleRatio: parseFloat(e.target.value),
-              })
-            }
-            className="h-2 w-full cursor-pointer rounded-lg bg-muted accent-primary"
+            onValueChange={(val) => {
+              const nextVal = typeof val === "number" ? val : Array.isArray(val) ? val[0] : 1.25
+              brand.setTypography({ typeScaleRatio: nextVal })
+            }}
+            className="py-1"
           />
 
-          <p className="text-[11px] leading-relaxed text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Controls mathematical proportional stepping from H1 (36px+) down to
             caption copy (11px).
           </p>

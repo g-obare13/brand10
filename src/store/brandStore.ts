@@ -114,6 +114,7 @@ export interface BrandState {
   }) => void
   addCustomFont: (font: { family: string; url: string; target: 'display' | 'body' }) => void
   stageFontFile: (staged: { file: File; family: string; target: 'display' | 'body' }) => void
+  removeStagedFontFile: (family: string) => void
   uploadStagedFonts: () => Promise<void>
 
   // Imagery actions
@@ -413,13 +414,18 @@ export const useBrandStore = create<BrandState>()(
           }
         }
 
+        const fallbackUrl = svgContent
+          ? `data:image/svg+xml;utf8,${encodeURIComponent(svgContent)}`
+          : rasterDataUri
+
         set({
           svgContent,
           rasterDataUri,
           isVector,
           aspectRatio: aspectRatio || 1.0,
-          logoUrl: uploadedUrl,
+          logoUrl: uploadedUrl || fallbackUrl,
         })
+        await get().saveToSupabase()
       },
 
       setSecondaryLogoData: async ({ svgContent, logoUrl }) => {
@@ -436,10 +442,15 @@ export const useBrandStore = create<BrandState>()(
           }
         }
 
+        const fallbackSecondaryUrl = svgContent
+          ? `data:image/svg+xml;utf8,${encodeURIComponent(svgContent)}`
+          : undefined
+
         set({
           secondarySvgContent: svgContent,
-          secondaryLogoUrl: uploadedUrl,
+          secondaryLogoUrl: uploadedUrl || fallbackSecondaryUrl,
         })
+        await get().saveToSupabase()
       },
 
       removeLogo: async () => {
@@ -519,6 +530,28 @@ export const useBrandStore = create<BrandState>()(
             stagedFontFiles: [...filtered, staged],
             ...(staged.target === 'display' ? { displayFont: staged.family } : { bodyFont: staged.family }),
           }
+        })
+      },
+
+      removeStagedFontFile: (family) => {
+        set((state) => {
+          const current = state.stagedFontFiles || []
+          const removedItem = current.find((f) => f.family === family)
+          const filtered = current.filter((f) => f.family !== family)
+          const updates: Partial<BrandState> = { stagedFontFiles: filtered }
+
+          if (removedItem) {
+            if (removedItem.target === 'display' && state.displayFont === family) {
+              updates.displayFont = 'Inter'
+            } else if (removedItem.target === 'body' && state.bodyFont === family) {
+              updates.bodyFont = 'Inter'
+            }
+          } else {
+            if (state.displayFont === family) updates.displayFont = 'Inter'
+            if (state.bodyFont === family) updates.bodyFont = 'Inter'
+          }
+
+          return updates
         })
       },
 
@@ -736,6 +769,9 @@ export const useBrandStore = create<BrandState>()(
                     ...p,
                     name: state.brandName,
                     brand_name: state.brandName,
+                    logo_url: state.logoUrl || (state.svgContent ? `data:image/svg+xml;utf8,${encodeURIComponent(state.svgContent)}` : p.logo_url),
+                    primary_color: state.colorPalette.find((c: any) => c.role === 'primary')?.hex || p.primary_color,
+                    vision: state.vision || p.vision,
                     updated_at: new Date().toISOString(),
                   }
                 : p
@@ -747,6 +783,18 @@ export const useBrandStore = create<BrandState>()(
 
         set({ isSaving: true })
         try {
+          const primaryLogo =
+            state.logoUrl ||
+            (state.svgContent
+              ? `data:image/svg+xml;utf8,${encodeURIComponent(state.svgContent)}`
+              : state.rasterDataUri)
+
+          const secondaryLogo =
+            state.secondaryLogoUrl ||
+            (state.secondarySvgContent
+              ? `data:image/svg+xml;utf8,${encodeURIComponent(state.secondarySvgContent)}`
+              : undefined)
+
           const payload = {
             project_id: state.projectId,
             brand_name: state.brandName,
@@ -759,9 +807,9 @@ export const useBrandStore = create<BrandState>()(
               design_movement: state.designMovement,
             },
             design_movement: state.designMovement,
-            logo_url: state.logoUrl,
+            logo_url: primaryLogo,
             logo_variants: {
-              secondary_url: state.secondaryLogoUrl,
+              secondary_url: secondaryLogo,
               custom_fonts: state.customFonts || [],
             },
             clearspace_multiplier: state.clearspaceMultiplier,
@@ -785,6 +833,29 @@ export const useBrandStore = create<BrandState>()(
             .from('brand_projects')
             .update({ name: state.brandName, updated_at: new Date().toISOString() })
             .eq('id', state.projectId)
+
+          // Keep in-memory projectsStore synchronized
+          try {
+            const { useProjectsStore } = await import('./projectsStore')
+            const projects = useProjectsStore.getState().projects
+            if (projects.some((p) => p.id === state.projectId)) {
+              useProjectsStore.setState({
+                projects: projects.map((p) =>
+                  p.id === state.projectId
+                    ? {
+                        ...p,
+                        logo_url: primaryLogo || p.logo_url,
+                        brand_name: state.brandName || p.brand_name,
+                        name: state.brandName || p.name,
+                        primary_color:
+                          state.colorPalette.find((c) => c.role === 'primary')?.hex ||
+                          p.primary_color,
+                      }
+                    : p
+                ),
+              })
+            }
+          } catch {}
 
           set({ isSaving: false, lastSavedAt: new Date().toISOString() })
         } catch (err) {

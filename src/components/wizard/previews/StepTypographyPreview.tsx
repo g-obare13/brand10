@@ -25,13 +25,48 @@ export function StepTypographyPreview() {
 
   const theme = getPreviewTheme(activeMovement.id)
 
-  // Dynamically load selected fonts into DOM
+  // Dynamically load selected Google fonts or re-ensure custom fonts into DOM
   useEffect(() => {
     loadGoogleFont(brand.displayFont)
     loadGoogleFont(brand.bodyFont)
     loadGoogleFont(brand.monoFont)
-  }, [brand.displayFont, brand.bodyFont, brand.monoFont])
 
+    // If there are staged font files or saved custom fonts, ensure their FontFace is registered
+    if (brand.stagedFontFiles && brand.stagedFontFiles.length > 0) {
+      brand.stagedFontFiles.forEach((staged) => {
+        try {
+          const blobUrl = URL.createObjectURL(staged.file)
+          const weights = ["400", "500", "600", "700", "800"]
+          weights.forEach((w) => {
+            try {
+              const face = new FontFace(staged.family, `url(${blobUrl})`, { weight: w, style: "normal" })
+              face.load().then((loaded) => document.fonts.add(loaded)).catch(() => {})
+            } catch {}
+          })
+          const baseFace = new FontFace(staged.family, `url(${blobUrl})`)
+          baseFace.load().then((loaded) => document.fonts.add(loaded)).catch(() => {})
+        } catch {}
+      })
+    }
+
+    if (brand.customFonts && brand.customFonts.length > 0) {
+      brand.customFonts.forEach((cf) => {
+        try {
+          const weights = ["400", "500", "600", "700", "800"]
+          weights.forEach((w) => {
+            try {
+              const face = new FontFace(cf.family, `url(${cf.url})`, { weight: w, style: "normal" })
+              face.load().then((loaded) => document.fonts.add(loaded)).catch(() => {})
+            } catch {}
+          })
+          const baseFace = new FontFace(cf.family, `url(${cf.url})`)
+          baseFace.load().then((loaded) => document.fonts.add(loaded)).catch(() => {})
+        } catch {}
+      })
+    }
+  }, [brand.displayFont, brand.bodyFont, brand.monoFont, brand.stagedFontFiles, brand.customFonts])
+
+  // Entrance and reactive font-switch animation for specimen typography elements
   useEffect(() => {
     if (!containerRef.current) return
     const ctx = gsap.context(() => {
@@ -39,21 +74,36 @@ export function StepTypographyPreview() {
       if (cards && cards.length > 0) {
         gsap.fromTo(
           cards,
-          { y: 24, opacity: 0 },
+          { y: 20, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 0.7,
+            duration: 0.6,
             stagger: 0.08,
-            delay: 0.1,
             ease: "power3.out",
+          }
+        )
+      }
+
+      // Smooth subtle pop/fade when font family or scale updates
+      const typeElements = containerRef.current?.querySelectorAll(".typo-specimen-item")
+      if (typeElements && typeElements.length > 0) {
+        gsap.fromTo(
+          typeElements,
+          { opacity: 0.4, y: 6 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.45,
+            stagger: 0.03,
+            ease: "power2.out",
           }
         )
       }
     }, containerRef)
 
     return () => ctx.revert()
-  }, [])
+  }, [brand.displayFont, brand.bodyFont, brand.monoFont, brand.typeScaleRatio])
 
   // Calculate proportional steps based on the modular ratio
   const ratio = brand.typeScaleRatio || 1.25
@@ -127,13 +177,13 @@ export function StepTypographyPreview() {
             style={{ fontFamily: `"${brand.displayFont}", sans-serif` }}
           >
             {/* H1 */}
-            <div className="space-y-0.5">
+            <div className="typo-specimen-item space-y-0.5">
               <div className="flex items-baseline justify-between text-[10px] font-mono text-muted-foreground">
                 <span>H1 Display Headline</span>
                 <span>{h1Size}px · Bold</span>
               </div>
               <h1
-                className="font-extrabold tracking-tight text-foreground leading-[1.1]"
+                className="font-extrabold tracking-tight text-foreground leading-[1.1] transition-[font-size] duration-300 ease-out"
                 style={{
                   fontSize: `${h1Size}px`,
                   fontFamily: `"${brand.displayFont}", sans-serif`,
@@ -144,13 +194,13 @@ export function StepTypographyPreview() {
             </div>
 
             {/* H2 */}
-            <div className="space-y-0.5">
+            <div className="typo-specimen-item space-y-0.5">
               <div className="flex items-baseline justify-between text-[10px] font-mono text-muted-foreground">
                 <span>H2 Section Header</span>
                 <span>{h2Size}px · Bold</span>
               </div>
               <h2
-                className="font-bold tracking-tight text-foreground leading-[1.15]"
+                className="font-bold tracking-tight text-foreground leading-[1.15] transition-[font-size] duration-300 ease-out"
                 style={{
                   fontSize: `${h2Size}px`,
                   fontFamily: `"${brand.displayFont}", sans-serif`,
@@ -161,13 +211,13 @@ export function StepTypographyPreview() {
             </div>
 
             {/* H3 */}
-            <div className="space-y-0.5">
+            <div className="typo-specimen-item space-y-0.5">
               <div className="flex items-baseline justify-between text-[10px] font-mono text-muted-foreground">
                 <span>H3 Module Title</span>
                 <span>{h3Size}px · SemiBold</span>
               </div>
               <h3
-                className="font-semibold tracking-tight text-foreground leading-[1.2]"
+                className="font-semibold tracking-tight text-foreground leading-[1.2] transition-[font-size] duration-300 ease-out"
                 style={{
                   fontSize: `${h3Size}px`,
                   fontFamily: `"${brand.displayFont}", sans-serif`,
@@ -178,13 +228,13 @@ export function StepTypographyPreview() {
             </div>
 
             {/* H4 */}
-            <div className="space-y-0.5">
+            <div className="typo-specimen-item space-y-0.5">
               <div className="flex items-baseline justify-between text-[10px] font-mono text-muted-foreground">
                 <span>H4 Subsection Title</span>
                 <span>{h4Size}px · SemiBold</span>
               </div>
               <h4
-                className="font-semibold text-foreground leading-[1.25]"
+                className="font-semibold text-foreground leading-[1.25] transition-[font-size] duration-300 ease-out"
                 style={{
                   fontSize: `${h4Size}px`,
                   fontFamily: `"${brand.displayFont}", sans-serif`,
@@ -195,13 +245,13 @@ export function StepTypographyPreview() {
             </div>
 
             {/* H5 */}
-            <div className="space-y-0.5">
+            <div className="typo-specimen-item space-y-0.5">
               <div className="flex items-baseline justify-between text-[10px] font-mono text-muted-foreground">
                 <span>H5 Card Header</span>
                 <span>{h5Size}px · Medium</span>
               </div>
               <h5
-                className="font-medium text-foreground leading-[1.3]"
+                className="font-medium text-foreground leading-[1.3] transition-[font-size] duration-300 ease-out"
                 style={{
                   fontSize: `${h5Size}px`,
                   fontFamily: `"${brand.displayFont}", sans-serif`,
@@ -212,13 +262,13 @@ export function StepTypographyPreview() {
             </div>
 
             {/* H6 */}
-            <div className="space-y-0.5">
+            <div className="typo-specimen-item space-y-0.5">
               <div className="flex items-baseline justify-between text-[10px] font-mono text-muted-foreground">
                 <span>H6 Metric / Group Label</span>
                 <span>{h6Size}px · Medium</span>
               </div>
               <h6
-                className="font-medium text-foreground uppercase tracking-wider"
+                className="font-medium text-foreground uppercase tracking-wider transition-[font-size] duration-300 ease-out"
                 style={{
                   fontSize: `${h6Size}px`,
                   fontFamily: `"${brand.displayFont}", sans-serif`,
@@ -244,12 +294,12 @@ export function StepTypographyPreview() {
             style={{ fontFamily: `"${brand.bodyFont}", sans-serif` }}
           >
             {/* Subtitle Large */}
-            <div className="space-y-0.5">
+            <div className="typo-specimen-item space-y-0.5">
               <span className="text-[10px] font-mono text-muted-foreground">
                 Subtitle Large · {subLgSize}px
               </span>
               <p
-                className="text-foreground/90 font-medium leading-relaxed"
+                className="text-foreground/90 font-medium leading-relaxed transition-[font-size] duration-300 ease-out"
                 style={{
                   fontSize: `${subLgSize}px`,
                   fontFamily: `"${brand.bodyFont}", sans-serif`,
@@ -261,12 +311,12 @@ export function StepTypographyPreview() {
             </div>
 
             {/* Subtitle Regular */}
-            <div className="space-y-0.5">
+            <div className="typo-specimen-item space-y-0.5">
               <span className="text-[10px] font-mono text-muted-foreground">
                 Subtitle Regular · {subRegSize}px
               </span>
               <p
-                className="text-muted-foreground leading-normal"
+                className="text-muted-foreground leading-normal transition-[font-size] duration-300 ease-out"
                 style={{
                   fontSize: `${subRegSize}px`,
                   fontFamily: `"${brand.bodyFont}", sans-serif`,
@@ -278,12 +328,12 @@ export function StepTypographyPreview() {
             </div>
 
             {/* Body Copy */}
-            <div className="space-y-0.5">
+            <div className="typo-specimen-item space-y-0.5">
               <span className="text-[10px] font-mono text-muted-foreground">
                 Body Regular · {bodySize}px
               </span>
               <p
-                className="text-muted-foreground leading-relaxed"
+                className="text-muted-foreground leading-relaxed transition-[font-size] duration-300 ease-out"
                 style={{
                   fontSize: `${bodySize}px`,
                   fontFamily: `"${brand.bodyFont}", sans-serif`,
@@ -296,12 +346,12 @@ export function StepTypographyPreview() {
             </div>
 
             {/* Captions & Microcopy */}
-            <div className="space-y-0.5">
+            <div className="typo-specimen-item space-y-0.5">
               <span className="text-[10px] font-mono text-muted-foreground">
                 Caption &amp; Microcopy · {captionSize}px
               </span>
               <p
-                className="text-muted-foreground/80 leading-normal"
+                className="text-muted-foreground/80 leading-normal transition-[font-size] duration-300 ease-out"
                 style={{
                   fontSize: `${captionSize}px`,
                   fontFamily: `"${brand.bodyFont}", sans-serif`,
@@ -314,7 +364,7 @@ export function StepTypographyPreview() {
         </div>
 
         {/* SECTION C: Interactive Buttons Specimen */}
-        <div className="space-y-3 pt-2 border-t border-border/50">
+        <div className="typo-specimen-item space-y-3 pt-2 border-t border-border/50">
           <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground">
             <span className="uppercase tracking-wider font-bold">
               Buttons &amp; Interactive Controls
@@ -347,7 +397,7 @@ export function StepTypographyPreview() {
         </div>
 
         {/* SECTION D: Monospace Code Specimen */}
-        <div className="space-y-2 pt-2 border-t border-border/50">
+        <div className="typo-specimen-item space-y-2 pt-2 border-t border-border/50">
           <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground">
             <span className="uppercase tracking-wider font-bold">
               Monospace Token Specimen

@@ -133,7 +133,7 @@ export function CreateProjectModal({
         brand.setBrandName(project.name || projectName)
         triggerClose()
         navigate({
-          to: "/studio/$projectId/wizard",
+          to: "/studio/$projectId",
           params: { projectId: project.id },
         })
       }

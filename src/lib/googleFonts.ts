@@ -137,9 +137,28 @@ export async function registerCustomFontFace(
         ? `url(${sourceUrlOrBuffer})`
         : sourceUrlOrBuffer
 
-    const fontFace = new FontFace(fontFamily, source)
-    const loadedFace = await fontFace.load()
-    document.fonts.add(loadedFace)
+    // Register for standard weights and normal weight so bold headings (H1-H6) match
+    const weights = ["400", "500", "600", "700", "800"]
+    for (const weight of weights) {
+      try {
+        const fontFace = new FontFace(fontFamily, source, { weight, style: "normal" })
+        const loadedFace = await fontFace.load()
+        document.fonts.add(loadedFace)
+      } catch (innerErr) {
+        console.warn(`Could not register weight ${weight} for '${fontFamily}':`, innerErr)
+      }
+    }
+
+    // Also register default without descriptors as baseline
+    const baseFace = new FontFace(fontFamily, source)
+    const loadedBase = await baseFace.load()
+    document.fonts.add(loadedBase)
+
+    // Force style recalculation across document
+    if (document.body) {
+      document.body.style.fontFamily = document.body.style.fontFamily
+    }
+
     return true
   } catch (err) {
     console.error(`Failed to register custom font face '${fontFamily}':`, err)

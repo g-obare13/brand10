@@ -8,7 +8,6 @@ import {
   IconPalette,
   IconTypography,
   IconPhoto,
-  IconIcons,
 } from "@tabler/icons-react"
 
 interface StepSummaryProps {
@@ -83,25 +82,11 @@ export function StepSummary({ projectId }: StepSummaryProps) {
             <IconPhoto size={18} />
           </div>
           <div>
-            <span className="block text-xs font-bold text-foreground">
+            <span className="block text-xs font-bold text-foreground capitalize">
               {brand.imageryMood || "Minimal"} Photography
             </span>
-            <span className="block text-[11px] text-muted-foreground capitalize">
-              Overlay: {brand.imageryOverlay || "None"}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 rounded-2xl border border-border/80 bg-card/60 p-4">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-xs">
-            <IconIcons size={18} />
-          </div>
-          <div>
-            <span className="block text-xs font-bold text-foreground capitalize">
-              {brand.iconStyle || "Stroke"} Icons ({brand.iconRadius}px)
-            </span>
             <span className="block text-[11px] text-muted-foreground">
-              Keyline {brand.iconStroke || 2.0}px
+              Direction Preset
             </span>
           </div>
         </div>

@@ -1,6 +1,8 @@
 import type { BrandProjectItem } from "@/store/projectsStore"
 import { useProjectsStore } from "@/store/projectsStore"
 import { useAuthStore } from "@/store/authStore"
+import { useBrandStore } from "@/store/brandStore"
+import { get as idbGet } from "idb-keyval"
 import {
   IconArrowRight,
   IconCopy,
@@ -37,6 +39,133 @@ interface ProjectsTabProps {
   onOpenCreateModal: () => void
 }
 
+interface ProjectCardLogoProps {
+  project: BrandProjectItem
+  primaryColor: string
+  brandInitial: string
+}
+
+function ProjectCardLogo({
+  project,
+  primaryColor,
+  brandInitial,
+}: ProjectCardLogoProps) {
+  const brand = useBrandStore()
+  const [logoSrc, setLogoSrc] = useState<string | null>(() => {
+    if (project.logo_url) return project.logo_url
+    if (brand.projectId === project.id) {
+      if (brand.logoUrl) return brand.logoUrl
+      if (brand.svgContent) {
+        return `data:image/svg+xml;utf8,${encodeURIComponent(brand.svgContent)}`
+      }
+    }
+    return null
+  })
+  const [hasError, setHasError] = useState(false)
+
+  useEffect(() => {
+    let isMounted = true
+    const isAlive = () => isMounted
+
+    if (project.logo_url) {
+      setLogoSrc(project.logo_url)
+      setHasError(false)
+      return
+    }
+
+    if (brand.projectId === project.id) {
+      if (brand.logoUrl) {
+        setLogoSrc(brand.logoUrl)
+        setHasError(false)
+        return
+      }
+      if (brand.svgContent) {
+        setLogoSrc(
+          `data:image/svg+xml;utf8,${encodeURIComponent(brand.svgContent)}`
+        )
+        setHasError(false)
+        return
+      }
+    }
+
+    const fetchCachedLogo = async () => {
+      try {
+        const cachedSvg = await idbGet<string>(`brand_svg_${project.id}`)
+        if (!isAlive()) return
+        if (cachedSvg) {
+          setLogoSrc(`data:image/svg+xml;utf8,${encodeURIComponent(cachedSvg)}`)
+          setHasError(false)
+          return
+        }
+
+        const cachedRaster = await idbGet<string>(`brand_raster_${project.id}`)
+        if (!isAlive()) return
+        if (cachedRaster) {
+          setLogoSrc(cachedRaster)
+          setHasError(false)
+          return
+        }
+
+        const raw = localStorage.getItem(`brandio_local_brand_${project.id}`)
+        if (raw) {
+          const parsed = JSON.parse(raw)
+          if (parsed.logoUrl) {
+            setLogoSrc(parsed.logoUrl)
+            setHasError(false)
+            return
+          }
+          if (parsed.svgContent) {
+            setLogoSrc(
+              `data:image/svg+xml;utf8,${encodeURIComponent(parsed.svgContent)}`
+            )
+            setHasError(false)
+            return
+          }
+        }
+      } catch {}
+    }
+
+    fetchCachedLogo()
+
+    return () => {
+      isMounted = false
+    }
+  }, [
+    project.id,
+    project.logo_url,
+    brand.projectId,
+    brand.logoUrl,
+    brand.svgContent,
+  ])
+
+  if (logoSrc && !hasError) {
+    return (
+      <div
+        className="flex size-12 items-center justify-center overflow-hidden rounded-2xl border border-border/80 bg-background/80 p-2 transition-transform duration-300 group-hover:scale-105"
+        style={{ borderColor: `${primaryColor}30` }}
+      >
+        <img
+          src={logoSrc}
+          alt={project.brand_name || project.name}
+          className="size-full object-contain"
+          onError={() => setHasError(true)}
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div
+      className="flex size-12 items-center justify-center rounded-2xl border border-white/20 text-base font-bold text-white transition-transform duration-300 group-hover:scale-105"
+      style={{
+        backgroundColor: primaryColor,
+      }}
+    >
+      {brandInitial}
+    </div>
+  )
+}
+
 export function ProjectsTab({ onOpenCreateModal }: ProjectsTabProps) {
   const auth = useAuthStore()
   const projectsStore = useProjectsStore()
@@ -49,6 +178,10 @@ export function ProjectsTab({ onOpenCreateModal }: ProjectsTabProps) {
   const [projectToDelete, setProjectToDelete] =
     useState<BrandProjectItem | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  useEffect(() => {
+    projectsStore.fetchProjects(auth.user?.id)
+  }, [auth.user?.id])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -137,123 +270,134 @@ export function ProjectsTab({ onOpenCreateModal }: ProjectsTabProps) {
           </div>
         ) : hasProjects ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {projectsStore.projects.map((project: BrandProjectItem) => (
-              <SpotlightCard
-                key={project.id}
-                color={project.primary_color || "#4f46e5"}
-                interactive={false}
-                tilt={false}
-                shimmer={false}
-                className="project-card flex min-h-65 flex-col justify-between shadow-none"
-              >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div
-                      className="flex size-10 items-center justify-center rounded-2xl border text-sm font-bold text-white transition-transform duration-300"
-                      style={{
-                        backgroundColor: project.primary_color || "#4f46e5",
-                        // boxShadow: `0 6px 16px ${project.primary_color || "#4f46e5"}40`,
-                      }}
-                    >
-                      {(project.brand_name || project.name || "B")
-                        .charAt(0)
-                        .toUpperCase()}
+            {projectsStore.projects.map((project: BrandProjectItem) => {
+              const primaryColor = project.primary_color || "#4f46e5"
+              const brandInitial = (project.brand_name || project.name || "B")
+                .charAt(0)
+                .toUpperCase()
+
+              return (
+                <SpotlightCard
+                  key={project.id}
+                  color={primaryColor}
+                  interactive={false}
+                  tilt={false}
+                  shimmer={false}
+                  className="project-card group flex min-h-68 flex-col justify-between rounded-3xl bg-card/75 p-6 backdrop-blur-xl transition-all duration-300"
+                >
+                  <div className="space-y-4">
+                    {/* Header: Logo / Avatar & Actions */}
+                    <div className="flex items-center justify-between">
+                      <ProjectCardLogo
+                        project={project}
+                        primaryColor={primaryColor}
+                        brandInitial={brandInitial}
+                      />
+
+                      <div className="flex items-center gap-1.5">
+                        <Tooltip>
+                          <TooltipTrigger
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              if (isLimitReached) return
+                              projectsStore.duplicateProject(
+                                project.id,
+                                auth.user?.id
+                              )
+                            }}
+                            className={cn(
+                              "cursor-pointer rounded-full border border-border/60 p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground",
+                              isLimitReached &&
+                                "cursor-not-allowed opacity-40 hover:bg-transparent hover:text-muted-foreground"
+                            )}
+                            aria-label="Duplicate Brand"
+                          >
+                            <IconCopy size={15} />
+                          </TooltipTrigger>
+                          <TooltipContent
+                            side="top"
+                            sideOffset={6}
+                            className="text-xs font-medium shadow-xl"
+                          >
+                            {isLimitReached
+                              ? "Project Limit Reached (Max 2)"
+                              : "Duplicate Brand"}
+                          </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setProjectToDelete(project)
+                            }}
+                            className="cursor-pointer rounded-full border border-destructive/20 p-2 text-destructive transition hover:bg-destructive/10"
+                            aria-label="Delete Brand"
+                          >
+                            <IconTrash size={15} />
+                          </TooltipTrigger>
+                          <TooltipContent
+                            side="top"
+                            sideOffset={6}
+                            className="text-xs font-medium shadow-xl"
+                          >
+                            Delete Brand
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5">
-                      <Tooltip>
-                        <TooltipTrigger
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            if (isLimitReached) return
-                            projectsStore.duplicateProject(
-                              project.id,
-                              auth.user?.id
-                            )
-                          }}
-                          className={cn(
-                            "cursor-pointer rounded-full border p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground",
-                            isLimitReached &&
-                              "cursor-not-allowed opacity-40 hover:bg-transparent hover:text-muted-foreground"
-                          )}
-                          aria-label="Duplicate Brand"
-                        >
-                          <IconCopy size={15} />
-                        </TooltipTrigger>
-                        <TooltipContent
-                          side="top"
-                          sideOffset={6}
-                          className="text-xs font-medium shadow-xl"
-                        >
-                          {isLimitReached
-                            ? "Project Limit Reached (Max 2)"
-                            : "Duplicate Brand"}
-                        </TooltipContent>
-                      </Tooltip>
+                    {/* Brand Info */}
+                    <div className="pt-1">
+                      <h3>{project.brand_name || project.name}</h3>
 
-                      <Tooltip>
-                        <TooltipTrigger
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setProjectToDelete(project)
-                          }}
-                          className="cursor-pointer rounded-full border border-destructive/20 p-2 text-destructive transition hover:bg-destructive/10"
-                          aria-label="Delete Brand"
-                        >
-                          <IconTrash size={15} />
-                        </TooltipTrigger>
-                        <TooltipContent
-                          side="top"
-                          sideOffset={6}
-                          className="text-xs font-medium shadow-xl"
-                        >
-                          Delete Brand
-                        </TooltipContent>
-                      </Tooltip>
+                      {/* Vision Statement (if present) */}
+                      {project.vision ? (
+                        <p className="mt-1.5 line-clamp-2">{project.vision}</p>
+                      ) : null}
                     </div>
                   </div>
 
-                  <div className="pt-2">
-                    <h3 className="font-heading text-xl font-bold tracking-tight text-foreground transition group-hover:text-primary">
-                      {project.brand_name || project.name}
-                    </h3>
-                    <p className="mt-1 text-xs text-muted-foreground">
+                  {/* Card Footer */}
+                  <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-5">
+                    {/* Last edited timestamp */}
+                    <p className="mt-2 text-xs font-medium text-muted-foreground">
                       Last edited{" "}
-                      {new Date(project.updated_at).toLocaleDateString()}
+                      {new Date(project.updated_at).toLocaleDateString(
+                        undefined,
+                        {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        }
+                      )}
                     </p>
-                  </div>
-                </div>
-
-                <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-5">
-                  <span className="rounded-full border border-border bg-muted/40 px-3 py-1 font-mono text-[11px] text-muted-foreground">
-                    System v1.0
-                  </span>
-
-                  <Link
-                    to="/studio/$projectId"
-                    params={{ projectId: project.id }}
-                  >
-                    <Button
-                      size="pill"
-                      variant="outline"
-                      gsapFill
-                      className="cursor-pointer rounded-full px-5 py-3 text-xs font-semibold"
-                      icon={
-                        <IconArrowRight
-                          size={14}
-                          className="transition-transform group-hover:translate-x-0.5"
-                        />
-                      }
-                      iconPlacement="right"
+                    <Link
+                      to="/studio/$projectId"
+                      params={{ projectId: project.id }}
                     >
-                      Open Studio
-                    </Button>
-                  </Link>
-                </div>
-              </SpotlightCard>
-            ))}
+                      <Button
+                        size="pill"
+                        variant="outline"
+                        gsapFill
+                        className="cursor-pointer rounded-full px-5 py-3 text-xs font-semibold"
+                        icon={
+                          <IconArrowRight
+                            size={14}
+                            className="transition-transform group-hover:translate-x-0.5"
+                          />
+                        }
+                        iconPlacement="right"
+                      >
+                        Open Studio
+                      </Button>
+                    </Link>
+                  </div>
+                </SpotlightCard>
+              )
+            })}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center rounded-3xl p-12 text-center backdrop-blur-sm">
