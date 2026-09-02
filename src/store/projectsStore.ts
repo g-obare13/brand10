@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { supabase } from '../lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { get as idbGet } from 'idb-keyval'
 
 export interface BrandProjectItem {

@@ -12,8 +12,8 @@ import {
 } from "@tabler/icons-react"
 import { Link } from "@tanstack/react-router"
 import { useEffect, useRef, useState } from "react"
-import { SpotlightCard } from "../../shared/SpotlightCard"
-import { Button } from "../../ui/button"
+import { SpotlightCard } from "@/components/shared/SpotlightCard"
+import { Button } from "@/components/ui/button"
 import WordReveal from "@/components/shared/WordReveal"
 import { animateFadeUp } from "@/lib/gsap-animations"
 import { gsap } from "gsap"
@@ -23,7 +23,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "../../ui/tooltip"
+} from "@/components/ui/tooltip"
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -32,7 +32,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "../../ui/alert-dialog"
+} from "@/components/ui/alert-dialog"
 import { Loader } from "@/components/ui/loader"
 
 interface ProjectsTabProps {

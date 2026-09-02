@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
-import { useBrandStore } from '../../store/brandStore'
-import { buildAndDownloadZip, generateTailwindConfig, generateTokensJson, generateCssTokens } from '../../lib/zipBuilder'
+import { toast } from 'sonner'
+import { useBrandStore } from '@/store/brandStore'
+import { buildAndDownloadZip, generateTailwindConfig, generateTokensJson, generateCssTokens } from '@/lib/zipBuilder'
 import { downloadBrandPdf } from './PdfBrandDeck'
-import { Button } from '../ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { IconPackage, IconFileText, IconCode, IconDownload, IconCheck, IconCopy } from '@tabler/icons-react'
 
 interface ExportModalProps {
@@ -49,8 +50,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({ open, onOpenChange }) 
         svgContent: brand.svgContent,
         rasterDataUri: brand.rasterDataUri,
       })
+      toast.success('Production asset package downloaded.')
     } catch (err) {
       console.error('ZIP compilation error:', err)
+      toast.error('Failed to generate ZIP archive. Please try again.')
     } finally {
       setIsZipping(false)
     }
@@ -72,9 +75,18 @@ export const ExportModal: React.FC<ExportModalProps> = ({ open, onOpenChange }) 
         monoFont: brand.monoFont,
         baseFontSize: brand.baseFontSize,
         typeScaleRatio: brand.typeScaleRatio,
+        logoUrl: brand.logoUrl,
+        rasterDataUri: brand.rasterDataUri,
+        clearspaceMultiplier: brand.clearspaceMultiplier,
+        dosAndDonts: brand.dosAndDonts,
+        imageryMood: brand.imageryMood,
+        imageryOverlay: brand.imageryOverlay,
+        iconStyle: brand.iconStyle,
       })
+      toast.success('Brand guidelines PDF generated.')
     } catch (err) {
       console.error('PDF export error:', err)
+      toast.error('Failed to generate PDF deck. Please try again.')
     } finally {
       setIsPdfing(false)
     }

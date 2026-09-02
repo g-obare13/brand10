@@ -1,9 +1,9 @@
 import React, { useState } from "react"
 import { Link } from "@tanstack/react-router"
-import { useBrandStore } from "../../store/brandStore"
-import { Button } from "../ui/button"
-import { ExportModal } from "../export/ExportModal"
-import { ThemeToggler } from "../shared/theme-toggler"
+import { useBrandStore } from "@/store/brandStore"
+import { Button } from "@/components/ui/button"
+import { ExportModal } from "@/components/export/ExportModal"
+import { ThemeToggler } from "@/components/shared/theme-toggler"
 import {
   IconArrowLeft,
   IconArrowBackUp,

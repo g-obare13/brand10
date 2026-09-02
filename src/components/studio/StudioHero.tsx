@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react"
 import { Link } from "@tanstack/react-router"
-import { useBrandStore } from "../../store/brandStore"
-import { Button } from "../ui/button"
-import GlassPanel from "../shared/GlassPanel"
+import { useBrandStore } from "@/store/brandStore"
+import { Button } from "@/components/ui/button"
+import GlassPanel from "@/components/shared/GlassPanel"
 import {
   IconArrowLeft,
   IconArrowBackUp,

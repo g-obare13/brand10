@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useBrandStore } from '../../../store/brandStore'
+import { useBrandStore } from '@/store/brandStore'
 import {
   IconSparkles,
   IconTarget,

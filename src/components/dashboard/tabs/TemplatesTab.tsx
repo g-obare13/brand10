@@ -1,8 +1,8 @@
 import { BRAND_TEMPLATES } from "@/data/dashboard"
 import { IconPlus } from "@tabler/icons-react"
 import { useState } from "react"
-import { SpotlightCard } from "../../shared/SpotlightCard"
-import { Button } from "../../ui/button"
+import { SpotlightCard } from "@/components/shared/SpotlightCard"
+import { Button } from "@/components/ui/button"
 
 interface TemplatesTabProps {
   onOpenCreateModal: () => void

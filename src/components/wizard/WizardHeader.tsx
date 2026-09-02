@@ -1,8 +1,15 @@
 import GlassPanel from "@/components/shared/GlassPanel"
 import { Button } from "@/components/ui/button"
+import { Loader } from "@/components/ui/loader"
 import { cn } from "@/lib/utils"
 import { useBrandStore } from "@/store/brandStore"
-import { IconArrowLeft, IconCheck } from "@tabler/icons-react"
+import {
+  IconAlertCircle,
+  IconArrowLeft,
+  IconCheck,
+  IconCloudCheck,
+  IconCloudOff,
+} from "@tabler/icons-react"
 
 export const WIZARD_STEPS = [
   { id: 1, title: "Foundation", subtitle: "Identity & Vibe" },
@@ -62,7 +69,43 @@ export function WizardHeader({
               <IconArrowLeft size={18} />
             </Button>
           </GlassPanel>
-          <h4>{brand.brandName || "Brand Workspace"}</h4>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <h4>{brand.brandName || "Brand Workspace"}</h4>
+
+            {/* Real-time Save & Sync Status Badge */}
+            {brand.syncStatus === "saving" || brand.isSaving ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/60 px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground shadow-xs">
+                <Loader size="sm" className="size-3 text-primary stroke-primary" />
+                <span>Saving...</span>
+              </span>
+            ) : brand.syncStatus === "error" || brand.saveError ? (
+              <button
+                type="button"
+                onClick={() => brand.saveToSupabase()}
+                title={brand.saveError || "Cloud sync failed. Click to retry."}
+                className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-destructive/40 bg-destructive/10 px-2.5 py-0.5 text-[11px] font-medium text-destructive transition-colors hover:bg-destructive/20 shadow-xs"
+              >
+                <IconAlertCircle size={12} className="shrink-0" />
+                <span>Sync failed (retry)</span>
+              </button>
+            ) : brand.syncStatus === "offline" ? (
+              <span
+                title="Saved locally on this device"
+                className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-medium text-amber-600 dark:text-amber-400 shadow-xs"
+              >
+                <IconCloudOff size={12} className="shrink-0" />
+                <span>Offline draft</span>
+              </span>
+            ) : brand.lastSavedAt ? (
+              <span
+                title={`Last saved at ${new Date(brand.lastSavedAt).toLocaleTimeString()}`}
+                className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400 shadow-xs"
+              >
+                <IconCloudCheck size={12} className="shrink-0" />
+                <span>Saved</span>
+              </span>
+            ) : null}
+          </div>
         </div>
 
         {/* Right: Stepper Pills & Skip CTA */}

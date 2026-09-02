@@ -1,6 +1,6 @@
 import React, { useState } from "react"
-import { useBrandStore } from "../../../store/brandStore"
-import { getReadableTextColor } from "../../../lib/colorUtils"
+import { useBrandStore } from "@/store/brandStore"
+import { getReadableTextColor } from "@/lib/colorUtils"
 import {
   IconDeviceLaptop,
   IconShare,

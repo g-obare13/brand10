@@ -2,15 +2,15 @@ import { Google } from "@boxicons/react"
 import { IconSparkles } from "@tabler/icons-react"
 import { useNavigate } from "@tanstack/react-router"
 import React, { useState } from "react"
-import { useAuthStore } from "../../store/authStore"
-import { Button } from "../ui/button"
+import { useAuthStore } from "@/store/authStore"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog"
+} from "@/components/ui/dialog"
 import { Logo } from "./Logo"
 
 export interface LoginModalProps {

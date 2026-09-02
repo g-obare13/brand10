@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react"
-import { useBrandStore } from "../../../store/brandStore"
-import { ingestBrandFile } from "../../../lib/extractor"
-import { Button } from "../../ui/button"
+import { useBrandStore } from "@/store/brandStore"
+import { ingestBrandFile } from "@/lib/extractor"
+import { Button } from "@/components/ui/button"
 import {
   IconUpload,
   IconCheck,

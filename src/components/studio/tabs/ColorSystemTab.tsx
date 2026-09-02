@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { useBrandStore } from '../../../store/brandStore'
-import type { ColorSwatch } from '../../../lib/colorUtils'
-import { createColorSwatch, getWcagContrast, getReadableTextColor } from '../../../lib/colorUtils'
-import { Button } from '../../ui/button'
+import { useBrandStore } from '@/store/brandStore'
+import type { ColorSwatch } from '@/lib/colorUtils'
+import { createColorSwatch, getWcagContrast, getReadableTextColor } from '@/lib/colorUtils'
+import { Button } from '@/components/ui/button'
 import {
   IconPalette,
   IconPlus,

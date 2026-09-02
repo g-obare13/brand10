@@ -1,4 +1,4 @@
-import Auralis from "../shared/Auralis"
+import Auralis from "@/components/shared/Auralis"
 
 /**
  * Ambient visual background canvas for the main dashboard views.

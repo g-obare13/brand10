@@ -13,7 +13,8 @@ import { supabase } from "@/lib/supabase"
 import { useAuthStore } from "@/store/authStore"
 import { Toaster } from "sonner"
 import "sonner/dist/styles.css"
-import appCss from "../styles.css?url"
+import appCss from "@/styles.css?url"
+import { ScrollManager } from "@/components/shared/ScrollManager"
 
 initConsole()
 
@@ -231,17 +232,19 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         suppressHydrationWarning
         className="min-h-screen bg-background text-foreground antialiased transition-colors duration-150 selection:bg-primary/20 selection:text-primary"
       >
-        <ThemeProvider>
-          {children}
-          <Toaster
-            position="bottom-right"
-            closeButton
-            richColors
-            toastOptions={{
-              className: "font-sans",
-            }}
-          />
-        </ThemeProvider>
+        <ScrollManager>
+          <ThemeProvider>
+            {children}
+            <Toaster
+              position="bottom-right"
+              closeButton
+              richColors
+              toastOptions={{
+                className: "font-sans",
+              }}
+            />
+          </ThemeProvider>
+        </ScrollManager>
 
         {/* <TanStackDevtools
           config={{

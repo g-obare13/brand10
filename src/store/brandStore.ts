@@ -1,9 +1,10 @@
 import { create } from 'zustand'
 import { temporal } from 'zundo'
 import { get as idbGet, set as idbSet, del as idbDel } from 'idb-keyval'
-import type { ColorSwatch } from '../lib/colorUtils'
-import { createColorSwatch } from '../lib/colorUtils'
-import { supabase } from '../lib/supabase'
+import { toast } from 'sonner'
+import type { ColorSwatch } from '@/lib/colorUtils'
+import { createColorSwatch } from '@/lib/colorUtils'
+import { supabase } from '@/lib/supabase'
 
 export interface BrandToneRatings {
   formal: number // 0 (Ultra Casual) to 100 (Formal Corporate)
@@ -66,6 +67,8 @@ export interface BrandState {
   isSaving: boolean
   isLoading: boolean
   lastSavedAt: string | null
+  syncStatus: 'idle' | 'saving' | 'saved' | 'offline' | 'error'
+  saveError: string | null
 
   // Actions
   setProjectId: (id: string) => void
@@ -385,6 +388,8 @@ export const useBrandStore = create<BrandState>()(
       isSaving: false,
       isLoading: false,
       lastSavedAt: null,
+      syncStatus: 'idle',
+      saveError: null,
 
       setProjectId: (id) => set({ projectId: id }),
       setBrandName: (name) => set({ brandName: name }),
@@ -723,7 +728,15 @@ export const useBrandStore = create<BrandState>()(
               baseFontSize: Number(data.base_font_size) || 16,
               typeScaleRatio: Number(data.type_scale_ratio) || 1.25,
               customFonts: data.logo_variants?.custom_fonts || [],
+              dosAndDonts: data.dos_and_donts || get().dosAndDonts,
+              imageryMood: data.imagery_mood || 'minimal',
+              imageryOverlay: data.imagery_overlay || 'none',
+              iconStyle: data.icon_style || 'stroke',
+              iconRadius: Number(data.icon_radius) || 4,
+              iconStroke: Number(data.icon_stroke) || 2.0,
               lastSavedAt: data.updated_at,
+              syncStatus: 'saved',
+              saveError: null,
               isLoading: false,
             })
           } else {
@@ -752,13 +765,37 @@ export const useBrandStore = create<BrandState>()(
               baseFontSize: 16,
               typeScaleRatio: 1.25,
               clearspaceMultiplier: 1.0,
+              dosAndDonts: get().dosAndDonts,
+              imageryMood: 'minimal',
+              imageryOverlay: 'none',
+              iconStyle: 'stroke',
+              iconRadius: 4,
+              iconStroke: 2.0,
               lastSavedAt: new Date().toISOString(),
+              syncStatus: 'saved',
+              saveError: null,
               isLoading: false,
             })
           }
         } catch (err) {
-          console.warn('Failed to load project from Supabase:', err)
-          set({ isLoading: false })
+          console.warn('Failed to load project from Supabase, attempting local draft fallback:', err)
+          try {
+            const rawDraft = localStorage.getItem(`brandio_local_brand_${projectId}`)
+            if (rawDraft) {
+              const draft = JSON.parse(rawDraft)
+              set({
+                ...draft,
+                projectId,
+                syncStatus: 'offline',
+                saveError: null,
+                isLoading: false,
+              })
+              toast.info('Loaded local offline draft for this brand.')
+              return
+            }
+          } catch {}
+          set({ isLoading: false, syncStatus: 'error', saveError: 'Failed to load project from Supabase' })
+          toast.error('Failed to load brand project from cloud.')
         }
       },
 
@@ -767,7 +804,7 @@ export const useBrandStore = create<BrandState>()(
         if (state.isLoading || !state.projectId || state.projectId === 'demo-project' || !state.brandName) return
 
         if (!supabase || state.projectId.startsWith('demo-') || state.projectId.startsWith('project-')) {
-          set({ lastSavedAt: new Date().toISOString() })
+          set({ isSaving: false, syncStatus: 'offline', saveError: null, lastSavedAt: new Date().toISOString() })
           try {
             localStorage.setItem(`brandio_local_brand_${state.projectId}`, JSON.stringify(state))
             const localProjects = JSON.parse(
@@ -791,7 +828,7 @@ export const useBrandStore = create<BrandState>()(
           return
         }
 
-        set({ isSaving: true })
+        set({ isSaving: true, syncStatus: 'saving', saveError: null })
         try {
           const primaryLogo =
             state.logoUrl ||
@@ -829,6 +866,12 @@ export const useBrandStore = create<BrandState>()(
             monospace_font: state.monoFont,
             base_font_size: state.baseFontSize,
             type_scale_ratio: state.typeScaleRatio,
+            dos_and_donts: state.dosAndDonts,
+            imagery_mood: state.imageryMood,
+            imagery_overlay: state.imageryOverlay,
+            icon_style: state.iconStyle,
+            icon_radius: state.iconRadius,
+            icon_stroke: state.iconStroke,
             updated_at: new Date().toISOString(),
           }
 
@@ -867,10 +910,27 @@ export const useBrandStore = create<BrandState>()(
             }
           } catch {}
 
-          set({ isSaving: false, lastSavedAt: new Date().toISOString() })
-        } catch (err) {
+          // Cache draft locally as fallback resilience
+          try {
+            localStorage.setItem(`brandio_local_brand_${state.projectId}`, JSON.stringify(state))
+          } catch {}
+
+          set({ isSaving: false, syncStatus: 'saved', saveError: null, lastSavedAt: new Date().toISOString() })
+        } catch (err: any) {
           console.error('Failed to save to Supabase:', err)
-          set({ isSaving: false })
+          const errMsg = err?.message || 'Failed to save to Supabase'
+          try {
+            localStorage.setItem(`brandio_local_brand_${state.projectId}`, JSON.stringify(state))
+          } catch {}
+          set({ isSaving: false, syncStatus: 'error', saveError: errMsg })
+          toast.error('Cloud sync failed. Draft saved locally.', {
+            action: {
+              label: 'Retry',
+              onClick: () => {
+                get().saveToSupabase()
+              },
+            },
+          })
         }
       },
     }),

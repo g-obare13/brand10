@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
 import { useBrandStore } from "@/store/brandStore"
 import { Header } from "@/components/shared/Header"
 import { DashboardBackground } from "@/components/dashboard/DashboardBackground"
@@ -26,7 +27,17 @@ import {
   IconSparkles,
 } from "@tabler/icons-react"
 
+interface StudioSearchParams {
+  step?: number
+}
+
 export const Route = createFileRoute("/studio/$projectId")({
+  validateSearch: (search: Record<string, unknown>): StudioSearchParams => {
+    const rawStep = Number(search.step)
+    const step =
+      Number.isInteger(rawStep) && rawStep >= 1 && rawStep <= 6 ? rawStep : 1
+    return { step }
+  },
   head: () => ({
     meta: [
       {
@@ -47,16 +58,17 @@ export const Route = createFileRoute("/studio/$projectId")({
  * Features:
  * - Direct hydration from Supabase or IndexedDB based on route projectId.
  * - Two-column responsive wizard layout (step configuration on left, dynamic live bento preview on right).
- * - Step progression, validation, and auto-save on finish.
+ * - Step progression, URL query sync, validation, and auto-save on finish.
  *
  * @component
  * @returns {React.ReactElement} The rendered studio / wizard page.
  */
 function StudioPage() {
   const { projectId } = Route.useParams()
+  const search = Route.useSearch()
+  const currentStep = search.step ?? 1
   const brand = useBrandStore()
   const navigate = useNavigate()
-  const [currentStep, setCurrentStep] = useState(1)
   const [isSaving, setIsSaving] = useState(false)
 
   const isProjectLoading =
@@ -67,6 +79,16 @@ function StudioPage() {
       brand.loadFromProject(projectId)
     }
   }, [projectId, brand.projectId])
+
+  const goToStep = (step: number) => {
+    const safeStep = Math.min(Math.max(1, step), 6)
+    navigate({
+      to: "/studio/$projectId",
+      params: { projectId },
+      search: { step: safeStep },
+    })
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
 
   const handleNext = async () => {
     if (isProjectLoading || isSaving) return
@@ -107,10 +129,10 @@ function StudioPage() {
         }
 
         await brand.saveToSupabase()
-        setCurrentStep((prev) => prev + 1)
-        window.scrollTo({ top: 0, behavior: "smooth" })
+        goToStep(currentStep + 1)
       } catch (err) {
         console.error("Failed to advance wizard step:", err)
+        toast.error("Failed to advance wizard step. Please check your changes.")
       } finally {
         setIsSaving(false)
       }
@@ -120,16 +142,15 @@ function StudioPage() {
   const handleBack = () => {
     if (isProjectLoading || isSaving) return
     if (currentStep > 1) {
-      setCurrentStep((prev) => prev - 1)
-      window.scrollTo({ top: 0, behavior: "smooth" })
+      goToStep(currentStep - 1)
     }
   }
 
-  const handleSkipToStudio = () => {
-    navigate({
-      to: "/studio/$projectId",
-      params: { projectId },
-    })
+  const handleSkipStep = () => {
+    if (isProjectLoading || isSaving) return
+    if (currentStep < 6) {
+      goToStep(currentStep + 1)
+    }
   }
 
   return (
@@ -146,7 +167,7 @@ function StudioPage() {
           {/* Sub-Header Control & Step Indicator Strip */}
           <WizardHeader
             currentStep={currentStep}
-            onStepSelect={(step) => setCurrentStep(step)}
+            onStepSelect={(step) => goToStep(step)}
             projectId={projectId}
           />
 
@@ -194,7 +215,7 @@ function StudioPage() {
                         variant="outline"
                         size="pill"
                         gsapFill
-                        onClick={handleSkipToStudio}
+                        onClick={handleSkipStep}
                         disabled={isProjectLoading || isSaving}
                         className="cursor-pointer rounded-full px-4 text-xs font-semibold text-muted-foreground hover:text-foreground disabled:opacity-30"
                       >

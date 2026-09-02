@@ -5,9 +5,9 @@ import { ArrowRightStroke } from "@boxicons/react"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { gsap } from "gsap"
 import { useEffect, useRef } from "react"
-import { Header } from "../components/shared/Header"
-import Container from "../components/ui/container"
-import { useBrandStore } from "../store/brandStore"
+import { Header } from "@/components/shared/Header"
+import Container from "@/components/ui/container"
+import { useBrandStore } from "@/store/brandStore"
 
 export const Route = createFileRoute("/")({
   head: () => ({

@@ -30,6 +30,12 @@ CREATE TABLE IF NOT EXISTS brand_data (
   monospace_font TEXT,
   base_font_size NUMERIC DEFAULT 16,
   type_scale_ratio NUMERIC DEFAULT 1.25,
+  dos_and_donts JSONB DEFAULT '[]',
+  imagery_mood TEXT DEFAULT 'minimal',
+  imagery_overlay TEXT DEFAULT 'none',
+  icon_style TEXT DEFAULT 'stroke',
+  icon_radius NUMERIC DEFAULT 4,
+  icon_stroke NUMERIC DEFAULT 2.0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

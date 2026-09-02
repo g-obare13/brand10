@@ -5,11 +5,11 @@ import {
   DashboardBackground,
   DashboardHero,
   DashboardToolbar,
-} from "../components/dashboard"
-import { Header } from "../components/shared/Header"
-import Container from "../components/ui/container"
-import { useAuthStore } from "../store/authStore"
-import { useProjectsStore } from "../store/projectsStore"
+} from "@/components/dashboard"
+import { Header } from "@/components/shared/Header"
+import Container from "@/components/ui/container"
+import { useAuthStore } from "@/store/authStore"
+import { useProjectsStore } from "@/store/projectsStore"
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({

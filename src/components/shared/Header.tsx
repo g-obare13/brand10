@@ -16,8 +16,8 @@ import {
 import { Link, useLocation, useNavigate } from "@tanstack/react-router"
 import gsap from "gsap"
 import { useEffect, useRef, useState } from "react"
-import { Badge } from "../ui/badge"
-import Container from "../ui/container"
+import { Badge } from "@/components/ui/badge"
+import Container from "@/components/ui/container"
 import GlassPanel from "./GlassPanel"
 import ImageComponentOptimized from "./ImageComponentOptimized"
 

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { useBrandStore } from '../../../store/brandStore'
+import { useBrandStore } from '@/store/brandStore'
 import {
   CURATED_PAIRINGS,
   POPULAR_GOOGLE_FONTS,
   MODULAR_SCALES,
   loadGoogleFont,
   computeTypeScale,
-} from '../../../lib/fontLoader'
+} from '@/lib/fontLoader'
 import { IconTypography, IconSparkles, IconDeviceDesktop, IconCheck } from '@tabler/icons-react'
 /**
  * Deep studio tab for managing brand typography pairing, scale ratios, and specimen testing.

@@ -1,14 +1,14 @@
 import { useNavigate } from "@tanstack/react-router"
 import gsap from "gsap"
 import React, { useEffect, useRef, useState } from "react"
-import { animateFadeUp } from "../../lib/gsap-animations"
-import { useAuthStore } from "../../store/authStore"
-import { useProjectsStore } from "../../store/projectsStore"
-import { useBrandStore } from "../../store/brandStore"
-import { Button } from "../ui/button"
-import { Input } from "../ui/input"
-import { Label } from "../ui/label"
-import { Loader } from "../ui/loader"
+import { animateFadeUp } from "@/lib/gsap-animations"
+import { useAuthStore } from "@/store/authStore"
+import { useProjectsStore } from "@/store/projectsStore"
+import { useBrandStore } from "@/store/brandStore"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Loader } from "@/components/ui/loader"
 
 interface CreateProjectModalProps {
   isOpen: boolean

@@ -1,12 +1,12 @@
 import { Link } from "@tanstack/react-router"
 import type { ReactNode } from "react"
-import GlassPanel from "../shared/GlassPanel"
+import GlassPanel from "@/components/shared/GlassPanel"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "../ui/tooltip"
+} from "@/components/ui/tooltip"
 import {
   AppsAlt,
   Cog,

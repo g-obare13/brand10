@@ -1,5 +1,5 @@
 import { IconLock } from "@tabler/icons-react"
-import GlassPanel from "../shared/GlassPanel"
+import GlassPanel from "@/components/shared/GlassPanel"
 
 interface DashboardHeroProps {
   userEmail?: string

@@ -4,12 +4,14 @@ import {
   StyleSheet,
   Text,
   View,
+  Image,
   pdf,
 } from "@react-pdf/renderer"
 import fileSaver from "file-saver"
 import React from "react"
-import type { ColorSwatch } from "../../lib/colorUtils"
-import { computeTypeScale } from "../../lib/fontLoader"
+import type { ColorSwatch } from "@/lib/colorUtils"
+import { computeTypeScale } from "@/lib/fontLoader"
+import type { BrandDoDontItem } from "@/store/brandStore"
 
 const saveAs = fileSaver.saveAs
 
@@ -183,6 +185,75 @@ const styles = StyleSheet.create({
     width: "25%",
     textAlign: "right",
   },
+  logoSectionRow: {
+    display: "flex",
+    flexDirection: "row",
+    gap: 16,
+    marginTop: 15,
+  },
+  logoPreviewCard: {
+    flex: 1,
+    backgroundColor: "#131b2e",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#1e293b",
+    padding: 24,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 180,
+  },
+  logoImage: {
+    maxWidth: 220,
+    maxHeight: 110,
+    objectFit: "contain",
+  },
+  logoRulesCard: {
+    flex: 1,
+    backgroundColor: "#131b2e",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#1e293b",
+    padding: 20,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+  },
+  ruleGrid: {
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginTop: 12,
+  },
+  ruleCard: {
+    width: "48%",
+    backgroundColor: "#131b2e",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#1e293b",
+    padding: 12,
+  },
+  ruleBadgeDo: {
+    fontSize: 8,
+    fontFamily: "Helvetica-Bold",
+    color: "#10b981",
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderRadius: 3,
+    alignSelf: "flex-start",
+    marginBottom: 6,
+  },
+  ruleBadgeDont: {
+    fontSize: 8,
+    fontFamily: "Helvetica-Bold",
+    color: "#f43f5e",
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderRadius: 3,
+    alignSelf: "flex-start",
+    marginBottom: 6,
+  },
 })
 
 export interface BrandPdfProps {
@@ -203,6 +274,13 @@ export interface BrandPdfProps {
   monoFont: string
   baseFontSize: number
   typeScaleRatio: number
+  logoUrl?: string
+  rasterDataUri?: string
+  clearspaceMultiplier?: number
+  dosAndDonts?: BrandDoDontItem[]
+  imageryMood?: string
+  imageryOverlay?: string
+  iconStyle?: string
 }
 
 /**
@@ -230,6 +308,10 @@ export const BrandPdfDeck: React.FC<BrandPdfProps> = ({
   monoFont,
   baseFontSize,
   typeScaleRatio,
+  logoUrl,
+  rasterDataUri,
+  clearspaceMultiplier = 1.0,
+  dosAndDonts = [],
 }) => {
   const typeScale = computeTypeScale(baseFontSize, typeScaleRatio)
   const primaryColor =
@@ -316,11 +398,76 @@ export const BrandPdfDeck: React.FC<BrandPdfProps> = ({
         </View>
       </Page>
 
-      {/* SLIDE 2: STRATEGY & TONE */}
+      {/* SLIDE 2: LOGO SYSTEM & CLEARSPACE */}
+      <Page size="A4" orientation="landscape" style={styles.page}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>{brandName} • Logo Mark & Geometry</Text>
+          <Text style={styles.headerPageNum}>02</Text>
+        </View>
+
+        <View style={{ flexGrow: 1 }}>
+          <Text style={styles.slideTitle}>Primary Mark & Clearspace Bounds</Text>
+          <Text style={styles.slideSubtitle}>
+            Preserve proportional geometry and mandatory protective exclusion zone across all media.
+          </Text>
+
+          <View style={styles.logoSectionRow}>
+            {/* Left: Logo Preview Box */}
+            <View style={styles.logoPreviewCard}>
+              {rasterDataUri || logoUrl ? (
+                <Image
+                  src={rasterDataUri || logoUrl}
+                  style={styles.logoImage}
+                />
+              ) : (
+                <View style={{ alignItems: "center", justifyContent: "center" }}>
+                  <Text style={{ fontSize: 32, fontFamily: "Helvetica-Bold", color: "#ffffff" }}>
+                    {brandName}
+                  </Text>
+                  <Text style={{ fontSize: 10, color: "#64748b", marginTop: 8 }}>
+                    Primary Wordmark Specification
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* Right: Technical Guidelines */}
+            <View style={styles.logoRulesCard}>
+              <View>
+                <Text style={styles.cardLabel}>Clearspace Requirement</Text>
+                <Text style={styles.cardBody}>
+                  Maintain a minimum isolation clearance of {clearspaceMultiplier}x the mark perimeter. No text, graphic elements, trims, or borders may intrude into this zone.
+                </Text>
+              </View>
+
+              <View style={{ marginTop: 12 }}>
+                <Text style={styles.cardLabel}>Rendering & Formats</Text>
+                <Text style={styles.cardBody}>
+                  Production marks should use vector SVG where scalable resolution is required, or high-density PNG with alpha transparency for raster touchpoints.
+                </Text>
+              </View>
+
+              <View style={{ marginTop: 12 }}>
+                <Text style={styles.cardLabel}>Integrity Rule</Text>
+                <Text style={styles.cardBody}>
+                  Never stretch, condense, skew, add unapproved dropshadows, or alter color channels outside the official color system.
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>{brandName} Design System</Text>
+          <Text style={styles.footerText}>Section 01: Logo System</Text>
+        </View>
+      </Page>
+
+      {/* SLIDE 3: STRATEGY & TONE */}
       <Page size="A4" orientation="landscape" style={styles.page}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>{brandName} • Brand Strategy</Text>
-          <Text style={styles.headerPageNum}>02</Text>
+          <Text style={styles.headerPageNum}>03</Text>
         </View>
 
         <View style={{ flexGrow: 1 }}>
@@ -400,17 +547,17 @@ export const BrandPdfDeck: React.FC<BrandPdfProps> = ({
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>{brandName} Design System</Text>
-          <Text style={styles.footerText}>Section 01: Strategy</Text>
+          <Text style={styles.footerText}>Section 02: Strategy</Text>
         </View>
       </Page>
 
-      {/* SLIDE 3: COLOR SYSTEM */}
+      {/* SLIDE 4: COLOR SYSTEM */}
       <Page size="A4" orientation="landscape" style={styles.page}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>
             {brandName} • Color Architecture
           </Text>
-          <Text style={styles.headerPageNum}>03</Text>
+          <Text style={styles.headerPageNum}>04</Text>
         </View>
 
         <View style={{ flexGrow: 1 }}>
@@ -447,17 +594,17 @@ export const BrandPdfDeck: React.FC<BrandPdfProps> = ({
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>{brandName} Design System</Text>
-          <Text style={styles.footerText}>Section 02: Color Matrix</Text>
+          <Text style={styles.footerText}>Section 03: Color Matrix</Text>
         </View>
       </Page>
 
-      {/* SLIDE 4: TYPOGRAPHY SYSTEM */}
+      {/* SLIDE 5: TYPOGRAPHY SYSTEM */}
       <Page size="A4" orientation="landscape" style={styles.page}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>
             {brandName} • Typographic Scale
           </Text>
-          <Text style={styles.headerPageNum}>04</Text>
+          <Text style={styles.headerPageNum}>05</Text>
         </View>
 
         <View style={{ flexGrow: 1 }}>
@@ -497,9 +644,55 @@ export const BrandPdfDeck: React.FC<BrandPdfProps> = ({
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>{brandName} Design System</Text>
-          <Text style={styles.footerText}>Section 03: Typography</Text>
+          <Text style={styles.footerText}>Section 04: Typography</Text>
         </View>
       </Page>
+
+      {/* SLIDE 6: BRAND USAGE & GOVERNANCE */}
+      {dosAndDonts.length > 0 && (
+        <Page size="A4" orientation="landscape" style={styles.page}>
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>
+              {brandName} • Brand Governance & Rules
+            </Text>
+            <Text style={styles.headerPageNum}>06</Text>
+          </View>
+
+          <View style={{ flexGrow: 1 }}>
+            <Text style={styles.slideTitle}>Usage Guidelines & Boundaries</Text>
+            <Text style={styles.slideSubtitle}>
+              Preserve visual consistency across digital, physical, and partner touchpoints.
+            </Text>
+
+            <View style={styles.ruleGrid}>
+              {dosAndDonts.slice(0, 6).map((item) => (
+                <View key={item.id} style={styles.ruleCard}>
+                  <Text
+                    style={
+                      item.type === "do"
+                        ? styles.ruleBadgeDo
+                        : styles.ruleBadgeDont
+                    }
+                  >
+                    {item.type === "do" ? "APPROVED / DO" : "STRICTLY FORBIDDEN / DON'T"}
+                  </Text>
+                  <Text style={{ fontSize: 11, fontFamily: "Helvetica-Bold", color: "#ffffff", marginBottom: 4 }}>
+                    {item.rule}
+                  </Text>
+                  <Text style={{ fontSize: 9, color: "#94a3b8", lineHeight: 1.4 }}>
+                    {item.detail}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>{brandName} Design System</Text>
+            <Text style={styles.footerText}>Section 05: Governance</Text>
+          </View>
+        </Page>
+      )}
     </Document>
   )
 }
