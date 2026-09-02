@@ -21,6 +21,10 @@ const config = defineConfig({
       "@tanstack/react-store",
       "@tanstack/store",
       "@tabler/icons-react",
+      /^gsap/,
+      "@boxicons/react",
+      "@base-ui/react",
+      "sonner",
     ],
   },
   build: {
