@@ -10,8 +10,7 @@ if (typeof window !== "undefined") {
 }
 export function ScrollManager({ children }: { children: React.ReactNode }) {
   const circleRef = useRef<SVGCircleElement>(null)
-  const textRef = useRef<HTMLSpanElement>(null)
-  const arrowRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
   const lenisRef = useRef<Lenis>(null)
 
   useEffect(() => {
@@ -38,16 +37,15 @@ export function ScrollManager({ children }: { children: React.ReactNode }) {
         circleRef.current.style.strokeDashoffset = `${dashoffset}`
       }
 
-      // Toggle between text and arrow when at the bottom
-      if (progress >= 0.99) {
-        if (textRef.current) textRef.current.style.opacity = "0"
-        if (arrowRef.current) arrowRef.current.style.opacity = "1"
-      } else {
-        if (textRef.current) {
-          textRef.current.style.opacity = "1"
-          textRef.current.innerText = `${Math.round(progress * 100)}%`
+      // Show button only when user has scrolled down
+      if (buttonRef.current) {
+        if (progress > 0.04) {
+          buttonRef.current.style.opacity = "1"
+          buttonRef.current.style.pointerEvents = "auto"
+        } else {
+          buttonRef.current.style.opacity = "0"
+          buttonRef.current.style.pointerEvents = "none"
         }
-        if (arrowRef.current) arrowRef.current.style.opacity = "0"
       }
     })
 
@@ -78,14 +76,16 @@ export function ScrollManager({ children }: { children: React.ReactNode }) {
     <>
       {children}
 
-      {/* Circular Progress Indicator */}
+      {/* Sleek Scroll-to-Top Button */}
       <button
+        ref={buttonRef}
         onClick={scrollToTop}
-        className="fixed right-6 bottom-6 z-50 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border bg-background shadow-lg backdrop-blur-md transition-transform duration-300 hover:scale-110 active:scale-95"
+        style={{ opacity: 0, pointerEvents: "none" }}
+        className="fixed right-6 bottom-6 z-50 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-border/80 bg-background/90 shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-110 active:scale-95"
         aria-label="Scroll to top"
       >
         <svg
-          className="h-full w-full -rotate-90 transform"
+          className="absolute inset-0 h-full w-full -rotate-90 transform"
           viewBox="0 0 100 100"
         >
           <circle
@@ -105,18 +105,7 @@ export function ScrollManager({ children }: { children: React.ReactNode }) {
             style={{ strokeDashoffset: 289.026 }}
           />
         </svg>
-        <span
-          ref={textRef}
-          className="absolute text-[10px] font-bold transition-opacity duration-300"
-        >
-          0%
-        </span>
-        <div
-          ref={arrowRef}
-          className="absolute opacity-0 transition-opacity duration-300"
-        >
-          <ChevronUp className="h-5 w-5 text-foreground" />
-        </div>
+        <ChevronUp className="relative z-10 h-5 w-5 text-foreground" />
       </button>
     </>
   )

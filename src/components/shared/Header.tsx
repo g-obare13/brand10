@@ -45,6 +45,7 @@ export function Header({ action }: HeaderProps = {}) {
   const { user, initialize, signOut } = useAuthStore()
   const menuRef = useRef<HTMLDivElement>(null)
   const menuBtnRef = useRef<HTMLButtonElement>(null)
+  const getStartedBtnRef = useRef<HTMLButtonElement>(null)
 
   const handleCopy = (text: string, fieldId: string) => {
     navigator.clipboard.writeText(text)
@@ -165,7 +166,7 @@ export function Header({ action }: HeaderProps = {}) {
               blur="none"
               noise
               noiseOpacity={0.02}
-              className="rounded-full p-1"
+              className="hidden rounded-full p-1 lg:flex"
             >
               <ThemeToggler />
             </GlassPanel>
@@ -181,7 +182,7 @@ export function Header({ action }: HeaderProps = {}) {
                 <Button
                   gsapFill
                   variant="outline"
-                  className="hidden cursor-pointer rounded-full p-6 lg:flex"
+                  className="cursor-pointer rounded-full p-6"
                   icon={<IconLogout size={16} />}
                   onClick={async () => {
                     await signOut()
@@ -195,7 +196,7 @@ export function Header({ action }: HeaderProps = {}) {
                 <Button
                   gsapFill
                   variant="outline"
-                  className="hidden cursor-pointer rounded-full p-6 lg:flex"
+                  className="cursor-pointer rounded-full p-6"
                   icon={<IconLock size={16} />}
                   href="/dashboard/projects"
                   iconPlacement="right"
@@ -204,11 +205,15 @@ export function Header({ action }: HeaderProps = {}) {
                 </Button>
               ) : (
                 <Button
+                  ref={getStartedBtnRef}
                   gsapFill
                   variant="outline"
-                  className="hidden cursor-pointer rounded-full p-6 lg:flex"
+                  className="cursor-pointer rounded-full p-6"
                   icon={<IconLock size={16} />}
-                  onClick={() => setLoginModalOpen(true)}
+                  onClick={() => {
+                    setIsOpen(false)
+                    setLoginModalOpen(!loginModalOpen)
+                  }}
                   iconPlacement="right"
                 >
                   {headerData.chatLabel}
@@ -220,10 +225,13 @@ export function Header({ action }: HeaderProps = {}) {
             <Button
               ref={menuBtnRef}
               variant="shiny"
-              className="btn-fill rounded-full p-6"
+              className="btn-fill hidden rounded-full p-6 lg:flex"
               icon={isOpen ? <IconX size={16} /> : <IconMenu size={16} />}
               iconPlacement="right"
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={() => {
+                setLoginModalOpen(false)
+                setIsOpen(!isOpen)
+              }}
             >
               {headerData.menuLabel}
             </Button>
@@ -344,10 +352,14 @@ export function Header({ action }: HeaderProps = {}) {
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Login Modal */}
-        <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
+          {/* Login Flyout Card */}
+          <LoginModal
+            open={loginModalOpen}
+            onOpenChange={setLoginModalOpen}
+            triggerRef={getStartedBtnRef}
+          />
+        </div>
       </Container>
     </header>
   )

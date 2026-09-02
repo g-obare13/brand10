@@ -35,14 +35,15 @@ export function GeneralErrorComponent({ reset }: ErrorComponentProps) {
       if (buttons && buttons.length > 0) {
         gsap.fromTo(
           buttons,
-          { y: 25, opacity: 0 },
+          { y: 20, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 1.1,
+            duration: 0.9,
             stagger: 0.12,
-            delay: 0.25,
+            delay: 0.35,
             ease: "power3.out",
+            clearProps: "opacity,transform",
           }
         )
       }
@@ -90,6 +91,7 @@ export function GeneralErrorComponent({ reset }: ErrorComponentProps) {
               variant={"shiny"}
               size={"pill"}
               gsapFill
+              style={{ opacity: 0 }}
               className={"hero-cta-btn rounded-full px-12! py-8!"}
             >
               Try Again
@@ -99,6 +101,7 @@ export function GeneralErrorComponent({ reset }: ErrorComponentProps) {
               variant={"outline"}
               size={"pill"}
               gsapFill
+              style={{ opacity: 0 }}
               className={"hero-cta-btn rounded-full px-12! py-8!"}
               href="/"
             >

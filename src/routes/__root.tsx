@@ -150,12 +150,8 @@ export const Route = createRootRoute({
     }
 
     // Check store state first
-    const { user, isGuest } = useAuthStore.getState()
+    const { user } = useAuthStore.getState()
     if (user) {
-      return
-    }
-
-    if (isGuest && !supabase) {
       return
     }
 
@@ -170,7 +166,6 @@ export const Route = createRootRoute({
           useAuthStore.setState({
             user: session.user,
             session,
-            isGuest: false,
             loading: false,
           })
           return

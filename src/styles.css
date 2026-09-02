@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "lenis/dist/lenis.css";
 
 @import "@fontsource-variable/jetbrains-mono";
 
@@ -224,26 +225,26 @@
     }
   }
   h1 {
-    @apply text-5xl font-semibold text-foreground lg:text-6xl;
+    @apply text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl lg:text-6xl;
   }
   h2 {
-    @apply text-4xl font-semibold text-foreground md:text-5xl;
+    @apply text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl;
   }
   h3 {
-    @apply text-3xl font-semibold text-foreground md:text-4xl;
+    @apply text-2xl font-semibold text-foreground sm:text-3xl md:text-4xl;
   }
   h4 {
-    @apply text-2xl font-semibold text-foreground;
+    @apply text-xl font-semibold text-foreground sm:text-2xl;
   }
   h5 {
-    @apply text-xl font-semibold text-foreground;
+    @apply text-lg font-semibold text-foreground sm:text-xl;
   }
   h6 {
-    @apply text-lg font-semibold text-foreground;
+    @apply text-base font-semibold text-foreground sm:text-lg;
   }
   p {
     font-family: var(--font-sans);
-    @apply text-base font-normal text-olive-950/90 lg:text-base dark:text-muted-foreground;
+    @apply text-sm font-normal text-olive-950/90 sm:text-base lg:text-base dark:text-muted-foreground;
   }
   label {
     @apply font-sans;

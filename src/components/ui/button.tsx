@@ -363,7 +363,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     )
 
     const classes = cn(
-      "group/button relative inline-flex items-center justify-center gap-2 overflow-hidden text-current no-underline transition-all duration-300",
+      "group/button relative inline-flex items-center justify-center gap-2 overflow-hidden text-current no-underline transition-[color,background-color,border-color,box-shadow] duration-200",
       buttonVariants({ variant, size }),
       isIconOnly && "aspect-square justify-center px-0",
       className

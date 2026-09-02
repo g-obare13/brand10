@@ -4,7 +4,7 @@ import { IconCheck } from "@tabler/icons-react"
 /**
  * Dashboard settings tab displaying workspace tier, quotas, and preferences.
  * Features:
- * - Active session information (auth email vs guest local storage).
+ * - Active session information (auth email).
  * - Quota usage meters for project limits.
  * - System feature switches and defaults overview.
  *
@@ -34,7 +34,7 @@ export function SettingsTab() {
               Active Account
             </h4>
             <p className="text-xs text-muted-foreground">
-              {auth.user?.email || "Guest Session (Local Storage)"}
+              {auth.user?.email || "Not signed in"}
             </p>
           </div>
           <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-500">
