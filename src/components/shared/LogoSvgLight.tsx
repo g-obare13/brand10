@@ -6,7 +6,7 @@ interface SvgProps {
 }
 
 /**
- * Vector SVG mark for the Brandio brand identity (light/white paths for dark mode).
+ * Vector SVG mark for the Brand10 brand identity (light/white paths for dark mode).
  *
  * @component
  * @param {SvgProps} props - The component props.

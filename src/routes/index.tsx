@@ -13,7 +13,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       {
-        title: "Brandio - Modern Brand Identity Studio & Living Design Systems",
+        title: "Brand10 - Modern Brand Identity Studio & Living Design Systems",
       },
       {
         name: "description",
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:title",
         content:
-          "Brandio - Modern Brand Identity Studio & Living Design Systems",
+          "Brand10 - Modern Brand Identity Studio & Living Design Systems",
       },
       {
         property: "og:description",
@@ -111,16 +111,16 @@ function LandingPage() {
             <WordReveal as="h1" stagger={0.03} duration={1.4} start="top 90%">
               Create comprehensive brand guidelines in minutes with Brand
               <span className="font-heading text-5xl font-semibold text-primary lg:text-6xl">
-                i
+                1
               </span>
               <span className="font-heading text-5xl font-semibold text-olive-400 lg:text-6xl">
-                o
+                0
               </span>
               .
             </WordReveal>
 
             <WordReveal as="p" stagger={0.03} duration={1.4} start="top 90%">
-              Brandio is your AI brand studio. Automatically generate and manage
+              Brand10 is your AI brand studio. Automatically generate and manage
               logo clearspace rules, accessible color palettes, typography
               systems, and exportable brand decks in one unified workspace.
             </WordReveal>

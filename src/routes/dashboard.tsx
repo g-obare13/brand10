@@ -15,7 +15,7 @@ export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
       {
-        title: "Dashboard | Brandio",
+        title: "Dashboard | Brand10",
       },
       {
         name: "description",

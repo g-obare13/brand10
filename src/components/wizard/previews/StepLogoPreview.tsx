@@ -73,7 +73,7 @@ function BlueprintFrame({
   const overshoot = size === "lg" ? 16 : 12
   const totalExt = outerOffset + overshoot
 
-  const name = brandName || "Brandio"
+  const name = brandName || "Brand10"
 
   const renderFallbackText = () => {
     if (name.toLowerCase().endsWith("io") && name.length > 2) {
@@ -438,10 +438,7 @@ export function StepLogoPreview() {
         blur="none"
         noise
         noiseOpacity={0.02}
-        className={cn(
-          "preview-card-anim space-y-4 p-6",
-          theme.interactiveCard
-        )}
+        className={cn("preview-card-anim space-y-4 p-6", theme.interactiveCard)}
       >
         <div className="mb-2 flex items-center justify-between">
           <span className="text-sm font-semibold">

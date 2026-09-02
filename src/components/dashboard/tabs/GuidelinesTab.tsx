@@ -104,7 +104,7 @@ export function GuidelinesTab({ onOpenCreateModal }: GuidelinesTabProps) {
           </WordReveal>
 
           <WordReveal as="p" stagger={0.02} duration={1.2} start="top 90%">
-            The 6 core guideline pillars configured in your Brandio studio.
+            The 6 core guideline pillars configured in your Brand10 studio.
           </WordReveal>
         </div>
       </div>

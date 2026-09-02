@@ -31,7 +31,7 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Brandio - Modern Brand Identity Studio & Living Design Systems",
+        title: "Brand10 - Modern Brand Identity Studio & Living Design Systems",
       },
       {
         name: "description",
@@ -41,11 +41,11 @@ export const Route = createRootRoute({
       {
         name: "keywords",
         content:
-          "brand identity, design system, brand guidelines, typography scale, color palette generator, brand kit, SVG logo, Brandio",
+          "brand identity, design system, brand guidelines, typography scale, color palette generator, brand kit, SVG logo, Brand10",
       },
       {
         name: "author",
-        content: "Brandio",
+        content: "Brand10",
       },
       {
         name: "theme-color",
@@ -58,12 +58,12 @@ export const Route = createRootRoute({
       },
       {
         property: "og:site_name",
-        content: "Brandio",
+        content: "Brand10",
       },
       {
         property: "og:title",
         content:
-          "Brandio - Modern Brand Identity Studio & Living Design Systems",
+          "Brand10 - Modern Brand Identity Studio & Living Design Systems",
       },
       {
         property: "og:description",
@@ -82,7 +82,7 @@ export const Route = createRootRoute({
       {
         name: "twitter:title",
         content:
-          "Brandio - Modern Brand Identity Studio & Living Design Systems",
+          "Brand10 - Modern Brand Identity Studio & Living Design Systems",
       },
       {
         name: "twitter:description",

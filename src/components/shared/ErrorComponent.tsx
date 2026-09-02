@@ -8,7 +8,7 @@ import WordReveal from "./WordReveal"
 import { gsap } from "gsap"
 
 /**
- * Standardized 500 / Runtime Error Component for Brandio.
+ * Standardized 500 / Runtime Error Component for Brand10.
  * Adheres to the system design language:
  * - Dynamic ambient gradient glows with dark/light mode integration.
  * - Glassmorphic card styling with rounded surfaces.
@@ -110,7 +110,7 @@ export function GeneralErrorComponent({ reset }: ErrorComponentProps) {
 
       {/* Footer */}
       <footer className="relative z-10 py-6 text-center text-xs text-foreground">
-        © {new Date().getFullYear()} Brandio. All rights reserved.
+        © {new Date().getFullYear()} Brand10. All rights reserved.
       </footer>
     </div>
   )

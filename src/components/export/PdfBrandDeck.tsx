@@ -236,7 +236,7 @@ export const BrandPdfDeck: React.FC<BrandPdfProps> = ({
     colors.find((c) => c.role === "primary")?.hex || "#6366f1"
 
   return (
-    <Document title={`${brandName} - Brand Guidelines`} author="Brandio Studio">
+    <Document title={`${brandName} - Brand Guidelines`} author="Brand10 Studio">
       {/* SLIDE 1: COVER */}
       <Page size="A4" orientation="landscape" style={styles.coverPage}>
         <View
@@ -308,7 +308,7 @@ export const BrandPdfDeck: React.FC<BrandPdfProps> = ({
           }}
         >
           <Text style={{ fontSize: 10, color: "#64748b" }}>
-            Generated via Brandio Brand Studio
+            Generated via Brand10 Brand Studio
           </Text>
           <Text style={{ fontSize: 10, color: "#64748b" }}>
             Confidential & Proprietary

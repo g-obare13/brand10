@@ -32,7 +32,7 @@ export function initConsole() {
     #+#    #+##+#    #+##+#     #+##+#   #+#+##+#    #+#   #+#   #+#    #+# 
     ######### ###    ######     ######    ################################   
 
-    %c Brandio | v0.0.16 https://brandio.com %c
+    %c Brand10 | v0.0.1 https://brand10.vercel.com %c
 
     %cBuilt By Obare.
     

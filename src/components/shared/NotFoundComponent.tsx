@@ -7,7 +7,7 @@ import WordReveal from "./WordReveal"
 import { gsap } from "gsap"
 
 /**
- * Standardized 404 Not Found Component for Brandio.
+ * Standardized 404 Not Found Component for Brand10.
  * Features:
  * - Ambient gradient glows and futuristic glassmorphic container.
  * - Bold typographic presentation with design system color palette.
@@ -101,7 +101,7 @@ export function NotFoundComponent() {
 
       {/* Footer */}
       <footer className="relative z-10 py-6 text-center text-xs text-foreground">
-        © {new Date().getFullYear()} Brandio. All rights reserved.
+        © {new Date().getFullYear()} Brand10. All rights reserved.
       </footer>
     </div>
   )

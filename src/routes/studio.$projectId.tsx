@@ -30,7 +30,7 @@ export const Route = createFileRoute("/studio/$projectId")({
   head: () => ({
     meta: [
       {
-        title: "Brand Studio & Guidelines Wizard | Brandio",
+        title: "Brand Studio & Guidelines Wizard | Brand10",
       },
       {
         name: "description",
