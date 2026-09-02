@@ -1,8 +1,13 @@
+import { useEffect, useRef } from "react"
 import { useBrandStore } from "@/store/brandStore"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import GlassPanel from "@/components/shared/GlassPanel"
 import { IconX } from "@tabler/icons-react"
+import { DESIGN_MOVEMENTS } from "@/data/wizard"
+import { getPreviewTheme } from "./previewTheme"
+import { Circle } from "@boxicons/react"
+import { gsap } from "gsap"
 
 const LOGO_DONTS = [
   {
@@ -190,6 +195,7 @@ function BlueprintFrame({
 
 export function StepLogoPreview() {
   const brand = useBrandStore()
+  const containerRef = useRef<HTMLDivElement>(null)
   const primaryColor =
     brand.colorPalette.find((c) => c.role === "primary")?.hex || "#6366f1"
 
@@ -201,97 +207,163 @@ export function StepLogoPreview() {
     ? `data:image/svg+xml;utf8,${encodeURIComponent(brand.secondarySvgContent)}`
     : null
 
+  // Determine active movement from store or fallback
+  const activeMovement =
+    (brand.designMovement
+      ? DESIGN_MOVEMENTS.find((m) => m.id === brand.designMovement)
+      : null) ||
+    DESIGN_MOVEMENTS.find((m) =>
+      Object.entries(m.tones).every(
+        ([k, v]) => brand.toneRatings[k as keyof typeof brand.toneRatings] === v
+      )
+    ) ||
+    DESIGN_MOVEMENTS[0]
+
+  const theme = getPreviewTheme(activeMovement.id)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    const ctx = gsap.context(() => {
+      const cards = containerRef.current?.querySelectorAll(".preview-card-anim")
+      if (cards && cards.length > 0) {
+        gsap.fromTo(
+          cards,
+          { y: 24, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            stagger: 0.08,
+            delay: 0.1,
+            ease: "power3.out",
+          }
+        )
+      }
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [])
+
   return (
-    <div className="space-y-6">
+    <div ref={containerRef} className={theme.container}>
       {/* 1. PRIMARY LOGO SYSTEM (TOP) */}
       <div className="space-y-3">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
-          {/* Left: Large Showcase Card */}
+          {/* Left: Large Showcase Card with Movement Styling */}
           <GlassPanel
             blur="none"
             noise
             noiseOpacity={0.02}
-            className="flex min-h-55 items-center justify-between rounded-2xl bg-card md:col-span-7"
+            className={cn(
+              "preview-card-anim relative flex min-h-55 flex-col justify-between overflow-hidden md:col-span-7",
+              theme.heroCard
+            )}
           >
-            <div className="flex h-full flex-col items-center justify-center gap-12 p-8">
+            {/* Ambient Glow */}
+            {theme.heroGlow !== "hidden" && (
+              <div
+                className={theme.heroGlow}
+                style={{ backgroundColor: primaryColor }}
+              />
+            )}
+
+            <div className="relative z-10 flex items-center justify-between">
+              <Badge
+                className={theme.badge}
+                showDivider={true}
+                icon={<Circle />}
+              >
+                {activeMovement.label} Mark
+              </Badge>
+              <span className={theme.accentPill}>{activeMovement.badge}</span>
+            </div>
+
+            <div className="relative z-10 flex h-full flex-col items-center justify-center gap-6 py-8">
               <BlueprintFrame
                 svgUri={primarySvgUri}
                 brandName={brand.brandName}
                 primaryColor={primaryColor}
                 size="lg"
-                className="bg-white"
+                className="bg-white/95 shadow-xs"
               />
-              <span className="text-xs font-medium text-foreground">
-                Primary Logo System
-              </span>
+              <span className={theme.badgeText}>Primary Vector Geometry</span>
             </div>
           </GlassPanel>
 
           {/* Right: Stacked Light & Dark Canvas Cards */}
           <div className="flex flex-col gap-4 md:col-span-5">
             {/* Top: Light Canvas */}
-            <GlassPanel
-              blur="none"
-              noise
-              noiseOpacity={0.02}
-              className="flex min-h-25.5 items-center justify-between rounded-2xl bg-card"
+            <div
+              className={cn(
+                "preview-card-anim flex min-h-26 flex-1 items-center justify-center bg-white/90 p-4 dark:bg-card/90",
+                theme.tileCard
+              )}
             >
-              <div className="flex h-full flex-col items-center justify-center gap-12 p-8">
-                <BlueprintFrame
-                  svgUri={primarySvgUri}
-                  brandName={brand.brandName}
-                  primaryColor={primaryColor}
-                  size="lg"
-                  className="bg-white"
-                />
-              </div>
-            </GlassPanel>
+              <BlueprintFrame
+                svgUri={primarySvgUri}
+                brandName={brand.brandName}
+                primaryColor={primaryColor}
+                size="sm"
+                className="bg-white"
+              />
+            </div>
 
             {/* Bottom: Dark Canvas */}
-            <GlassPanel
-              blur="none"
-              noise
-              noiseOpacity={0.02}
-              className="flex min-h-25.5 items-center justify-between rounded-2xl bg-primary-950"
+            <div
+              className={cn(
+                "preview-card-anim flex min-h-26 flex-1 items-center justify-center border-zinc-800 bg-zinc-950 p-4",
+                theme.tileCard
+              )}
             >
-              <div className="flex h-full flex-col items-center justify-center gap-12 p-8">
-                <BlueprintFrame
-                  svgUri={primarySvgUri}
-                  brandName={brand.brandName}
-                  primaryColor={primaryColor}
-                  isDark={true}
-                  size="sm"
-                />
-              </div>
-            </GlassPanel>
+              <BlueprintFrame
+                svgUri={primarySvgUri}
+                brandName={brand.brandName}
+                primaryColor={primaryColor}
+                isDark={true}
+                size="sm"
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 2. SECONDARY LOGO SYSTEM (BOTTOM) - Shown only when secondary SVG is uploaded */}
+      {/* 2. SECONDARY LOGO SYSTEM (BOTTOM) - Shown when secondary SVG is uploaded */}
       {secondarySvgUri && (
         <div className="space-y-3">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
             {/* Left: Large Showcase Card */}
-
             <GlassPanel
               blur="none"
               noise
               noiseOpacity={0.02}
-              className="flex min-h-55 items-center justify-between rounded-2xl bg-card md:col-span-7"
+              className={cn(
+                "preview-card-anim relative flex min-h-55 flex-col justify-between overflow-hidden md:col-span-7",
+                theme.heroCard
+              )}
             >
-              <div className="flex h-full flex-col items-center justify-center gap-12 p-8!">
+              {theme.heroGlow !== "hidden" && (
+                <div
+                  className={theme.heroGlow}
+                  style={{ backgroundColor: primaryColor }}
+                />
+              )}
+
+              <div className="relative z-10 flex items-center justify-between">
+                <Badge className={theme.badge}>Secondary Lockup</Badge>
+                <span className={theme.accentPill}>Alternate</span>
+              </div>
+
+              <div className="relative z-10 flex h-full flex-col items-center justify-center gap-6 py-8">
                 <BlueprintFrame
                   svgUri={secondarySvgUri}
                   brandName={brand.brandName}
                   primaryColor={primaryColor}
                   size="lg"
-                  className="bg-white"
+                  className="bg-white/95 shadow-xs"
                   isSecondary
                 />
-
-                <span className="text-xs font-medium text-foreground">
-                  Secondary Logo System
+                <span className={theme.badgeText}>
+                  Horizontal / Wordmark Variant
                 </span>
               </div>
             </GlassPanel>
@@ -299,7 +371,12 @@ export function StepLogoPreview() {
             {/* Right: Stacked Light & Dark Canvas Cards */}
             <div className="flex flex-col gap-4 md:col-span-5">
               {/* Top: Light Canvas */}
-              <div className="flex min-h-25.5 flex-1 items-center justify-center rounded-2xl border border-border/80 bg-white p-4 dark:bg-card/90">
+              <div
+                className={cn(
+                  "preview-card-anim flex min-h-26 flex-1 items-center justify-center bg-white/90 p-4 dark:bg-card/90",
+                  theme.tileCard
+                )}
+              >
                 <BlueprintFrame
                   svgUri={secondarySvgUri}
                   brandName={brand.brandName}
@@ -311,7 +388,12 @@ export function StepLogoPreview() {
               </div>
 
               {/* Bottom: Dark Canvas */}
-              <div className="flex min-h-25.5 flex-1 items-center justify-center rounded-2xl border border-zinc-800 bg-black p-4">
+              <div
+                className={cn(
+                  "preview-card-anim flex min-h-26 flex-1 items-center justify-center border-zinc-800 bg-zinc-950 p-4",
+                  theme.tileCard
+                )}
+              >
                 <BlueprintFrame
                   svgUri={secondarySvgUri}
                   brandName={brand.brandName}
@@ -331,25 +413,32 @@ export function StepLogoPreview() {
         blur="none"
         noise
         noiseOpacity={0.02}
-        className="space-y-3 rounded-2xl border border-border/80 bg-card p-5"
+        className={cn(
+          "preview-card-anim space-y-4 p-6",
+          theme.interactiveCard
+        )}
       >
         <div className="mb-2 flex items-center justify-between">
-          <span className="font-medium">
+          <span className="text-sm font-semibold">
             Logo Usage Constraints (Don&apos;ts)
           </span>
+          <Badge className={theme.badge}>Rules &amp; Guardrails</Badge>
         </div>
 
-        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {LOGO_DONTS.map((item, idx) => (
             <div
               key={idx}
-              className="flex items-start gap-2.5 rounded-xl p-3 text-left transition-all"
+              className={cn(
+                "flex items-start gap-2.5 rounded-xl border border-border/40 bg-background/50 p-3 text-left transition-all",
+                theme.tileCard
+              )}
             >
               <div className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-rose-500/20 text-rose-500">
                 <IconX size={10} />
               </div>
               <div className="space-y-0.5">
-                <h5 className="text-sm font-medium">{item.rule}</h5>
+                <h5 className="text-base font-semibold">{item.rule}</h5>
                 <p className="text-sm text-muted-foreground">{item.detail}</p>
               </div>
             </div>

@@ -144,13 +144,15 @@ function StudioWizardRoute() {
 
                 {/* Bottom Step Actions - Pinned to bottom of the card */}
                 {currentStep < 7 && (
-                  <div className="mt-auto flex items-center justify-between border-t border-border/40 pt-6">
+                  <div className="mt-auto flex items-center justify-between pt-6">
                     <Button
                       variant="outline"
                       size="pill"
                       gsapFill
                       onClick={handleBack}
-                      disabled={currentStep === 1 || isProjectLoading || isSaving}
+                      disabled={
+                        currentStep === 1 || isProjectLoading || isSaving
+                      }
                       className="cursor-pointer rounded-full px-4 text-xs font-semibold disabled:opacity-30"
                       icon={<IconArrowLeft size={14} />}
                       iconPlacement="left"

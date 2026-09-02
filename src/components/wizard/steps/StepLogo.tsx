@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import { useBrandStore } from "@/store/brandStore"
+import { gsap } from "gsap"
 import {
   extractColorsFromSvg,
   clusterDistinctColors,
@@ -29,6 +30,7 @@ const MAX_SVG_BYTES = 1 * 1024 * 1024 // 1MB
 
 export function StepLogo() {
   const brand = useBrandStore()
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const [activeSlot, setActiveSlot] = useState<"primary" | "secondary">(
     "primary"
@@ -42,6 +44,29 @@ export function StepLogo() {
 
   const primaryInputRef = useRef<HTMLInputElement>(null)
   const secondaryInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    const ctx = gsap.context(() => {
+      const items = containerRef.current?.querySelectorAll(".logo-item-anim")
+      if (items && items.length > 0) {
+        gsap.fromTo(
+          items,
+          { y: 24, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            stagger: 0.08,
+            delay: 0.1,
+            ease: "power3.out",
+          }
+        )
+      }
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [])
 
   // Extract dominant distinct colors from primary and secondary SVGs
   const refreshExtractedColors = async (
@@ -163,7 +188,7 @@ export function StepLogo() {
     : null
 
   return (
-    <div className="relative flex h-full flex-col space-y-6">
+    <div ref={containerRef} className="relative flex h-full flex-col space-y-6">
       {/* Step Header */}
       <div className="space-y-1">
         <WordReveal
@@ -189,7 +214,7 @@ export function StepLogo() {
 
       {/* Error Alert */}
       {errorMsg && (
-        <div className="flex items-center gap-2.5 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
+        <div className="logo-item-anim flex items-center gap-2.5 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
           <IconAlertCircle size={16} className="shrink-0" />
           <span className="font-medium">{errorMsg}</span>
         </div>
@@ -199,7 +224,7 @@ export function StepLogo() {
       <Tabs
         value={activeSlot}
         onValueChange={(val) => setActiveSlot(val as "primary" | "secondary")}
-        className="w-full space-y-4"
+        className="logo-item-anim w-full space-y-4"
       >
         <TabsList className="w-full">
           <TabsTrigger value="primary">
@@ -409,19 +434,13 @@ export function StepLogo() {
       {/* 3. EXTRACTED COLORS PREVIEW */}
       {extractedColors.length > 0 &&
         Boolean(brand.svgContent || brand.secondarySvgContent) && (
-          <div className="space-y-3 rounded-2xl border border-border/70 bg-card/60 p-4 shadow-xs">
+          <div className="logo-item-anim space-y-3 rounded-2xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-foreground">
+                <span className="text-xs font-medium text-foreground">
                   Extracted Colors from SVG
                 </span>
-                <Badge className="border-primary/20 bg-primary/10 py-0 text-[10px] font-semibold text-primary">
-                  Auto-synced
-                </Badge>
               </div>
-              <span className="text-[11px] text-muted-foreground">
-                Syncs to Color Matrix automatically
-              </span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">

@@ -15,12 +15,14 @@ import {
 
 export const ColorSystemTab: React.FC = () => {
   const brand = useBrandStore()
-  const [selectedSwatchId, setSelectedSwatchId] = useState<string>(brand.colorPalette[0]?.id || '')
+  const [selectedSwatchId, setSelectedSwatchId] = useState<string>(
+    brand.colorPalette[0] ? brand.colorPalette[0].id : ''
+  )
   const [newColorHex, setNewColorHex] = useState('#6366f1')
   const [newColorRole, setNewColorRole] = useState<ColorSwatch['role']>('custom')
 
   const selectedSwatch =
-    brand.colorPalette.find((c) => c.id === selectedSwatchId) || brand.colorPalette[0]
+    brand.colorPalette.find((c) => c.id === selectedSwatchId) ?? brand.colorPalette[0]
 
   const handleAddColor = (e: React.FormEvent) => {
     e.preventDefault()
@@ -28,7 +30,8 @@ export const ColorSystemTab: React.FC = () => {
   }
 
   const handleUpdateHex = (id: string, hex: string) => {
-    const updated = createColorSwatch(hex, selectedSwatch?.role || 'custom', selectedSwatch?.name)
+    const target = brand.colorPalette.find((c) => c.id === id) ?? selectedSwatch
+    const updated = createColorSwatch(hex, target.role, target.name)
     brand.updateColorSwatch(id, {
       hex: updated.hex,
       rgb: updated.rgb,
@@ -37,6 +40,10 @@ export const ColorSystemTab: React.FC = () => {
       shades: updated.shades,
     })
   }
+
+  const bgHex = brand.colorPalette.find((c) => c.role === 'background')?.hex || '#090d16'
+  const secHex = brand.colorPalette.find((c) => c.role === 'secondary')?.hex || '#334155'
+  const primHex = brand.colorPalette.find((c) => c.role === 'primary')?.hex || '#6366f1'
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
@@ -60,8 +67,8 @@ export const ColorSystemTab: React.FC = () => {
             className="h-full flex items-center justify-center text-[10px] font-bold transition-all"
             style={{
               width: '60%',
-              backgroundColor: brand.colorPalette.find((c) => c.role === 'background')?.hex || '#090d16',
-              color: getReadableTextColor(brand.colorPalette.find((c) => c.role === 'background')?.hex || '#090d16'),
+              backgroundColor: bgHex,
+              color: getReadableTextColor(bgHex),
             }}
           >
             60% Canvas / Neutral
@@ -70,8 +77,8 @@ export const ColorSystemTab: React.FC = () => {
             className="h-full flex items-center justify-center text-[10px] font-bold transition-all"
             style={{
               width: '30%',
-              backgroundColor: brand.colorPalette.find((c) => c.role === 'secondary')?.hex || '#334155',
-              color: getReadableTextColor(brand.colorPalette.find((c) => c.role === 'secondary')?.hex || '#334155'),
+              backgroundColor: secHex,
+              color: getReadableTextColor(secHex),
             }}
           >
             30% Secondary Structure
@@ -80,8 +87,8 @@ export const ColorSystemTab: React.FC = () => {
             className="h-full flex items-center justify-center text-[10px] font-bold transition-all"
             style={{
               width: '10%',
-              backgroundColor: brand.colorPalette.find((c) => c.role === 'primary')?.hex || '#6366f1',
-              color: getReadableTextColor(brand.colorPalette.find((c) => c.role === 'primary')?.hex || '#6366f1'),
+              backgroundColor: primHex,
+              color: getReadableTextColor(primHex),
             }}
           >
             10% Accent
@@ -102,7 +109,7 @@ export const ColorSystemTab: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             {brand.colorPalette.map((swatch) => {
-              const isSelected = swatch.id === selectedSwatch?.id
+              const isSelected = swatch.id === selectedSwatch.id
               return (
                 <div
                   key={swatch.id}
@@ -176,73 +183,71 @@ export const ColorSystemTab: React.FC = () => {
         </div>
 
         {/* Right: Selected Swatch Tints, Shades & Space Models */}
-        {selectedSwatch && (
-          <div className="rounded-2xl border border-border bg-card p-6 space-y-5 shadow-xs text-card-foreground">
-            <div>
-              <span className="text-[10px] uppercase tracking-wider font-semibold text-primary">Selected Color</span>
-              <div className="flex items-center gap-3 mt-1">
-                <input
-                  type="color"
-                  value={selectedSwatch.hex}
-                  onChange={(e) => handleUpdateHex(selectedSwatch.id, e.target.value)}
-                  className="w-8 h-8 rounded-lg cursor-pointer bg-transparent border-0"
-                />
-                <input
-                  type="text"
-                  value={selectedSwatch.name}
-                  onChange={(e) => brand.updateColorSwatch(selectedSwatch.id, { name: e.target.value })}
-                  className="text-sm font-bold text-foreground bg-transparent border-b border-border focus:border-primary outline-none pb-0.5"
-                />
-              </div>
-            </div>
-
-            {/* Model Breakdown */}
-            <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-              <div className="p-2 rounded-lg bg-muted/40 border border-border">
-                <span className="text-[10px] text-muted-foreground block">HEX</span>
-                <span className="text-foreground font-bold">{selectedSwatch.hex.toUpperCase()}</span>
-              </div>
-              <div className="p-2 rounded-lg bg-muted/40 border border-border">
-                <span className="text-[10px] text-muted-foreground block">RGB</span>
-                <span className="text-foreground">
-                  {selectedSwatch.rgb.r}, {selectedSwatch.rgb.g}, {selectedSwatch.rgb.b}
-                </span>
-              </div>
-              <div className="p-2 rounded-lg bg-muted/40 border border-border">
-                <span className="text-[10px] text-muted-foreground block">CMYK</span>
-                <span className="text-foreground">
-                  {selectedSwatch.cmyk.c}, {selectedSwatch.cmyk.m}, {selectedSwatch.cmyk.y}, {selectedSwatch.cmyk.k}
-                </span>
-              </div>
-              <div className="p-2 rounded-lg bg-muted/40 border border-border">
-                <span className="text-[10px] text-muted-foreground block">HSL</span>
-                <span className="text-foreground">
-                  {selectedSwatch.hsl.h}°, {selectedSwatch.hsl.s}%, {selectedSwatch.hsl.l}%
-                </span>
-              </div>
-            </div>
-
-            {/* 11-step Tonal Scale */}
-            <div className="space-y-2 pt-2">
-              <h4 className="text-xs font-semibold text-foreground">11-Step Tonal Scale (Tailwind)</h4>
-              <div className="grid grid-cols-6 gap-1 rounded-xl overflow-hidden p-1 bg-muted/30 border border-border">
-                {Object.entries(selectedSwatch.shades || {}).map(([step, shadeHex]) => (
-                  <div
-                    key={step}
-                    className="h-10 rounded flex flex-col items-center justify-between p-1 text-[9px] font-mono transition hover:scale-105"
-                    style={{
-                      backgroundColor: shadeHex,
-                      color: getReadableTextColor(shadeHex),
-                    }}
-                    title={`${step}: ${shadeHex}`}
-                  >
-                    <span>{step}</span>
-                  </div>
-                ))}
-              </div>
+        <div className="rounded-2xl border border-border bg-card p-6 space-y-5 shadow-xs text-card-foreground">
+          <div>
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-primary">Selected Color</span>
+            <div className="flex items-center gap-3 mt-1">
+              <input
+                type="color"
+                value={selectedSwatch.hex}
+                onChange={(e) => handleUpdateHex(selectedSwatch.id, e.target.value)}
+                className="w-8 h-8 rounded-lg cursor-pointer bg-transparent border-0"
+              />
+              <input
+                type="text"
+                value={selectedSwatch.name}
+                onChange={(e) => brand.updateColorSwatch(selectedSwatch.id, { name: e.target.value })}
+                className="text-sm font-bold text-foreground bg-transparent border-b border-border focus:border-primary outline-none pb-0.5"
+              />
             </div>
           </div>
-        )}
+
+          {/* Model Breakdown */}
+          <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+            <div className="p-2 rounded-lg bg-muted/40 border border-border">
+              <span className="text-[10px] text-muted-foreground block">HEX</span>
+              <span className="text-foreground font-bold">{selectedSwatch.hex.toUpperCase()}</span>
+            </div>
+            <div className="p-2 rounded-lg bg-muted/40 border border-border">
+              <span className="text-[10px] text-muted-foreground block">RGB</span>
+              <span className="text-foreground">
+                {selectedSwatch.rgb.r}, {selectedSwatch.rgb.g}, {selectedSwatch.rgb.b}
+              </span>
+            </div>
+            <div className="p-2 rounded-lg bg-muted/40 border border-border">
+              <span className="text-[10px] text-muted-foreground block">CMYK</span>
+              <span className="text-foreground">
+                {selectedSwatch.cmyk.c}, {selectedSwatch.cmyk.m}, {selectedSwatch.cmyk.y}, {selectedSwatch.cmyk.k}
+              </span>
+            </div>
+            <div className="p-2 rounded-lg bg-muted/40 border border-border">
+              <span className="text-[10px] text-muted-foreground block">HSL</span>
+              <span className="text-foreground">
+                {selectedSwatch.hsl.h}°, {selectedSwatch.hsl.s}%, {selectedSwatch.hsl.l}%
+              </span>
+            </div>
+          </div>
+
+          {/* 11-step Tonal Scale */}
+          <div className="space-y-2 pt-2">
+            <h4 className="text-xs font-semibold text-foreground">11-Step Tonal Scale (Tailwind)</h4>
+            <div className="grid grid-cols-6 gap-1 rounded-xl overflow-hidden p-1 bg-muted/30 border border-border">
+              {Object.entries(selectedSwatch.shades).map(([step, shadeHex]) => (
+                <div
+                  key={step}
+                  className="h-10 rounded flex flex-col items-center justify-between p-1 text-[9px] font-mono transition hover:scale-105"
+                  style={{
+                    backgroundColor: shadeHex,
+                    color: getReadableTextColor(shadeHex),
+                  }}
+                  title={`${step}: ${shadeHex}`}
+                >
+                  <span>{step}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* WCAG 2.1 Accessibility Matrix */}

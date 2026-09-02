@@ -1,115 +1,311 @@
+import { useRef, useEffect, useState } from "react"
 import { useBrandStore } from "@/store/brandStore"
+import { generateTonalShades } from "@/lib/colorUtils"
 import GlassPanel from "@/components/shared/GlassPanel"
-import { IconPalette, IconShieldCheck, IconSparkles } from "@tabler/icons-react"
+import { DESIGN_MOVEMENTS } from "@/data/wizard"
+import { getPreviewTheme } from "./previewTheme"
+import { gsap } from "gsap"
+import chroma from "chroma-js"
+import { Badge } from "@/components/ui/badge"
+import { Shield } from "@boxicons/react"
+import { Button } from "@/components/ui/button"
+import { IconCheck } from "@tabler/icons-react"
+import { toast } from "sonner"
+import { ColorInfoDialog } from "./ColorInfoDialog"
+
+const SHADE_KEYS = [
+  "50",
+  "100",
+  "200",
+  "300",
+  "400",
+  "500",
+  "600",
+  "700",
+  "800",
+  "900",
+  "950",
+] as const
+
+function findClosestShade(
+  baseHex: string,
+  shades: Record<string, string>
+): string {
+  try {
+    let closestKey = "500"
+    let minDelta = Infinity
+    for (const [key, hex] of Object.entries(shades)) {
+      const d = chroma.deltaE(baseHex, hex)
+      if (d < minDelta) {
+        minDelta = d
+        closestKey = key
+      }
+    }
+    return closestKey
+  } catch {
+    return "500"
+  }
+}
+
+function getCardTextColor(shadeHex: string, darkestShadeHex: string): string {
+  try {
+    const lum = chroma(shadeHex).luminance()
+    if (lum > 0.42) {
+      return chroma(darkestShadeHex).darken(0.3).hex()
+    }
+    return "#ffffff"
+  } catch {
+    return "#ffffff"
+  }
+}
+
+function getApproximateColorName(hex: string, defaultName?: string): string {
+  try {
+    const c = chroma(hex)
+    const [h, s, l] = c.hsl()
+    if (isNaN(h) || s < 0.08) {
+      if (l > 0.85) return "Porcelain White"
+      if (l < 0.15) return "Obsidian Black"
+      return "Slate Gray"
+    }
+    if (h < 15 || h >= 345)
+      return l < 0.35
+        ? "Crimson Velvet"
+        : l > 0.7
+          ? "Rose Blossom"
+          : "Persian Pink"
+    if (h < 40) return l > 0.7 ? "Peach Nectar" : "Persian Orange"
+    if (h < 65) return l > 0.7 ? "Vanilla Cream" : "Amber Gold"
+    if (h < 150)
+      return l > 0.7 ? "Mint Foam" : l < 0.3 ? "Forest Pine" : "Emerald Green"
+    if (h < 200) return l > 0.7 ? "Sky Cyan" : "Teal Lagoon"
+    if (h < 260)
+      return l > 0.7 ? "Ice Blue" : l < 0.3 ? "Navy Marine" : "Electric Royal"
+    if (h < 300) return l > 0.7 ? "Lavender Frost" : "Deep Indigo"
+    if (h < 345) return l > 0.7 ? "Persian Pink" : "Magenta Pulse"
+    return defaultName || "Brand Tone"
+  } catch {
+    return defaultName || "Brand Tone"
+  }
+}
+
+interface ColorShadeScaleRowProps {
+  label: string
+  role: "primary" | "secondary"
+  hex: string
+  shades: Record<string, string>
+}
+
+function ColorShadeScaleRow({
+  label,
+  role,
+  hex,
+  shades,
+}: ColorShadeScaleRowProps) {
+  const [copiedStep, setCopiedStep] = useState<string | null>(null)
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  const handleCopy = (step: string, hexValue: string) => {
+    navigator.clipboard.writeText(hexValue)
+    setCopiedStep(step)
+    if (copyTimeoutRef.current) {
+      clearTimeout(copyTimeoutRef.current)
+    }
+    copyTimeoutRef.current = setTimeout(() => {
+      setCopiedStep(null)
+    }, 1500)
+  }
+
+  const safeShades =
+    Object.keys(shades).length === 11 ? shades : generateTonalShades(hex)
+
+  const closestShade = findClosestShade(hex, safeShades)
+  const darkestShade = safeShades["950"] || safeShades["900"] || "#000000"
+
+  return (
+    <div className="space-y-3.5">
+      {/* Header Row: Name, Badge and Modal Triggers */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <span className="text-base font-semibold">{label}</span>
+          <Badge
+            className="rounded-full!"
+            variant={"outline"}
+            icon={<Shield />}
+          >
+            {role}
+          </Badge>
+        </div>
+
+        <div className="flex items-center gap-5 sm:gap-6">
+          <ColorInfoDialog
+            label={label}
+            role={role}
+            hex={hex}
+            shades={safeShades}
+          >
+            <Button variant={"ghost"}>Color info</Button>
+          </ColorInfoDialog>
+        </div>
+      </div>
+
+      {/* 11-Step Monochrome / Tonal Shade Cards Row */}
+      <div className="grid grid-cols-11 gap-1">
+        {SHADE_KEYS.map((step) => {
+          const shadeHex = safeShades[step] || hex
+          const isBase = step === closestShade
+          const isCopied = copiedStep === step
+          const textColor = getCardTextColor(shadeHex, darkestShade)
+          const cleanHex = shadeHex.replace("#", "").toUpperCase()
+          const copyValue = shadeHex.toUpperCase()
+
+          return (
+            <button
+              type="button"
+              key={step}
+              onClick={() => {
+                handleCopy(step, copyValue)
+                toast.success(`${copyValue} Copied to clipboard`, {
+                  position: "bottom-right",
+                  icon: <IconCheck size={16} />,
+                })
+              }}
+              title={`Click to copy ${copyValue}`}
+              aria-label={`Copy shade ${step} (${copyValue}) to clipboard`}
+              className="group relative flex min-h-24 cursor-pointer flex-col justify-between rounded-xl p-2 text-left transition-all select-none hover:scale-[1.03] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary active:scale-95 sm:p-2.5"
+              style={{ backgroundColor: shadeHex }}
+            >
+              {/* Active Base Shade Indicator Dot or Copied Checkmark */}
+              <div className="flex h-3 items-center justify-between">
+                {isBase ? (
+                  <div
+                    className="size-1.5 rounded-full shadow-xs"
+                    style={{ backgroundColor: textColor }}
+                  />
+                ) : (
+                  <span />
+                )}
+                {isCopied && (
+                  <IconCheck
+                    size={13}
+                    stroke={3}
+                    style={{ color: textColor }}
+                    className="animate-in duration-150 zoom-in-75 fade-in"
+                  />
+                )}
+              </div>
+
+              {/* Bottom Step Number and Uppercase Hex Value */}
+              <div className="space-y-0.5" style={{ color: textColor }}>
+                <span className="block text-[11px] leading-tight font-bold sm:text-xs">
+                  {step}
+                </span>
+                <span className="block text-[9px] font-medium tracking-tight uppercase sm:text-[10px]">
+                  {isCopied ? "COPIED" : cleanHex}
+                </span>
+              </div>
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
 
 export function StepColorsPreview() {
   const brand = useBrandStore()
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  const primaryColor =
-    brand.colorPalette.find((c) => c.role === "primary")?.hex || "#6366f1"
-  const secondaryColor =
-    brand.colorPalette.find((c) => c.role === "secondary")?.hex || "#06b6d4"
-  const accentColor =
-    brand.colorPalette.find((c) => c.role === "accent")?.hex || "#10b981"
+  const primary = brand.colorPalette.find((c) => c.role === "primary") ||
+    brand.colorPalette[0] || {
+      id: "primary",
+      role: "primary",
+      name: "Primary Brand",
+      hex: "#6366f1",
+      shades: generateTonalShades("#6366f1"),
+    }
+
+  const secondary = brand.colorPalette.find((c) => c.role === "secondary") ||
+    brand.colorPalette[1] || {
+      id: "secondary",
+      role: "secondary",
+      name: "Secondary Accent",
+      hex: "#06b6d4",
+      shades: generateTonalShades("#06b6d4"),
+    }
+
+  const activeMovement =
+    (brand.designMovement
+      ? DESIGN_MOVEMENTS.find((m) => m.id === brand.designMovement)
+      : null) ||
+    DESIGN_MOVEMENTS.find((m) =>
+      Object.entries(m.tones).every(
+        ([k, v]) => brand.toneRatings[k as keyof typeof brand.toneRatings] === v
+      )
+    ) ||
+    DESIGN_MOVEMENTS[0]
+
+  const theme = getPreviewTheme(activeMovement.id)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    const ctx = gsap.context(() => {
+      const cards = containerRef.current?.querySelectorAll(".preview-card-anim")
+      if (cards && cards.length > 0) {
+        gsap.fromTo(
+          cards,
+          { y: 24, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            stagger: 0.08,
+            delay: 0.1,
+            ease: "power3.out",
+          }
+        )
+      }
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [])
+
+  const primaryName = getApproximateColorName(primary.hex, primary.name)
+  const secondaryName = getApproximateColorName(secondary.hex, secondary.name)
 
   return (
-    <div className="space-y-4">
-      {/* 1. Large Palette Swatches Showcase */}
+    <div ref={containerRef} className={theme.container}>
       <GlassPanel
         blur="none"
         noise
         noiseOpacity={0.02}
-        className="rounded-3xl border border-border/80 bg-card/90 p-6 shadow-sm space-y-4"
+        className="preview-card-anim flex space-y-8 rounded-3xl bg-card/90 p-6"
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            <IconPalette size={15} className="text-primary" />
-            <span>Active Color Hierarchy</span>
-          </div>
-          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-500">
-            <IconShieldCheck size={13} />
-            WCAG Compliant
-          </span>
-        </div>
+        {/* Dominant Color 1 (Primary) Monochrome Scale */}
+        <ColorShadeScaleRow
+          label={primaryName}
+          role="primary"
+          hex={primary.hex}
+          shades={primary.shades}
+        />
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-          {brand.colorPalette.map((swatch, idx) => (
-            <div
-              key={idx}
-              className="flex flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/80 transition-all hover:scale-102"
-            >
-              <div
-                className="h-20 w-full transition-all duration-300"
-                style={{ backgroundColor: swatch.hex }}
-              />
-              <div className="p-2.5 space-y-0.5 text-center">
-                <span className="block text-[10px] font-bold uppercase tracking-wider text-foreground">
-                  {swatch.role || `Color ${idx + 1}`}
-                </span>
-                <span className="block font-mono text-[10px] text-muted-foreground uppercase">
-                  {swatch.hex}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </GlassPanel>
+        <div className="h-12" />
 
-      {/* 2. UI Component Theme Simulation */}
-      <GlassPanel
-        blur="none"
-        noise
-        noiseOpacity={0.02}
-        className="rounded-3xl border border-border/80 bg-card/90 p-6 shadow-sm space-y-4"
-      >
-        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-          Live UI Component Simulation
-        </span>
-
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {/* Primary Action Button */}
-          <div
-            className="flex items-center justify-center rounded-2xl p-4 text-xs font-bold text-white shadow-md transition-all"
-            style={{
-              backgroundColor: primaryColor,
-              boxShadow: `0 6px 16px ${primaryColor}40`,
-            }}
-          >
-            Primary Action
-          </div>
-
-          {/* Secondary Badge/Button */}
-          <div
-            className="flex items-center justify-center rounded-2xl p-4 text-xs font-bold text-white shadow-md transition-all"
-            style={{
-              backgroundColor: secondaryColor,
-              boxShadow: `0 6px 16px ${secondaryColor}40`,
-            }}
-          >
-            Secondary Element
-          </div>
-
-          {/* Accent Highlight */}
-          <div
-            className="flex items-center justify-center rounded-2xl p-4 text-xs font-bold text-white shadow-md transition-all"
-            style={{
-              backgroundColor: accentColor,
-              boxShadow: `0 6px 16px ${accentColor}40`,
-            }}
-          >
-            Accent Highlight
-          </div>
-        </div>
-
-        {/* Gradient Banner */}
-        <div
-          className="h-14 w-full rounded-2xl flex items-center justify-center text-xs font-semibold text-white shadow-xs"
-          style={{
-            background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor}, ${accentColor})`,
-          }}
-        >
-          Dynamic Triple-Tone Gradient Wave
-        </div>
+        {/* Dominant Color 2 (Secondary) Monochrome Scale */}
+        <ColorShadeScaleRow
+          label={secondaryName}
+          role="secondary"
+          hex={secondary.hex}
+          shades={secondary.shades}
+        />
       </GlassPanel>
     </div>
   )

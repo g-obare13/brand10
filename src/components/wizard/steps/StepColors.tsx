@@ -1,207 +1,147 @@
+import { useRef, useEffect } from "react"
 import { useBrandStore } from "@/store/brandStore"
-import { createColorSwatch } from "@/lib/colorUtils"
+import { generateTonalShades } from "@/lib/colorUtils"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { IconPalette, IconCheck, IconShieldCheck } from "@tabler/icons-react"
-import { cn } from "@/lib/utils"
-
-const COLOR_PRESETS = [
-  {
-    name: "Electric Indigo",
-    primary: "#6366f1",
-    secondary: "#06b6d4",
-    accent: "#10b981",
-    neutral: "#0f172a",
-    background: "#ffffff",
-  },
-  {
-    name: "Cyber Cyan & Purple",
-    primary: "#06b6d4",
-    secondary: "#8b5cf6",
-    accent: "#f43f5e",
-    neutral: "#09090b",
-    background: "#ffffff",
-  },
-  {
-    name: "Botanical Moss",
-    primary: "#84cc16",
-    secondary: "#d97706",
-    accent: "#ec4899",
-    neutral: "#292524",
-    background: "#fefce8",
-  },
-  {
-    name: "Solar Flare Orange",
-    primary: "#f59e0b",
-    secondary: "#ef4444",
-    accent: "#3b82f6",
-    neutral: "#18181b",
-    background: "#fafafa",
-  },
-  {
-    name: "Frontier Royal Blue",
-    primary: "#2563eb",
-    secondary: "#10b981",
-    accent: "#8b5cf6",
-    neutral: "#030712",
-    background: "#f8fafc",
-  },
-]
+import { IconShieldCheck } from "@tabler/icons-react"
+import WordReveal from "@/components/shared/WordReveal"
+import { gsap } from "gsap"
+import chroma from "chroma-js"
 
 export function StepColors() {
   const brand = useBrandStore()
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const primarySwatch =
-    brand.colorPalette.find((c) => c.role === "primary") || brand.colorPalette[0]
-  const accentSwatch =
-    brand.colorPalette.find((c) => c.role === "accent") || brand.colorPalette[2]
+    brand.colorPalette.find((c) => c.role === "primary") ||
+    brand.colorPalette[0]
+  const secondarySwatch =
+    brand.colorPalette.find((c) => c.role === "secondary") ||
+    brand.colorPalette[1]
 
-  const handleApplyPreset = (preset: (typeof COLOR_PRESETS)[number]) => {
-    const swatches = [
-      createColorSwatch(preset.primary, "primary", "Primary Brand"),
-      createColorSwatch(preset.secondary, "secondary", "Secondary Hue"),
-      createColorSwatch(preset.accent, "accent", "Accent Highlight"),
-      createColorSwatch(preset.neutral, "neutral", "Midnight Surface"),
-      createColorSwatch(preset.background, "background", "Pure Surface"),
-    ]
-    brand.setColorPalette(swatches)
-  }
+  useEffect(() => {
+    if (!containerRef.current) return
+    const ctx = gsap.context(() => {
+      const items = containerRef.current?.querySelectorAll(".colors-item-anim")
+      if (items && items.length > 0) {
+        gsap.fromTo(
+          items,
+          { y: 24, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            stagger: 0.08,
+            delay: 0.1,
+            ease: "power3.out",
+          }
+        )
+      }
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [])
 
   const handleColorChange = (id: string, hex: string) => {
-    brand.updateColorSwatch(id, { hex })
+    const valid = chroma.valid(hex)
+    const shades = valid ? generateTonalShades(hex) : undefined
+    brand.updateColorSwatch(id, { hex, ...(shades ? { shades } : {}) })
   }
 
   return (
-    <div className="space-y-6">
+    <div ref={containerRef} className="space-y-6">
       <div className="space-y-1">
-        <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-          <IconPalette size={13} />
-          Step 3: Color Matrix
-        </div>
-        <h3 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+        <WordReveal
+          as="h4"
+          stagger={0.03}
+          duration={1.2}
+          disableScrollTrigger={true}
+          className="mb-2"
+        >
           Palette &amp; Accessibility Scale
-        </h3>
-        <p className="text-xs text-muted-foreground">
-          Select or customize high-impact brand hues verified for WCAG AA compliance.
-        </p>
+        </WordReveal>
+        <WordReveal
+          as="p"
+          stagger={0.03}
+          duration={1.2}
+          disableScrollTrigger={true}
+          className="mb-2"
+        >
+          Fine-tune the 2 dominant brand colors extracted from your mark. Tonal
+          scales and accessibility ratios adapt in real time.
+        </WordReveal>
       </div>
 
       <div className="space-y-5">
-        {/* Curated Presets */}
-        <div className="space-y-2">
-          <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Curated Harmonic Palettes
-          </Label>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {COLOR_PRESETS.map((preset) => {
-              const isSelected = primarySwatch?.hex.toLowerCase() === preset.primary.toLowerCase()
+        {/* Custom Color Inputs for 2 Dominant Colors */}
+        <div className="colors-item-anim space-y-3 pt-2">
+          <Label>Fine-tune Dominant Brand Colors</Label>
 
-              return (
-                <button
-                  key={preset.name}
-                  type="button"
-                  onClick={() => handleApplyPreset(preset)}
-                  className={cn(
-                    "flex cursor-pointer items-center justify-between rounded-2xl border p-3 text-left transition-all",
-                    isSelected
-                      ? "border-primary bg-primary/5 shadow-xs"
-                      : "border-border/80 bg-card/60 hover:border-primary/50 hover:bg-muted/60"
-                  )}
-                >
-                  <div className="space-y-1">
-                    <span className="text-xs font-bold text-foreground">
-                      {preset.name}
-                    </span>
-                    <div className="flex gap-1.5">
-                      {[
-                        preset.primary,
-                        preset.secondary,
-                        preset.accent,
-                        preset.neutral,
-                      ].map((hex, i) => (
-                        <div
-                          key={i}
-                          className="size-4 rounded-full border border-black/10 shadow-xs"
-                          style={{ backgroundColor: hex }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  {isSelected && <IconCheck size={16} className="text-primary" />}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Custom Color Inputs */}
-        <div className="space-y-3 pt-2">
-          <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Fine-tune Brand Values
-          </Label>
-
-          <div className="grid grid-cols-2 gap-3">
-            {primarySwatch && (
-              <div className="space-y-1.5 rounded-2xl border border-border/80 bg-card/60 p-3.5">
-                <span className="text-[11px] font-semibold text-muted-foreground">
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold text-foreground">
                   Primary Color
                 </span>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={primarySwatch.hex}
-                    onChange={(e) =>
-                      handleColorChange(primarySwatch.id, e.target.value)
-                    }
-                    className="size-8 cursor-pointer rounded-lg border-0 bg-transparent"
-                  />
-                  <Input
-                    value={primarySwatch.hex}
-                    onChange={(e) =>
-                      handleColorChange(primarySwatch.id, e.target.value)
-                    }
-                    className="h-8 rounded-lg font-mono text-xs uppercase"
-                  />
-                </div>
-              </div>
-            )}
-
-            {accentSwatch && (
-              <div className="space-y-1.5 rounded-2xl border border-border/80 bg-card/60 p-3.5">
-                <span className="text-[11px] font-semibold text-muted-foreground">
-                  Accent Color
+                <span className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                  Base Dominant
                 </span>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={accentSwatch.hex}
-                    onChange={(e) =>
-                      handleColorChange(accentSwatch.id, e.target.value)
-                    }
-                    className="size-8 cursor-pointer rounded-lg border-0 bg-transparent"
-                  />
-                  <Input
-                    value={accentSwatch.hex}
-                    onChange={(e) =>
-                      handleColorChange(accentSwatch.id, e.target.value)
-                    }
-                    className="h-8 rounded-lg font-mono text-xs uppercase"
-                  />
-                </div>
               </div>
-            )}
-          </div>
-        </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={
+                    chroma.valid(primarySwatch.hex)
+                      ? chroma(primarySwatch.hex).hex()
+                      : "#6366f1"
+                  }
+                  onChange={(e) =>
+                    handleColorChange(primarySwatch.id, e.target.value)
+                  }
+                  className="size-8 cursor-pointer rounded-lg border-0 bg-transparent"
+                />
+                <Input
+                  value={primarySwatch.hex}
+                  onChange={(e) =>
+                    handleColorChange(primarySwatch.id, e.target.value)
+                  }
+                  className="h-8 rounded-lg font-mono text-xs uppercase"
+                />
+              </div>
+            </div>
 
-        {/* Accessibility Status Card */}
-        <div className="flex items-center justify-between rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-3.5 text-xs text-emerald-600 dark:text-emerald-400">
-          <div className="flex items-center gap-2">
-            <IconShieldCheck size={18} />
-            <span className="font-semibold">
-              WCAG 2.1 AA Compliance Score: 100%
-            </span>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold text-foreground">
+                  Secondary Color
+                </span>
+                <span className="rounded-md bg-secondary/10 px-1.5 py-0.5 text-[10px] font-medium text-foreground">
+                  Alternate Dominant
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={
+                    chroma.valid(secondarySwatch.hex)
+                      ? chroma(secondarySwatch.hex).hex()
+                      : "#06b6d4"
+                  }
+                  onChange={(e) =>
+                    handleColorChange(secondarySwatch.id, e.target.value)
+                  }
+                  className="size-8 cursor-pointer rounded-lg border-0 bg-transparent"
+                />
+                <Input
+                  value={secondarySwatch.hex}
+                  onChange={(e) =>
+                    handleColorChange(secondarySwatch.id, e.target.value)
+                  }
+                  className="h-8 rounded-lg font-mono text-xs uppercase"
+                />
+              </div>
+            </div>
           </div>
-          <span className="font-mono text-[10px] font-bold">Contrast 7.4:1</span>
         </div>
       </div>
     </div>

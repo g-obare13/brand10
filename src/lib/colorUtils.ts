@@ -176,3 +176,77 @@ export function getReadableTextColor(bgHex: string): '#000000' | '#ffffff' {
     return '#000000'
   }
 }
+
+function sRgbToY(rgb: [number, number, number]): number {
+  const r = Math.pow(rgb[0] / 255, 2.4)
+  const g = Math.pow(rgb[1] / 255, 2.4)
+  const b = Math.pow(rgb[2] / 255, 2.4)
+  return 0.2126729 * r + 0.7151522 * g + 0.072175 * b
+}
+
+/**
+ * Calculate APCA Lc (Advanced Perceptual Contrast Algorithm - W3 0.0.98G)
+ * Returns the absolute rounded contrast score (Lc) between text and background.
+ */
+export function calculateApca(textHex: string, bgHex: string): number {
+  try {
+    const validTxt = chroma.valid(textHex) ? textHex : '#000000'
+    const validBg = chroma.valid(bgHex) ? bgHex : '#ffffff'
+    const txtRgb = chroma(validTxt).rgb() as [number, number, number]
+    const bgRgb = chroma(validBg).rgb() as [number, number, number]
+
+    let yTxt = sRgbToY(txtRgb)
+    let yBg = sRgbToY(bgRgb)
+
+    // Soft clamp black
+    const blkThrs = 0.022
+    const blkClmp = 1.414
+    if (yTxt <= blkThrs) yTxt += Math.pow(blkThrs - yTxt, blkClmp)
+    if (yBg <= blkThrs) yBg += Math.pow(blkThrs - yBg, blkClmp)
+
+    if (Math.abs(yBg - yTxt) < 0.0005) return 0
+
+    let sapc = 0
+    if (yBg > yTxt) {
+      // dark text on light background
+      sapc = (Math.pow(yBg, 0.56) - Math.pow(yTxt, 0.57)) * 1.14
+      const lc = sapc < 0.1 ? 0 : (sapc - 0.027) * 100
+      return Math.round(Math.abs(lc))
+    } else {
+      // light text on dark background
+      sapc = (Math.pow(yBg, 0.65) - Math.pow(yTxt, 0.62)) * 1.14
+      const lc = sapc > -0.1 ? 0 : (sapc + 0.027) * 100
+      return Math.round(Math.abs(lc))
+    }
+  } catch {
+    return 0
+  }
+}
+
+/**
+ * Format color into OKLCH CSS notation: oklch(L C H)
+ */
+export function formatOklch(hex: string): string {
+  try {
+    const [l, c, h] = chroma(hex).oklch()
+    const safeH = isNaN(h) ? 0 : Math.round(h)
+    return `oklch(${l.toFixed(3)} ${c.toFixed(3)} ${safeH})`
+  } catch {
+    return 'oklch(0 0 0)'
+  }
+}
+
+/**
+ * Format color into HSL CSS notation: hsl(H, S%, L%)
+ */
+export function formatHsl(hex: string): string {
+  try {
+    const [h, s, l] = chroma(hex).hsl()
+    const safeH = isNaN(h) ? 0 : Math.round(h)
+    const safeS = Math.round((isNaN(s) ? 0 : s) * 100)
+    const safeL = Math.round((isNaN(l) ? 0 : l) * 100)
+    return `hsl(${safeH}, ${safeS}%, ${safeL}%)`
+  } catch {
+    return 'hsl(0, 0%, 0%)'
+  }
+}

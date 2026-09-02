@@ -574,6 +574,7 @@ export const useBrandStore = create<BrandState>()(
               vision: data.vision || '',
               coreValues: data.core_values || ['Excellence', 'Innovation', 'Integrity', 'Velocity'],
               toneRatings: data.tone_ratings || defaultApex.toneRatings,
+              designMovement: data.design_movement || data.tone_ratings?.design_movement || 'semi-flat',
               logoUrl: data.logo_url,
               secondaryLogoUrl: secondaryUrl,
               svgContent,
@@ -607,6 +608,7 @@ export const useBrandStore = create<BrandState>()(
               vision: '',
               coreValues: ['Excellence', 'Innovation', 'Integrity', 'Velocity'],
               toneRatings: { formal: 60, playful: 20, minimalist: 85, bold: 90 },
+              designMovement: 'semi-flat',
               colorPalette: defaultApex.colors,
               displayFont: defaultApex.displayFont,
               bodyFont: defaultApex.bodyFont,
@@ -659,7 +661,11 @@ export const useBrandStore = create<BrandState>()(
             mission: state.mission,
             vision: state.vision,
             core_values: state.coreValues,
-            tone_ratings: state.toneRatings,
+            tone_ratings: {
+              ...state.toneRatings,
+              design_movement: state.designMovement,
+            },
+            design_movement: state.designMovement,
             logo_url: state.logoUrl,
             logo_variants: {
               secondary_url: state.secondaryLogoUrl,

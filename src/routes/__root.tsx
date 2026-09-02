@@ -4,6 +4,8 @@ import { TanStackDevtools } from "@tanstack/react-devtools"
 
 import appCss from "../styles.css?url"
 import { ThemeProvider } from "@/components/shared/theme-provider"
+import "sonner/dist/styles.css"
+import { Toaster } from "sonner"
 
 export const Route = createRootRoute({
   head: () => ({
@@ -62,7 +64,17 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         suppressHydrationWarning
         className="min-h-screen bg-background text-foreground antialiased transition-colors duration-150 selection:bg-primary/20 selection:text-primary"
       >
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {children}
+          <Toaster
+            position="bottom-right"
+            closeButton
+            richColors
+            toastOptions={{
+              className: "font-sans",
+            }}
+          />
+        </ThemeProvider>
 
         {/* <TanStackDevtools
           config={{
