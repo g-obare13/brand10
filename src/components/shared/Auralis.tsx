@@ -85,6 +85,23 @@ export interface AuralisProps {
 
 const DEFAULT_COLORS = ["#6366f1", "#a855f7", "#38bdf8"]
 
+/**
+ * WebGL-powered generative animated aurora shader mesh background.
+ * Features:
+ * - Real-time fragment shader with Simplex noise computation.
+ * - Dynamic color interpolation across three input hex colors.
+ * - Adjustable noise grain and animation wave velocity.
+ * - Auto-resizing WebGL canvas handling window resize events.
+ *
+ * @component
+ * @param {AuralisProps} props - The component props.
+ * @param {string[]} [props.colors=DEFAULT_COLORS] - Array of 3 hex color strings.
+ * @param {number} [props.speed=0.3] - Animation speed multiplier.
+ * @param {number} [props.grain=0.4] - Noise grain intensity.
+ * @param {string} [props.height="100%"] - CSS height string.
+ * @param {string} [props.className] - CSS class names.
+ * @returns {React.ReactElement} The WebGL canvas container.
+ */
 const Auralis = ({
   colors = DEFAULT_COLORS,
   speed = 0.3,

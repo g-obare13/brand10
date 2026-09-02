@@ -20,6 +20,10 @@ export interface PreviewStyleConfig {
   typographyLabel: string
 }
 
+/**
+ * Complete set of UI token themes mapped to design movements.
+ * Controls typography, card borders, shadows, glows, and interactive element styling.
+ */
 export const PREVIEW_THEMES: Record<
   MovementId | "default",
   PreviewStyleConfig
@@ -202,6 +206,13 @@ export const PREVIEW_THEMES: Record<
   },
 }
 
+/**
+ * Retrieves the style configuration object corresponding to a given design movement ID.
+ * Falls back to "semi-flat" if the movement ID is invalid or missing.
+ *
+ * @param {string | null} [movementId] - Identifier of the design movement.
+ * @returns {PreviewStyleConfig} The resolved theme styling configuration.
+ */
 export function getPreviewTheme(
   movementId?: string | null
 ): PreviewStyleConfig {

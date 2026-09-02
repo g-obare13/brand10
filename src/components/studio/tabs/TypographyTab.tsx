@@ -8,7 +8,16 @@ import {
   computeTypeScale,
 } from '../../../lib/fontLoader'
 import { IconTypography, IconSparkles, IconDeviceDesktop, IconCheck } from '@tabler/icons-react'
-
+/**
+ * Deep studio tab for managing brand typography pairing, scale ratios, and specimen testing.
+ * Features:
+ * - Curated harmonic font pairings (Display, Body, Mono) with one-click adoption.
+ * - Modular scale ratio selector (Minor Second up to Golden Ratio).
+ * - Live font playground with editable text sandbox and responsive size specs.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered typography studio tab.
+ */
 export const TypographyTab: React.FC = () => {
   const brand = useBrandStore()
   const [sandboxText, setSandboxText] = useState(

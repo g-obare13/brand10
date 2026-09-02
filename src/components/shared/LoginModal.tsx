@@ -1,6 +1,9 @@
-import React, { useState } from "react"
+import { Google } from "@boxicons/react"
+import { IconSparkles } from "@tabler/icons-react"
 import { useNavigate } from "@tanstack/react-router"
+import React, { useState } from "react"
 import { useAuthStore } from "../../store/authStore"
+import { Button } from "../ui/button"
 import {
   Dialog,
   DialogContent,
@@ -8,20 +11,26 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog"
-import { Button } from "../ui/button"
 import { Logo } from "./Logo"
-import {
-  IconBrandGoogle,
-  IconSparkles,
-  IconShieldCheck,
-} from "@tabler/icons-react"
-import { Google } from "@boxicons/react"
 
 export interface LoginModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
+/**
+ * Authentication dialog allowing OAuth login with Google or continuing in guest mode.
+ * Features:
+ * - Supabase Google OAuth provider integration.
+ * - Guest mode fallback using local persistence.
+ * - Error alert banners and loading states on submission.
+ *
+ * @component
+ * @param {LoginModalProps} props - The component props.
+ * @param {boolean} props.open - Whether login dialog is open.
+ * @param {(open: boolean) => void} props.onOpenChange - Open state change callback.
+ * @returns {React.ReactElement} The rendered login modal.
+ */
 export const LoginModal: React.FC<LoginModalProps> = ({
   open,
   onOpenChange,

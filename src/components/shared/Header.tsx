@@ -1,32 +1,34 @@
-import { Logo } from "@/components/shared/Logo"
 import { LoginModal } from "@/components/shared/LoginModal"
+import { Logo } from "@/components/shared/Logo"
 import { ThemeToggler } from "@/components/shared/theme-toggler"
 import AnimatedUnderline from "@/components/ui/animated-underline"
 import { Button } from "@/components/ui/button"
 import { headerData } from "@/data/menu"
 import { animateFadeUp } from "@/lib/gsap-animations"
 import { useAuthStore } from "@/store/authStore"
-import {
-  IconLock,
-  IconLogout,
-  IconMenu,
-  IconMessageCircle,
-  IconX,
-} from "@tabler/icons-react"
+import { IconLock, IconLogout, IconMenu, IconX } from "@tabler/icons-react"
 import { Link, useLocation, useNavigate } from "@tanstack/react-router"
 import gsap from "gsap"
 import { useEffect, useRef, useState } from "react"
-import GlassPanel from "./GlassPanel"
 import Container from "../ui/container"
+import GlassPanel from "./GlassPanel"
 
 export interface HeaderProps {
   action?: "default" | "logout"
 }
 
 /**
- * Agency site header with navigation menu.
- * Includes a logo link, chat button, and a toggleable full-screen menu panel
- * with animated navigation links and detail items using GSAP.
+ * Primary agency application header with sticky navigation and mobile drawer.
+ * Features:
+ * - Brand logo link to home / projects.
+ * - Authentication state trigger (Login modal or Logout action).
+ * - ThemeToggler button switching light and dark modes.
+ * - Fullscreen responsive overlay menu with GSAP staggered animations.
+ *
+ * @component
+ * @param {HeaderProps} [props] - The component props.
+ * @param {"default" | "logout"} [props.action] - Override action type for the auth action button.
+ * @returns {React.ReactElement} The rendered global header.
  */
 export function Header({ action }: HeaderProps = {}) {
   const [isOpen, setIsOpen] = useState(false)

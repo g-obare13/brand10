@@ -11,6 +11,19 @@ interface ExportModalProps {
   onOpenChange: (open: boolean) => void
 }
 
+/**
+ * Multi-format brand asset export modal dialog.
+ * Features:
+ * - Production ZIP download containing SVG/PNG logos, CSS variables, tokens.json, and tailwind.config.js.
+ * - Multi-page vector PDF Brand Guidelines Deck generation with @react-pdf/renderer.
+ * - Live copyable code snippets for Tailwind config, W3C Design Tokens JSON, and CSS Custom Properties.
+ *
+ * @component
+ * @param {ExportModalProps} props - The component props.
+ * @param {boolean} props.open - Whether modal dialog is open.
+ * @param {(open: boolean) => void} props.onOpenChange - Open state change callback.
+ * @returns {React.ReactElement} The rendered export dialog modal.
+ */
 export const ExportModal: React.FC<ExportModalProps> = ({ open, onOpenChange }) => {
   const brand = useBrandStore()
   const [isZipping, setIsZipping] = useState(false)

@@ -48,7 +48,16 @@ export const DASHBOARD_NAV_ROUTES: DashboardRouteItem[] = [
     icon: <Cog />,
   },
 ]
-
+/**
+ * Floating bottom navigation toolbar for navigating primary dashboard tabs.
+ * Features:
+ * - GlassPanel rounded dock layout with subtle backdrop blur.
+ * - Icon buttons with accessible tooltips and active route indicators.
+ * - Links to Projects, Templates, Guidelines, AI Assistance, and Settings.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered floating navigation toolbar.
+ */
 export function DashboardToolbar() {
   return (
     <nav

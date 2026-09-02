@@ -7,7 +7,17 @@ import { getPreviewTheme } from "./previewTheme"
 import { cn } from "@/lib/utils"
 import { loadGoogleFont } from "@/lib/fontLoader"
 import { gsap } from "gsap"
-
+/**
+ * A live interactive preview demonstrating typography hierarchy and font pairings.
+ * Features:
+ * - Dynamic font previewing with Google Fonts dynamic loading.
+ * - Scales and specimen samples including Display, Headings, Body, and Monospace.
+ * - Fluid font size and type scale calculations based on brand parameters.
+ * - GSAP transition animations on font family changes.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered typography preview panel.
+ */
 export function StepTypographyPreview() {
   const brand = useBrandStore()
   const containerRef = useRef<HTMLDivElement>(null)

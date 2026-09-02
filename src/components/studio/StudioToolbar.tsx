@@ -55,6 +55,18 @@ interface StudioToolbarProps {
   onTabChange: (tab: StudioTab) => void
 }
 
+/**
+ * Floating bottom dock navigation toolbar for the Brand Studio.
+ * Features:
+ * - Tab switching buttons for Strategy, Logo, Colors, Typography, and Mockups.
+ * - GlassPanel dock container with subtle border highlights and tooltips.
+ *
+ * @component
+ * @param {StudioToolbarProps} props - The component props.
+ * @param {StudioTab} props.activeTab - Currently active studio tab.
+ * @param {(tab: StudioTab) => void} props.onTabChange - Handler to switch tabs.
+ * @returns {React.ReactElement} The rendered studio bottom toolbar.
+ */
 export function StudioToolbar({ activeTab, onTabChange }: StudioToolbarProps) {
   return (
     <nav

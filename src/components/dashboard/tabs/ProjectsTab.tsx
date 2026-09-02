@@ -45,6 +45,17 @@ interface ProjectCardLogoProps {
   brandInitial: string
 }
 
+/**
+ * Renders the logo preview badge for a project card.
+ * Handles fallbacks between remote logo URLs, local IndexedDB cached SVGs, and brand initials.
+ *
+ * @component
+ * @param {ProjectCardLogoProps} props - The component props.
+ * @param {BrandProjectItem} props.project - The brand project metadata item.
+ * @param {string} props.primaryColor - Primary brand color used for monogram & border styling.
+ * @param {string} props.brandInitial - Monogram letter fallback.
+ * @returns {React.ReactElement} The rendered project logo emblem.
+ */
 function ProjectCardLogo({
   project,
   primaryColor,
@@ -166,6 +177,19 @@ function ProjectCardLogo({
   )
 }
 
+/**
+ * Main projects listing tab in the dashboard.
+ * Features:
+ * - Interactive spotlight project cards with logo, color indicators, and metadata.
+ * - Project duplication, opening studio, and deletion with confirmation alert dialog.
+ * - Empty state with direct project creation button.
+ * - Integration with projectsStore, authStore, and brandStore.
+ *
+ * @component
+ * @param {ProjectsTabProps} props - The component props.
+ * @param {() => void} props.onOpenCreateModal - Callback to launch project creation dialog.
+ * @returns {React.ReactElement} The rendered projects management tab.
+ */
 export function ProjectsTab({ onOpenCreateModal }: ProjectsTabProps) {
   const auth = useAuthStore()
   const projectsStore = useProjectsStore()

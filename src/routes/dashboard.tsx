@@ -15,6 +15,17 @@ export const Route = createFileRoute("/dashboard")({
   component: DashboardLayout,
 })
 
+/**
+ * Master layout wrapper for all dashboard tab views (/dashboard/*).
+ * Features:
+ * - Dynamic ambient WebGL background and global application header.
+ * - Project quota and limit calculation passed into DashboardHero.
+ * - Bottom floating navigation dock for sub-routes.
+ * - Global CreateProjectModal mount point.
+ *
+ * @component
+ * @returns {React.ReactElement} The dashboard layout shell.
+ */
 function DashboardLayout() {
   const auth = useAuthStore()
   const projectsStore = useProjectsStore()

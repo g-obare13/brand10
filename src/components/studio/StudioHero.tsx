@@ -19,6 +19,19 @@ interface StudioHeroProps {
   onOpenExport: () => void
 }
 
+/**
+ * Studio hero section containing project title, breadcrumb backlink, and primary action buttons.
+ * Features:
+ * - GSAP staggered entry animations.
+ * - Inline project title renaming.
+ * - Undo/Redo state buttons.
+ * - Cloud save status indicator and export action trigger.
+ *
+ * @component
+ * @param {StudioHeroProps} props - The component props.
+ * @param {() => void} props.onOpenExport - Handler to open the studio export modal.
+ * @returns {React.ReactElement} The rendered studio hero section.
+ */
 export function StudioHero({ onOpenExport }: StudioHeroProps) {
   const brand = useBrandStore()
   const temporal = useBrandStore.temporal

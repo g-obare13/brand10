@@ -1,14 +1,8 @@
-import { Link, useNavigate } from "@tanstack/react-router"
-import { useBrandStore } from "@/store/brandStore"
 import GlassPanel from "@/components/shared/GlassPanel"
 import { Button } from "@/components/ui/button"
-import {
-  IconArrowLeft,
-  IconArrowRight,
-  IconCheck,
-  IconSparkles,
-} from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
+import { useBrandStore } from "@/store/brandStore"
+import { IconArrowLeft, IconCheck } from "@tabler/icons-react"
 
 export const WIZARD_STEPS = [
   { id: 1, title: "Foundation", subtitle: "Identity & Vibe" },
@@ -25,20 +19,25 @@ interface WizardHeaderProps {
   projectId: string
 }
 
+/**
+ * Wizard progress bar and header navigation controller.
+ * Features:
+ * - Step pills with completion checkmarks and click navigation.
+ * - Back to Dashboard and direct Skip to Studio actions.
+ * - Current brand name and progress status indicator.
+ *
+ * @component
+ * @param {WizardHeaderProps} props - The component props.
+ * @param {number} props.currentStep - Currently active wizard step (1-6).
+ * @param {(step: number) => void} props.onStepSelect - Callback invoked when clicking a step pill.
+ * @param {string} props.projectId - Active project identifier.
+ * @returns {React.ReactElement} The rendered wizard header controller.
+ */
 export function WizardHeader({
   currentStep,
   onStepSelect,
-  projectId,
 }: WizardHeaderProps) {
   const brand = useBrandStore()
-  const navigate = useNavigate()
-
-  const handleSkipToStudio = () => {
-    navigate({
-      to: "/studio/$projectId",
-      params: { projectId },
-    })
-  }
 
   return (
     <div className="space-y-4 pt-2 sm:pt-4">

@@ -15,6 +15,19 @@ interface CreateProjectModalProps {
   onClose: () => void
 }
 
+/**
+ * Modal dialog for initiating a new brand system project.
+ * Features:
+ * - GSAP animated bottom sheet / backdrop transitions.
+ * - Project initialization into Supabase with automatic redirection to the step wizard.
+ * - Integration with authStore and projectsStore.
+ *
+ * @component
+ * @param {CreateProjectModalProps} props - The component props.
+ * @param {boolean} props.isOpen - Whether modal is visible.
+ * @param {() => void} props.onClose - Callback triggered on dismiss.
+ * @returns {React.ReactElement | null} The modal element or null if closed.
+ */
 export function CreateProjectModal({
   isOpen,
   onClose,

@@ -1,28 +1,32 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
-import React, { useEffect, useRef, useState } from "react"
+import Auralis from "@/components/shared/Auralis"
+import WordReveal from "@/components/shared/WordReveal"
+import { Button } from "@/components/ui/button"
+import { ArrowRightStroke } from "@boxicons/react"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { gsap } from "gsap"
+import { useEffect, useRef } from "react"
 import { Header } from "../components/shared/Header"
 import Container from "../components/ui/container"
-import { ingestBrandFile } from "../lib/extractor"
 import { useBrandStore } from "../store/brandStore"
-import { Button } from "@/components/ui/button"
-import { ArrowRight, ArrowRightStroke } from "@boxicons/react"
-import BlurReveal from "@/components/shared/BlurReveal"
-import WordReveal from "@/components/shared/WordReveal"
-import { animateFadeUp } from "@/lib/gsap-animations"
-import Auralis from "@/components/shared/Auralis"
 
 export const Route = createFileRoute("/")({
   component: LandingPage,
 })
 
+/**
+ * Public landing page for the Brand Studio application.
+ * Features:
+ * - Ambient Auralis WebGL hero canvas and typography reveal effects.
+ * - Instant brand identity ingestion CTA with file drag-and-drop.
+ * - Fast-track button jumping directly into the interactive wizard.
+ *
+ * @component
+ * @returns {React.ReactElement} The landing page view.
+ */
 function LandingPage() {
   const navigate = useNavigate()
   const brand = useBrandStore()
 
-  const [brandName, setBrandName] = useState("")
-  const [isDragging, setIsDragging] = useState(false)
-  const [isProcessing, setIsProcessing] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
 
@@ -48,42 +52,6 @@ function LandingPage() {
 
     return () => ctx.revert()
   }, [])
-
-  const handleProcessFile = async (file: File) => {
-    try {
-      setIsProcessing(true)
-      const extracted = await ingestBrandFile(file)
-
-      // Create new project ID
-      const newProjectId = `project-${Math.random().toString(36).substring(2, 9)}`
-      brand.setProjectId(newProjectId)
-
-      const finalName = brandName.trim() || extracted.brandName || "My Brand"
-      brand.setBrandName(finalName)
-
-      await brand.setLogoData({
-        svgContent: extracted.svgDataUri
-          ? atob(extracted.svgDataUri.split(",")[1] || "")
-          : undefined,
-        rasterDataUri: extracted.rasterDataUri,
-        isVector: extracted.isVector,
-        aspectRatio: extracted.aspectRatio,
-      })
-
-      if (extracted.colors.length) {
-        brand.setColorPalette(extracted.colors)
-      }
-
-      navigate({
-        to: "/studio/$projectId",
-        params: { projectId: newProjectId },
-      })
-    } catch (err) {
-      console.error("File ingestion error:", err)
-    } finally {
-      setIsProcessing(false)
-    }
-  }
 
   const handleLaunchPreset = (presetKey: "apex" | "bloom" | "nova") => {
     const projectId = `demo-${presetKey}`

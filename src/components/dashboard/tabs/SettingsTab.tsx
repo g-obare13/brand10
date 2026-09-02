@@ -1,7 +1,16 @@
 import { useAuthStore } from "@/store/authStore"
 import { useProjectsStore } from "@/store/projectsStore"
 import { IconCheck } from "@tabler/icons-react"
-
+/**
+ * Dashboard settings tab displaying workspace tier, quotas, and preferences.
+ * Features:
+ * - Active session information (auth email vs guest local storage).
+ * - Quota usage meters for project limits.
+ * - System feature switches and defaults overview.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered settings panel tab.
+ */
 export function SettingsTab() {
   const auth = useAuthStore()
   const projectsStore = useProjectsStore()

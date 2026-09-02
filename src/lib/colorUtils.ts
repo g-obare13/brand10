@@ -192,8 +192,8 @@ export function calculateApca(textHex: string, bgHex: string): number {
   try {
     const validTxt = chroma.valid(textHex) ? textHex : '#000000'
     const validBg = chroma.valid(bgHex) ? bgHex : '#ffffff'
-    const txtRgb = chroma(validTxt).rgb() as [number, number, number]
-    const bgRgb = chroma(validBg).rgb() as [number, number, number]
+    const txtRgb = chroma(validTxt).rgb()
+    const bgRgb = chroma(validBg).rgb()
 
     let yTxt = sRgbToY(txtRgb)
     let yBg = sRgbToY(bgRgb)

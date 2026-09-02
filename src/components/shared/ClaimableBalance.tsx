@@ -10,6 +10,12 @@ import {
 import { Item, ItemContent } from "@/components/ui/item"
 import { Separator } from "@/components/ui/separator"
 
+/**
+ * Financial metric card displaying claimable wallet balances and royalty fee deductions.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered wallet card.
+ */
 export function ClaimableBalance() {
   return (
     <Card className="border-0 border-transparent shadow-none">

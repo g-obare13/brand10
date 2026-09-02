@@ -56,7 +56,23 @@ interface ColorInfoDialogProps {
   shades: Record<string, string>
   children?: ReactNode
 }
-
+/**
+ * An inspector modal displaying comprehensive color space metrics and contrast ratings.
+ * Features:
+ * - Tabulated breakdown of all 11 tonal shades (HEX, HSL, OKLCH).
+ * - APCA lightness contrast calculation and WCAG AA / AAA compliance.
+ * - One-click clipboard copy for color values.
+ * - Visual swatch sample column with calculated readable foreground colors.
+ *
+ * @component
+ * @param {ColorInfoDialogProps} props - The component props.
+ * @param {string} props.label - Color role name or label.
+ * @param {"primary" | "secondary"} props.role - Brand color role.
+ * @param {string} props.hex - Base hex code of the color.
+ * @param {Record<string, string>} props.shades - 11-step tonal ramp shades.
+ * @param {ReactNode} [props.children] - Trigger element for the dialog.
+ * @returns {React.ReactElement} The color metrics dialog modal.
+ */
 export function ColorInfoDialog({
   label,
   role,

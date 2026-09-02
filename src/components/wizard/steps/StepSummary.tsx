@@ -13,7 +13,18 @@ import {
 interface StepSummaryProps {
   projectId: string
 }
-
+/**
+ * Final wizard step confirming complete brand architecture setup.
+ * Features:
+ * - Direct save action syncing generated tokens with backend Supabase database.
+ * - Overview tiles summarizing Palette, Typography, and Imagery readiness.
+ * - Direct transition route CTA entering the deep Brand Studio.
+ *
+ * @component
+ * @param {StepSummaryProps} props - The component props.
+ * @param {string} props.projectId - Active project identifier.
+ * @returns {React.ReactElement} The rendered completion screen.
+ */
 export function StepSummary({ projectId }: StepSummaryProps) {
   const brand = useBrandStore()
   const navigate = useNavigate()
@@ -83,7 +94,7 @@ export function StepSummary({ projectId }: StepSummaryProps) {
           </div>
           <div>
             <span className="block text-xs font-bold text-foreground capitalize">
-              {brand.imageryMood || "Minimal"} Photography
+              {brand.imageryMood} Photography
             </span>
             <span className="block text-[11px] text-muted-foreground">
               Direction Preset

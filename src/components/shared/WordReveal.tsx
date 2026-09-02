@@ -78,7 +78,26 @@ function splitChildren(children: React.ReactNode): React.ReactNode {
     return child
   })
 }
-
+/**
+ * Word-by-word typography fade and rise reveal animation component.
+ * Features:
+ * - Automatically splits text children into word spans preserving layout whitespace.
+ * - GSAP & ScrollTrigger scroll-linked reveal or direct immediate triggers.
+ * - Supports polymorphic rendering across headings, paragraphs, spans, and divs.
+ *
+ * @component
+ * @param {WordRevealProps} props - The component props.
+ * @param {string} [props.text] - Plain text content to animate.
+ * @param {React.ReactNode} [props.children] - Children elements with nested text.
+ * @param {string} [props.className] - CSS class names.
+ * @param {"h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span" | "div"} [props.as="p"] - HTML tag.
+ * @param {number} [props.delay=0] - Initial delay in seconds.
+ * @param {number} [props.stagger=0.02] - Stagger between each word reveal.
+ * @param {number} [props.duration=1.2] - Animation duration per word.
+ * @param {string} [props.start="top 85%"] - ScrollTrigger start condition.
+ * @param {boolean} [props.disableScrollTrigger=false] - Whether to fire immediately without scroll trigger.
+ * @returns {React.ReactElement} The rendered animated word container.
+ */
 export function WordReveal({
   text,
   children,

@@ -1,9 +1,19 @@
 import { useBrandStore } from "@/store/brandStore"
 import { IMAGERY_BENTO_SHOWCASES } from "@/data/wizard"
 import chroma from "chroma-js"
-import ImageComponentOptimized from "@/components/shared/image-component-optimized"
+import ImageComponentOptimized from "@/components/shared/ImageComponentOptimized"
 import { Badge } from "@/components/ui/badge"
-
+/**
+ * A live interactive bento grid previewing brand imagery and mood selections.
+ * Features:
+ * - Dynamic color adaptation using brand primary, secondary, and accent colors.
+ * - Multi-card layout showcasing high-resolution imagery and brand typography.
+ * - Integration with ImageComponentOptimized with smooth blurhash transitions.
+ * - Real-time preview of imagery mood treatments (minimal, cinematic, vibrant, editorial).
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered imagery bento preview.
+ */
 export function StepImageryPreview() {
   const brand = useBrandStore()
 
@@ -12,10 +22,6 @@ export function StepImageryPreview() {
     brand.colorPalette.find((c) => c.role === "primary")?.hex || "#6366f1"
   const secondaryColor =
     brand.colorPalette.find((c) => c.role === "secondary")?.hex || "#06b6d4"
-  const accentColor =
-    brand.colorPalette.find((c) => c.role === "accent")?.hex ||
-    brand.colorPalette[2]?.hex ||
-    "#10b981"
 
   const moodKey =
     brand.imageryMood in IMAGERY_BENTO_SHOWCASES ? brand.imageryMood : "minimal"

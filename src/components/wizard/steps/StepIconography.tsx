@@ -35,6 +35,17 @@ const RADIUS_OPTIONS = [
   { label: "Pill 99px", value: 99 },
 ]
 
+/**
+ * Form component for configuring brand iconography geometry and style families.
+ * Features:
+ * - Icon family selector (Stroke, Solid Filled, Duotone Two-Tone).
+ * - Corner radius preset buttons (Sharp, Soft 4px, Squircle 8px, Pill 99px).
+ * - Stroke weight slider adjustments for linear stroke families.
+ * - Real-time icon preview cards reflecting color and geometry choices.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered iconography configuration form.
+ */
 export function StepIconography() {
   const brand = useBrandStore()
   const primaryColor =
@@ -63,7 +74,7 @@ export function StepIconography() {
           </Label>
           <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
             {STYLE_FAMILIES.map((fam) => {
-              const isSelected = (brand.iconStyle || "stroke") === fam.id
+              const isSelected = brand.iconStyle === fam.id
 
               return (
                 <button

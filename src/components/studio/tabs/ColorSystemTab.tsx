@@ -12,7 +12,17 @@ import {
   IconLayersSubtract,
   IconShieldCheck,
 } from '@tabler/icons-react'
-
+/**
+ * Deep studio tab for managing brand color matrix, harmony algorithms, and contrast compliance.
+ * Features:
+ * - Color swatch list with primary, secondary, accent, background, and surface roles.
+ * - Interactive color picker and hex/rgb/cmyk/hsl coordinate inspector.
+ * - 11-step tonal shades generator and live WCAG AA/AAA contrast matrix against background.
+ * - Swatch creation and removal with instantaneous state synchronization.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered color system studio tab.
+ */
 export const ColorSystemTab: React.FC = () => {
   const brand = useBrandStore()
   const [selectedSwatchId, setSelectedSwatchId] = useState<string>(

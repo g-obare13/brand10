@@ -5,6 +5,15 @@ interface SvgProps {
   color?: string
 }
 
+/**
+ * Vector SVG mark for the Brandio brand identity (light/white paths for dark mode).
+ *
+ * @component
+ * @param {SvgProps} props - The component props.
+ * @param {string} [props.className] - SVG CSS class names.
+ * @param {string} [props.color="#FAF8F5"] - Color attribute.
+ * @returns {React.ReactElement} The rendered vector logo.
+ */
 export const LogoSvgLight: React.FC<SvgProps> = ({
   className,
   color = "#FAF8F5",

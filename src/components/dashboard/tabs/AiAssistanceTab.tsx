@@ -5,6 +5,16 @@ interface AiAssistanceTabProps {
   onOpenCreateModal?: () => void
 }
 
+/**
+ * Dashboard tab providing an interactive AI copilot chat interface for brand generation.
+ * Features:
+ * - Animated headline and subtitle with WordReveal.
+ * - Embedded AiChat component for intelligent brand queries and guidelines assistance.
+ *
+ * @component
+ * @param {AiAssistanceTabProps} [_props] - The component props.
+ * @returns {React.ReactElement} The rendered AI assistance tab.
+ */
 export function AiAssistanceTab(_props: AiAssistanceTabProps = {}) {
   return (
     <div className="space-y-6">

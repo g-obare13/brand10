@@ -12,7 +12,13 @@ interface AuthState {
   signOut: () => Promise<void>
   continueAsGuest: () => void
 }
-
+/**
+ * Zustand authentication store managing Supabase auth sessions, OAuth sign-ins, and guest modes.
+ * Features:
+ * - Supabase getSession & onAuthStateChange event listeners.
+ * - Google OAuth provider integration.
+ * - Guest mode fallback for local offline experimentation.
+ */
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   session: null,

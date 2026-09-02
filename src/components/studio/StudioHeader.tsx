@@ -25,6 +25,21 @@ interface StudioHeaderProps {
   ) => void
 }
 
+/**
+ * Master top navigation bar for the deep Brand Studio application.
+ * Features:
+ * - Studio section switcher tabs with icons.
+ * - Undo and Redo buttons connected to temporal history state.
+ * - Editable brand name input.
+ * - Supabase persistence trigger with loading indicator.
+ * - Export modal trigger for PDF decks, JSON tokens, and ZIP packages.
+ *
+ * @component
+ * @param {StudioHeaderProps} props - The component props.
+ * @param {"overview" | "logo" | "colors" | "typography" | "mockups"} props.activeTab - Currently active studio section.
+ * @param {(tab: "overview" | "logo" | "colors" | "typography" | "mockups") => void} props.onTabChange - Tab change handler.
+ * @returns {React.ReactElement} The rendered studio header bar.
+ */
 export const StudioHeader: React.FC<StudioHeaderProps> = ({
   activeTab,
   onTabChange,

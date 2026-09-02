@@ -30,6 +30,16 @@ export const Route = createFileRoute("/studio/$projectId")({
   component: StudioPage,
 })
 
+/**
+ * Studio & Wizard route container for a brand project (/studio/:projectId).
+ * Features:
+ * - Direct hydration from Supabase or IndexedDB based on route projectId.
+ * - Two-column responsive wizard layout (step configuration on left, dynamic live bento preview on right).
+ * - Step progression, validation, and auto-save on finish.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered studio / wizard page.
+ */
 function StudioPage() {
   const { projectId } = Route.useParams()
   const brand = useBrandStore()

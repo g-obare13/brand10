@@ -30,6 +30,18 @@ export interface NoiseTextureProps extends ComponentProps<"svg"> {
   noiseOpacity?: number
 }
 
+/**
+ * Procedural SVG film grain and noise texture generator using feTurbulence and feColorMatrix.
+ *
+ * @component
+ * @param {NoiseTextureProps} props - The component props.
+ * @param {string} [props.className] - SVG CSS class names.
+ * @param {number} [props.frequency=0.4] - Base frequency for feTurbulence filter.
+ * @param {number} [props.octaves=6] - Number of turbulence octaves.
+ * @param {number} [props.slope=0.15] - Contrast slope after desaturation.
+ * @param {number} [props.noiseOpacity=0.6] - Layer opacity for the noise fill rect.
+ * @returns {React.ReactElement} The rendered SVG noise texture element.
+ */
 export const NoiseTexture = ({
   className,
   frequency = 0.4,

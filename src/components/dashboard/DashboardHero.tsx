@@ -1,7 +1,5 @@
-import { IconLock, IconPlus } from "@tabler/icons-react"
+import { IconLock } from "@tabler/icons-react"
 import GlassPanel from "../shared/GlassPanel"
-import WordReveal from "../shared/WordReveal"
-import { Button } from "../ui/button"
 
 interface DashboardHeroProps {
   userEmail?: string
@@ -10,12 +8,21 @@ interface DashboardHeroProps {
   onOpenCreateModal: () => void
 }
 
-export function DashboardHero({
-  userEmail,
-  projectCount,
-  isLimitReached,
-  onOpenCreateModal,
-}: DashboardHeroProps) {
+/**
+ * Header section for the main dashboard display.
+ * Features:
+ * - Dynamic warning banner when project creation tier limit is reached.
+ * - GlassPanel styled visual alerts.
+ *
+ * @component
+ * @param {DashboardHeroProps} props - The component props.
+ * @param {string} [props.userEmail] - Current authenticated user email address.
+ * @param {number} props.projectCount - Total number of user projects.
+ * @param {boolean} props.isLimitReached - Whether the account is at project quota.
+ * @param {() => void} props.onOpenCreateModal - Callback to trigger project creation.
+ * @returns {React.ReactElement} The rendered dashboard hero section.
+ */
+export function DashboardHero({ isLimitReached }: DashboardHeroProps) {
   return (
     <div className="space-y-6 pt-12">
       {/* Limit Reached Warning Alert */}

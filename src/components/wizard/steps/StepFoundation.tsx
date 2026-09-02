@@ -1,18 +1,22 @@
-import { useState, useEffect, useRef } from "react"
-import { useBrandStore } from "@/store/brandStore"
-import type { BrandToneRatings } from "@/store/brandStore"
-import { DESIGN_MOVEMENTS } from "@/data/wizard"
-import type { DesignMovement } from "@/data/wizard"
+import WordReveal from "@/components/shared/WordReveal"
+import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import WordReveal from "@/components/shared/WordReveal"
-import { animateFadeUp } from "@/lib/gsap-animations"
-import { gsap } from "gsap"
-import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Textarea } from "@/components/ui/textarea"
+import type { DesignMovement } from "@/data/wizard"
+import { DESIGN_MOVEMENTS } from "@/data/wizard"
+import type { BrandToneRatings } from "@/store/brandStore"
+import { useBrandStore } from "@/store/brandStore"
 import { XCircle } from "@boxicons/react"
-
+import { gsap } from "gsap"
+import { useEffect, useRef, useState } from "react"
+/**
+ * Skeleton loading state for StepFoundation form fields and interactive badges.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered form skeleton.
+ */
 export function StepFoundationSkeleton() {
   return (
     <div className="animate-pulse space-y-6">
@@ -57,6 +61,19 @@ export interface StepFoundationProps {
   isLoading?: boolean
 }
 
+/**
+ * Step 1 Wizard form component for configuring brand identity foundation.
+ * Features:
+ * - Brand name, tagline, and mission statement configuration inputs.
+ * - Interactive design movement selector with cursor-following floating preview card.
+ * - Real-time sync with brandStore tone ratings and design movements.
+ * - Core brand values chip manager with add/remove capabilities.
+ *
+ * @component
+ * @param {StepFoundationProps} [props] - The component props.
+ * @param {boolean} [props.isLoading] - Optional manual override for loading skeleton state.
+ * @returns {React.ReactElement} The rendered foundation configuration form.
+ */
 export function StepFoundation({ isLoading }: StepFoundationProps = {}) {
   const brand = useBrandStore()
   const effectiveLoading = isLoading ?? (brand.isLoading || !brand.projectId)

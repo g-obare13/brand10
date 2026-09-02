@@ -46,6 +46,18 @@ const GUIDELINE_ICONS: Record<
   foundation: IconCompass,
 }
 
+/**
+ * Dashboard tab displaying architectural guideline categories and system specs.
+ * Features:
+ * - Cards for Logo System, Color Science, Typographic Scale, Iconography, and Photography.
+ * - Interactive hover spotlight effects with brand accent glow.
+ * - Direct navigation to active project brand studio.
+ *
+ * @component
+ * @param {GuidelinesTabProps} props - The component props.
+ * @param {() => void} props.onOpenCreateModal - Callback to initiate project creation when no projects exist.
+ * @returns {React.ReactElement} The rendered brand guidelines tab.
+ */
 export function GuidelinesTab({ onOpenCreateModal }: GuidelinesTabProps) {
   const navigate = useNavigate()
   const projectsStore = useProjectsStore()

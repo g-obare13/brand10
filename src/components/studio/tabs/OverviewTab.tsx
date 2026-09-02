@@ -11,7 +11,16 @@ import {
 import { gsap } from 'gsap'
 import { animateFadeUp } from '@/lib/gsap-animations'
 import GlassPanel from '@/components/shared/GlassPanel'
-
+/**
+ * Deep studio tab for managing brand strategy, mission, vision, core values, and voice tones.
+ * Features:
+ * - Brand positioning inputs (tagline, mission, vision statements).
+ * - Interactive voice & tone sliders with dynamic descriptor labels.
+ * - Dynamic core values tag manager with instant addition and removal.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered strategy & tone studio tab.
+ */
 export const OverviewTab: React.FC = () => {
   const brand = useBrandStore()
   const [newValue, setNewValue] = useState('')

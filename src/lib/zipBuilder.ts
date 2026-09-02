@@ -1,7 +1,8 @@
 import JSZip from 'jszip'
 import fileSaver from 'file-saver'
-const saveAs = fileSaver.saveAs || fileSaver
 import type { ColorSwatch } from './colorUtils'
+
+const saveAs = fileSaver.saveAs
 
 export interface ZipExportOptions {
   brandName: string
@@ -160,7 +161,7 @@ export function generateGuidelinesMarkdown(options: ZipExportOptions): string {
 ## 1. Brand Strategy
 - **Mission:** ${options.mission || 'To empower and inspire through excellence.'}
 - **Vision:** ${options.vision || 'To lead the industry in quality, accessibility, and modern design.'}
-- **Core Values:** ${options.coreValues?.length ? options.coreValues.join(', ') : 'Excellence, Innovation, Integrity, Craftsmanship'}
+- **Core Values:** ${options.coreValues.length ? options.coreValues.join(', ') : 'Excellence, Innovation, Integrity, Craftsmanship'}
 
 ---
 

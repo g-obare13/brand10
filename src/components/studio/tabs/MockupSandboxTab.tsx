@@ -9,7 +9,15 @@ import {
   IconArrowRight,
   IconSparkles,
 } from '@tabler/icons-react'
-
+/**
+ * Deep studio tab for previewing brand assets in realistic product mockups.
+ * Features:
+ * - Mockup environments: SaaS Web Hero, Social Share Card, Mobile App Screen, and Business Card.
+ * - Dynamic color, typography, and logo injection across all simulated surfaces.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered mockup sandbox studio tab.
+ */
 export const MockupSandboxTab: React.FC = () => {
   const brand = useBrandStore()
   const [selectedMockup, setSelectedMockup] = useState<'web' | 'social' | 'mobile' | 'card'>('web')

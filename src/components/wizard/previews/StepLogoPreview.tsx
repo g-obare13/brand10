@@ -46,6 +46,20 @@ interface BlueprintFrameProps {
   isSecondary?: boolean
 }
 
+/**
+ * Architectural blueprint frame overlay rendering precision construction lines, tick marks, and crosshairs.
+ *
+ * @component
+ * @param {BlueprintFrameProps} props - The component props.
+ * @param {string | null} [props.svgUri] - Data URI or URL of the SVG logo mark.
+ * @param {string} props.brandName - Brand name fallback when no logo is uploaded.
+ * @param {string} props.primaryColor - Primary brand color used for accents.
+ * @param {string} [props.className] - Additional CSS class names.
+ * @param {boolean} [props.isDark=false] - Whether dark mode styling should apply.
+ * @param {"lg" | "sm"} [props.size="lg"] - Scale of blueprint markers and dimensions.
+ * @param {boolean} [props.isSecondary=false] - Whether this frame represents the secondary lockup.
+ * @returns {React.ReactElement} The rendered blueprint container frame.
+ */
 function BlueprintFrame({
   svgUri,
   brandName,
@@ -193,6 +207,17 @@ function BlueprintFrame({
   )
 }
 
+/**
+ * A live interactive preview showcasing primary and secondary logo marks, clearspace, and usage guidelines.
+ * Features:
+ * - Architectural blueprint display with dimension markers and construction lines.
+ * - Real-time clearspace calculation and visual perimeter box.
+ * - Side-by-side light and dark background contrast verification.
+ * - Dynamic Brand Do's and Don'ts usage guidelines display.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered logo system preview panel.
+ */
 export function StepLogoPreview() {
   const brand = useBrandStore()
   const containerRef = useRef<HTMLDivElement>(null)

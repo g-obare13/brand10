@@ -1,20 +1,23 @@
-import { useBrandStore } from "@/store/brandStore"
 import GlassPanel from "@/components/shared/GlassPanel"
-import { IconSparkles, IconShieldCheck, IconStar, IconBolt, IconHeart, IconCheck } from "@tabler/icons-react"
-
+import { useBrandStore } from "@/store/brandStore"
+import { IconShieldCheck } from "@tabler/icons-react"
+/**
+ * Live executive summary preview displaying brand synthesis cards.
+ * Features:
+ * - High-level synthesis of identity, logo, typography, and palette.
+ * - Monogram lockup and typography hierarchy preview.
+ * - System health and brand readiness indicator.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered executive summary preview.
+ */
 export function StepSummaryPreview() {
   const brand = useBrandStore()
 
   const primaryColor =
     brand.colorPalette.find((c) => c.role === "primary")?.hex || "#6366f1"
-  const secondaryColor =
-    brand.colorPalette.find((c) => c.role === "secondary")?.hex || "#06b6d4"
-  const accentColor =
-    brand.colorPalette.find((c) => c.role === "accent")?.hex || "#10b981"
 
-  const monogramLetter = (brand.brandName || "Brand")
-    .charAt(0)
-    .toUpperCase()
+  const monogramLetter = (brand.brandName || "Brand").charAt(0).toUpperCase()
 
   return (
     <div className="space-y-4">
@@ -23,10 +26,10 @@ export function StepSummaryPreview() {
         blur="none"
         noise
         noiseOpacity={0.02}
-        className="relative overflow-hidden rounded-3xl border border-border/80 bg-card/90 p-6 shadow-sm space-y-4"
+        className="relative space-y-4 overflow-hidden rounded-3xl border border-border/80 bg-card/90 p-6 shadow-sm"
       >
         <div
-          className="pointer-events-none absolute -top-12 -right-12 size-48 rounded-full blur-3xl opacity-30 transition-all duration-500"
+          className="pointer-events-none absolute -top-12 -right-12 size-48 rounded-full opacity-30 blur-3xl transition-all duration-500"
           style={{ backgroundColor: primaryColor }}
         />
 
@@ -55,7 +58,8 @@ export function StepSummaryPreview() {
               {brand.brandName || "Brand Workspace"}
             </h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              {brand.mission || "Complete multi-layer brand identity system generated."}
+              {brand.mission ||
+                "Complete multi-layer brand identity system generated."}
             </p>
           </div>
         </div>
@@ -63,8 +67,8 @@ export function StepSummaryPreview() {
 
       {/* 2. Color Palette & Typography Mini Bento */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="rounded-3xl border border-border/80 bg-card/90 p-5 space-y-3 shadow-xs">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+        <div className="space-y-3 rounded-3xl border border-border/80 bg-card/90 p-5 shadow-xs">
+          <span className="text-[11px] font-bold tracking-wider text-muted-foreground uppercase">
             Palette Matrix
           </span>
           <div className="flex items-center gap-2">
@@ -78,12 +82,12 @@ export function StepSummaryPreview() {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-border/80 bg-card/90 p-5 space-y-2 shadow-xs">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+        <div className="space-y-2 rounded-3xl border border-border/80 bg-card/90 p-5 shadow-xs">
+          <span className="text-[11px] font-bold tracking-wider text-muted-foreground uppercase">
             Type Pairings
           </span>
           <p
-            className="text-sm font-bold text-foreground truncate"
+            className="truncate text-sm font-bold text-foreground"
             style={{ fontFamily: `"${brand.displayFont}", sans-serif` }}
           >
             {brand.displayFont} + {brand.bodyFont}

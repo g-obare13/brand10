@@ -11,7 +11,12 @@ import {
 } from "@/components/ui/card"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-
+/**
+ * Goal definition card component for pacing milestones and targets.
+ *
+ * @component
+ * @returns {React.ReactElement} The milestone form card.
+ */
 export function NewMilestone() {
   return (
     <Card>

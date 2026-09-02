@@ -1,33 +1,36 @@
-import { useState, useRef, useEffect } from "react"
-import { useBrandStore } from "@/store/brandStore"
-import { gsap } from "gsap"
+import WordReveal from "@/components/shared/WordReveal"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
-  extractColorsFromSvg,
   clusterDistinctColors,
+  extractColorsFromSvg,
   syncExtractedColorsToPalette,
 } from "@/lib/extractor"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import {
-  IconVectorBezier2,
-  IconSun,
-  IconMoon,
-  IconLayersLinked,
-  IconUpload,
-  IconTrash,
-  IconRefresh,
-  IconAlertCircle,
-  IconCheck,
-  IconSparkles,
-  IconFileCode,
-} from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import WordReveal from "@/components/shared/WordReveal"
+import { useBrandStore } from "@/store/brandStore"
+import {
+  IconAlertCircle,
+  IconRefresh,
+  IconTrash,
+  IconUpload,
+} from "@tabler/icons-react"
+import { gsap } from "gsap"
+import { useEffect, useRef, useState } from "react"
 
 const MAX_SVG_BYTES = 1 * 1024 * 1024 // 1MB
 
+/**
+ * Step 2 Wizard form component for configuring primary and secondary brand logo marks.
+ * Features:
+ * - Drag-and-drop SVG file uploads with validation and size limit enforcement.
+ * - In-browser vector color extraction with clustering into brand color swatches.
+ * - Logo clearspace multiplier adjustments and lockup previews.
+ * - Brand guidelines Do's and Don'ts manager for logo usage rules.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered logo configuration form.
+ */
 export function StepLogo() {
   const brand = useBrandStore()
   const containerRef = useRef<HTMLDivElement>(null)
@@ -37,7 +40,7 @@ export function StepLogo() {
   )
   const [extractedColors, setExtractedColors] = useState<string[]>([])
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [isProcessing, setIsProcessing] = useState(false)
+  const [, setIsProcessing] = useState(false)
   const [dragOverSlot, setDragOverSlot] = useState<
     "primary" | "secondary" | null
   >(null)

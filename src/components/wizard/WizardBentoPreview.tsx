@@ -10,15 +10,19 @@ export interface WizardBentoPreviewProps {
   isLoading?: boolean
 }
 
-const STEP_TITLES: Record<number, string> = {
-  1: "Strategic Foundation Preview",
-  2: "Logo Geometry & Contrast Preview",
-  3: "Color Palette & Contrast Preview",
-  4: "Typography Hierarchy Preview",
-  5: "Imagery & Mood Preview",
-  6: "Brand System Master Overview",
-}
-
+/**
+ * Container component orchestrating the step-by-step interactive preview panel in the brand wizard.
+ * Features:
+ * - Dynamic rendering of step-specific bento previews (Foundation, Logo, Colors, Typography, Imagery, Summary).
+ * - Sticky position pin when scrolling through long wizard forms.
+ * - Loading state pass-through to preview skeletons.
+ *
+ * @component
+ * @param {WizardBentoPreviewProps} props - The component props.
+ * @param {number} [props.currentStep=1] - Currently active wizard step index (1-6).
+ * @param {boolean} [props.isLoading=false] - Whether project/brand data is loading.
+ * @returns {React.ReactElement} The active step preview panel.
+ */
 export function WizardBentoPreview({
   currentStep = 1,
   isLoading = false,

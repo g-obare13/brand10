@@ -1,14 +1,24 @@
-import { useRef, useEffect } from "react"
-import { useBrandStore } from "@/store/brandStore"
-import { generateTonalShades } from "@/lib/colorUtils"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { IconShieldCheck, IconSparkles } from "@tabler/icons-react"
 import WordReveal from "@/components/shared/WordReveal"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { DESIGN_MOVEMENTS } from "@/data/wizard"
-import { gsap } from "gsap"
+import { generateTonalShades } from "@/lib/colorUtils"
+import { useBrandStore } from "@/store/brandStore"
+import { IconSparkles } from "@tabler/icons-react"
 import chroma from "chroma-js"
-
+import { gsap } from "gsap"
+import { useEffect, useRef } from "react"
+/**
+ * Step 3 Wizard form component for configuring brand color palette and harmonic relationships.
+ * Features:
+ * - Color pickers and hex inputs for primary, secondary, and accent roles.
+ * - Preset palette suggestions based on the active design movement.
+ * - Instant tonal scale generation across 11 lightness values (50 to 950).
+ * - Real-time contrast checks and WCAG accessibility ratings.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered color configuration form.
+ */
 export function StepColors() {
   const brand = useBrandStore()
   const containerRef = useRef<HTMLDivElement>(null)
@@ -74,7 +84,7 @@ export function StepColors() {
             Palette &amp; Accessibility Scale
           </WordReveal>
           <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-            <span className="size-1.5 rounded-full bg-primary animate-pulse" />
+            <span className="size-1.5 animate-pulse rounded-full bg-primary" />
             <span>{activeMovement.label}</span>
           </div>
         </div>

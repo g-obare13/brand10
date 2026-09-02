@@ -14,6 +14,15 @@ import { Badge } from "@/components/ui/badge"
 import { Circle } from "@boxicons/react"
 import WordReveal from "@/components/shared/WordReveal"
 
+/**
+ * Loading skeleton component for the StepFoundationPreview panel.
+ * Mimics the card structure of the active design movement theme while data loads.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {PreviewStyleConfig} props.theme - Style configuration matching the active design movement.
+ * @returns {React.ReactElement} The rendered skeleton placeholder.
+ */
 export function StepFoundationPreviewSkeleton({
   theme,
 }: {
@@ -110,6 +119,19 @@ export interface StepFoundationPreviewProps {
   isLoading?: boolean
 }
 
+/**
+ * Live interactive preview of brand foundation (mission, vision, values, tone, and design movement).
+ * Features:
+ * - Movement-specific aesthetic theme rendering (Swiss, Cyberpunk, Neo-Brutalist, etc.).
+ * - GSAP staggered entry animations on mount and movement transitions.
+ * - Interactive UI demo widgets with simulated transactions and milestones.
+ * - Seamless integration with design movements and tone rating telemetry.
+ *
+ * @component
+ * @param {StepFoundationPreviewProps} [props] - The component props.
+ * @param {boolean} [props.isLoading] - Optional manual override for loading skeleton state.
+ * @returns {React.ReactElement} The rendered foundation preview showcase.
+ */
 export function StepFoundationPreview({
   isLoading,
 }: StepFoundationPreviewProps = {}) {

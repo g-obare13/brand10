@@ -1,26 +1,25 @@
-import React, { useState, useEffect, useRef } from "react"
-import { useBrandStore } from "@/store/brandStore"
-import { Label } from "@/components/ui/label"
-import { IconUpload, IconFileText, IconSparkles } from "@tabler/icons-react"
-import { cn } from "@/lib/utils"
 import WordReveal from "@/components/shared/WordReveal"
-import { fetchGoogleFonts, registerCustomFontFace } from "@/lib/googleFonts"
-import type { GoogleFontItem } from "@/lib/googleFonts"
+import { Label } from "@/components/ui/label"
 import { loadGoogleFont } from "@/lib/fontLoader"
+import type { GoogleFontItem } from "@/lib/googleFonts"
+import { fetchGoogleFonts, registerCustomFontFace } from "@/lib/googleFonts"
+import { useBrandStore } from "@/store/brandStore"
+import { IconFileText, IconUpload } from "@tabler/icons-react"
+import React, { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Combobox,
-  ComboboxInput,
   ComboboxContent,
-  ComboboxList,
-  ComboboxItem,
   ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
 } from "@/components/ui/combobox"
-import { Check, X } from "@boxicons/react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Slider } from "@/components/ui/slider"
+import { X } from "@boxicons/react"
 import { gsap } from "gsap"
 
 interface FontComboboxProps {
@@ -32,6 +31,19 @@ interface FontComboboxProps {
   isLoading?: boolean
 }
 
+/**
+ * Searchable combobox for selecting fonts from Google Fonts repository.
+ *
+ * @component
+ * @param {FontComboboxProps} props - The component props.
+ * @param {string} props.label - Display label for font role (e.g. Display Font).
+ * @param {string} [props.subtitle] - Helpful description or role usage note.
+ * @param {string} props.value - Currently chosen font family.
+ * @param {(fontName: string) => void} props.onSelect - Callback when a font is chosen.
+ * @param {GoogleFontItem[]} props.fonts - List of available Google Font entries.
+ * @param {boolean} [props.isLoading] - Whether font list is fetching.
+ * @returns {React.ReactElement} The rendered searchable font combobox.
+ */
 function FontCombobox({
   label,
   subtitle,
@@ -110,6 +122,17 @@ function FontCombobox({
   )
 }
 
+/**
+ * Step 4 Wizard form component for configuring brand typography hierarchy and scale.
+ * Features:
+ * - Searchable font pickers for Display, Body, and Monospace typography.
+ * - Dynamic base font size and typographic modular scale sliders.
+ * - Local font file uploads (.woff2, .woff, .ttf, .otf) with automatic font-face registration.
+ * - Live Google Fonts API integration with on-demand stylesheet injection.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered typography configuration form.
+ */
 export function StepTypography() {
   const brand = useBrandStore()
   const [googleFonts, setGoogleFonts] = useState<GoogleFontItem[]>([])
@@ -123,7 +146,8 @@ export function StepTypography() {
   useEffect(() => {
     if (!stepContainerRef.current) return
     const ctx = gsap.context(() => {
-      const cards = stepContainerRef.current?.querySelectorAll(".step-typo-anim")
+      const cards =
+        stepContainerRef.current?.querySelectorAll(".step-typo-anim")
       if (cards && cards.length > 0) {
         gsap.fromTo(
           cards,
@@ -317,10 +341,14 @@ export function StepTypography() {
                   <Badge
                     key={staged.family}
                     variant={"outline"}
-                    icon={<X className="cursor-pointer transition hover:text-destructive" />}
+                    icon={
+                      <X className="cursor-pointer transition hover:text-destructive" />
+                    }
                     onClick={() => {
                       brand.removeStagedFontFile(staged.family)
-                      toast.info(`Removed custom font "${staged.family}" (reset to Inter)`)
+                      toast.info(
+                        `Removed custom font "${staged.family}" (reset to Inter)`
+                      )
                     }}
                     className="cursor-pointer transition hover:border-destructive/50 hover:bg-destructive/10"
                   >
@@ -353,7 +381,12 @@ export function StepTypography() {
             step={0.025}
             value={brand.typeScaleRatio}
             onValueChange={(val) => {
-              const nextVal = typeof val === "number" ? val : Array.isArray(val) ? val[0] : 1.25
+              const nextVal =
+                typeof val === "number"
+                  ? val
+                  : Array.isArray(val)
+                    ? val[0]
+                    : 1.25
               brand.setTypography({ typeScaleRatio: nextVal })
             }}
             className="py-1"

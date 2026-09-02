@@ -129,7 +129,7 @@ export async function registerCustomFontFace(
   fontFamily: string,
   sourceUrlOrBuffer: string | ArrayBuffer
 ): Promise<boolean> {
-  if (typeof window === "undefined" || !document.fonts) return false
+  if (typeof window === "undefined") return false
 
   try {
     const source =
@@ -153,11 +153,6 @@ export async function registerCustomFontFace(
     const baseFace = new FontFace(fontFamily, source)
     const loadedBase = await baseFace.load()
     document.fonts.add(loadedBase)
-
-    // Force style recalculation across document
-    if (document.body) {
-      document.body.style.fontFamily = document.body.style.fontFamily
-    }
 
     return true
   } catch (err) {

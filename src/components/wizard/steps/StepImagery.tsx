@@ -1,12 +1,20 @@
-import { useBrandStore } from "@/store/brandStore"
-import { Label } from "@/components/ui/label"
-import { IconCheck } from "@tabler/icons-react"
-import { cn } from "@/lib/utils"
 import WordReveal from "@/components/shared/WordReveal"
+import { cn } from "@/lib/utils"
+import { useBrandStore } from "@/store/brandStore"
+import { IconCheck } from "@tabler/icons-react"
 
-import { IMAGERY_MOOD_OPTIONS } from "@/data/wizard"
 import { Badge } from "@/components/ui/badge"
-
+import { IMAGERY_MOOD_OPTIONS } from "@/data/wizard"
+/**
+ * Step 5 Wizard form component for configuring brand photography mood and lighting treatments.
+ * Features:
+ * - Selectable mood directions (Minimal, Cinematic, Vibrant, Editorial) with sample preview chips.
+ * - Image color overlays and duotone tint mode configuration.
+ * - Real-time sync with brand imagery tokens in brandStore.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered imagery configuration form.
+ */
 export function StepImagery() {
   const brand = useBrandStore()
 

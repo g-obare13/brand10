@@ -98,7 +98,28 @@ function splitIntoCharacters(children: React.ReactNode): React.ReactNode {
     return child
   })
 }
-
+/**
+ * Staggered text character blur-to-sharpness entry animation component.
+ * Features:
+ * - Unicode grapheme segmentation preserving emojis and complex glyphs.
+ * - GSAP & ScrollTrigger integration with custom trigger points and scroll triggers.
+ * - Smooth CSS filter blur interpolation combined with vertical translateY translation.
+ *
+ * @component
+ * @param {BlurRevealProps} props - The component props.
+ * @param {string} [props.text] - Plain text content to animate.
+ * @param {React.ReactNode} [props.children] - Children elements with nested text.
+ * @param {string} [props.className] - CSS class names.
+ * @param {"h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span" | "div"} [props.as="p"] - HTML tag.
+ * @param {number} [props.delay=0] - Initial start delay in seconds.
+ * @param {number} [props.stagger=0.04] - Stagger between character reveals.
+ * @param {number} [props.duration=0.8] - Total tween duration per character.
+ * @param {number} [props.blurAmount=12] - Starting blur radius in pixels.
+ * @param {number} [props.yOffset=20] - Starting vertical translation offset in pixels.
+ * @param {string} [props.start="top 85%"] - ScrollTrigger start condition.
+ * @param {boolean} [props.disableScrollTrigger=false] - Whether to fire immediately on mount.
+ * @returns {React.ReactElement} The rendered animated typography container.
+ */
 export function BlurReveal({
   text,
   children,

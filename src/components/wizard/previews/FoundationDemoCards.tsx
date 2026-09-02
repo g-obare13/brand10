@@ -10,6 +10,16 @@ interface DemoCardsProps {
   primaryColor: string
 }
 
+/**
+ * Interactive financial widget card simulating a wallet balance and royalty breakdown.
+ * Styled dynamically based on active movement theme tokens.
+ *
+ * @component
+ * @param {DemoCardsProps} props - The component props.
+ * @param {PreviewStyleConfig} props.theme - Active design movement style tokens.
+ * @param {string} props.primaryColor - Primary brand color for buttons and accents.
+ * @returns {React.ReactElement} The rendered balance widget card.
+ */
 export function MovementClaimableBalance({
   theme,
   primaryColor,
@@ -74,6 +84,16 @@ export function MovementClaimableBalance({
   )
 }
 
+/**
+ * Interactive milestone goal formulation widget card simulating input fields and buttons.
+ * Styled dynamically based on active movement theme tokens.
+ *
+ * @component
+ * @param {DemoCardsProps} props - The component props.
+ * @param {PreviewStyleConfig} props.theme - Active design movement style tokens.
+ * @param {string} props.primaryColor - Primary brand color for CTAs and focus outlines.
+ * @returns {React.ReactElement} The rendered milestone form card.
+ */
 export function MovementNewMilestone({ theme, primaryColor }: DemoCardsProps) {
   return (
     <div className={theme.interactiveCard}>

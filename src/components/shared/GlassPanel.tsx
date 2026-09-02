@@ -68,7 +68,24 @@ const blurMap = {
   "2xl": "backdrop-blur-2xl",
   "3xl": "backdrop-blur-3xl",
 }
-
+/**
+ * Glassmorphic container with configurable backdrop blur, surface noise grain, and cursor shine.
+ * Features:
+ * - Granular blur levels from none to 3xl backdrop blur.
+ * - Organic SVG noise texture overlay with customizable opacity.
+ * - Interactive cursor-following spotlight shine effect.
+ * - Polymorphic component rendering (as div, section, article, etc.).
+ *
+ * @component
+ * @param {GlassPanelProps} props - The component props.
+ * @param {React.ReactNode} [props.children] - Child elements.
+ * @param {string} [props.className] - Container CSS classes.
+ * @param {string} [props.contentClassName] - Inner content wrapper classes.
+ * @param {"none" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl"} [props.blur="md"] - Blur intensity.
+ * @param {boolean} [props.noise=false] - Whether to show film grain.
+ * @param {boolean} [props.interactive=false] - Enables cursor light reflection.
+ * @returns {React.ReactElement} The rendered glassmorphism panel.
+ */
 export const GlassPanel = React.forwardRef<HTMLDivElement, GlassPanelProps>(
   (
     {

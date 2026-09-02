@@ -95,6 +95,24 @@ const DEFAULT_MODELS = [
   "GPT-5.6",
 ]
 
+/**
+ * Interactive prompt input widget simulating an AI multi-model chat interface.
+ * Features:
+ * - Model selector dropdown supporting OpenAI, Anthropic, and Gemini models.
+ * - Auto-expanding or scrollable prompt textarea.
+ * - File attachment button and quick submission key handling (Enter to submit).
+ *
+ * @component
+ * @param {AIPromptProps} props - The component props.
+ * @param {string[]} [props.models] - Available AI model options.
+ * @param {string} [props.defaultModel="Claude Fable 5"] - Initially selected model.
+ * @param {string} [props.placeholder] - Textarea placeholder text.
+ * @param {string} [props.headerText] - Promo/status header text.
+ * @param {string} [props.headerAction] - Action label next to header text.
+ * @param {(value: string, model: string) => void} [props.onSubmit] - Submission callback.
+ * @param {string} [props.className] - Container CSS class names.
+ * @returns {React.ReactElement} The rendered AI chat input card.
+ */
 export function AiChat({
   models = DEFAULT_MODELS,
   defaultModel = "Claude Fable 5",

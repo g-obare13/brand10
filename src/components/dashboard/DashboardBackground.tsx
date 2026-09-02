@@ -1,5 +1,15 @@
 import Auralis from "../shared/Auralis"
 
+/**
+ * Ambient visual background canvas for the main dashboard views.
+ * Features:
+ * - Auralis shader mesh with customizable speed, grain, and color gradients.
+ * - Soft radial blurred ambient glow spheres.
+ * - Non-interactive pointer-events-none layout.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered ambient background.
+ */
 export function DashboardBackground() {
   return (
     <div className="pointer-events-none fixed inset-0 z-0 h-screen w-full overflow-hidden [mask-image:radial-gradient(ellipse_at_top,black_40%,transparent_85%)] opacity-70 dark:opacity-85">

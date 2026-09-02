@@ -298,6 +298,16 @@ export async function uploadCustomFontToSupabase(
 
 const defaultApex = PRESET_BRANDS.apex
 
+/**
+ * Master Zustand store with temporal (undo/redo) middleware managing the active brand identity system.
+ * Features:
+ * - Brand positioning tokens (Name, Tagline, Mission, Vision, Core Values, Tone Ratings).
+ * - Logo geometry, SVG markup, vector states, clearspace, and usage guidelines.
+ * - Color swatch matrix with real-time harmonic shade calculations.
+ * - Typographic scale parameters, Google Fonts pairings, and custom font uploads.
+ * - Imagery and iconography style system preferences.
+ * - Bidirectional persistence with IndexedDB and Supabase PostgreSQL & Storage buckets.
+ */
 export const useBrandStore = create<BrandState>()(
   temporal(
     (set, get) => ({

@@ -38,7 +38,24 @@ export interface SpotlightCardProps extends React.HTMLAttributes<HTMLDivElement>
    */
   interactive?: boolean
 }
-
+/**
+ * An interactive card with cursor-tracking spotlight glow, 3D tilt, and dynamic accent styling.
+ * Features:
+ * - Real-time radial cursor spotlight following mouse position.
+ * - Subtle 3D perspective tilt calculations with smooth easing.
+ * - Dynamic bottom accent keyline expansion on hover.
+ * - Sibling dimming support for grid layouts.
+ *
+ * @component
+ * @param {SpotlightCardProps} props - The component props.
+ * @param {string} [props.color="#6366f1"] - Accent highlight color.
+ * @param {boolean} [props.dimmed=false] - Whether card is dimmed.
+ * @param {boolean} [props.tilt=true] - Enables 3D perspective rotation on hover.
+ * @param {number} [props.maxTilt=7] - Maximum tilt degree.
+ * @param {boolean} [props.shimmer=true] - Sweep sheen animation.
+ * @param {boolean} [props.accentLine=true] - Expanding bottom glowing accent bar.
+ * @returns {React.ReactElement} The rendered spotlight card container.
+ */
 export const SpotlightCard = React.forwardRef<
   HTMLDivElement,
   SpotlightCardProps

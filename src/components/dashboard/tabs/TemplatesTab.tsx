@@ -8,6 +8,18 @@ interface TemplatesTabProps {
   onOpenCreateModal: () => void
 }
 
+/**
+ * Dashboard tab displaying pre-configured brand identity starter templates.
+ * Features:
+ * - Starter kits (Apex Autonomous, Nova Creative, Bloom Organics, etc.).
+ * - Swatch palette previews and typography movement details.
+ * - One-click adoption triggering project creation dialog.
+ *
+ * @component
+ * @param {TemplatesTabProps} props - The component props.
+ * @param {() => void} props.onOpenCreateModal - Callback to create a project from template.
+ * @returns {React.ReactElement} The rendered templates catalog tab.
+ */
 export function TemplatesTab({ onOpenCreateModal }: TemplatesTabProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null)
 

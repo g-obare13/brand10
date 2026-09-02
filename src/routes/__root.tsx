@@ -1,11 +1,9 @@
 import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router"
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
-import { TanStackDevtools } from "@tanstack/react-devtools"
 
-import appCss from "../styles.css?url"
 import { ThemeProvider } from "@/components/shared/theme-provider"
-import "sonner/dist/styles.css"
 import { Toaster } from "sonner"
+import "sonner/dist/styles.css"
+import appCss from "../styles.css?url"
 
 export const Route = createRootRoute({
   head: () => ({
@@ -46,6 +44,18 @@ export const Route = createRootRoute({
   shellComponent: RootDocument,
 })
 
+/**
+ * Root HTML shell document wrapping the entire TanStack Router application.
+ * Features:
+ * - Immediate theme flash prevention script for dark/light mode hydration.
+ * - Global ThemeProvider context and Sonner toast notifications container.
+ * - TanStack devtools panels.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {React.ReactNode} props.children - Router outlet children.
+ * @returns {React.ReactElement} The root HTML document structure.
+ */
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">

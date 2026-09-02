@@ -97,6 +97,17 @@ interface ColorShadeScaleRowProps {
   shades: Record<string, string>
 }
 
+/**
+ * Row component displaying a full 50-950 tonal shade scale with click-to-copy functionality.
+ *
+ * @component
+ * @param {ColorShadeScaleRowProps} props - The component props.
+ * @param {string} props.label - Display label for the color role.
+ * @param {"primary" | "secondary"} props.role - The brand color role.
+ * @param {string} props.hex - The source hex code for the swatch.
+ * @param {Record<string, string>} props.shades - Map of shade keys (50-950) to hex strings.
+ * @returns {React.ReactElement} The interactive tonal shade scale row.
+ */
 function ColorShadeScaleRow({
   label,
   role,
@@ -221,6 +232,17 @@ function ColorShadeScaleRow({
   )
 }
 
+/**
+ * Interactive live preview for brand color system, showing swatches, contrast ratios, and shades.
+ * Features:
+ * - Real-time WCAG accessibility / contrast ratings with Shield badges.
+ * - 11-step tonal ramp generation (50 to 950) with click-to-copy hex functionality.
+ * - Comprehensive ColorInfoDialog inspector for deep colorimetry metrics.
+ * - Preview cards demonstrating primary and secondary color applications in UI contexts.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered color system preview panel.
+ */
 export function StepColorsPreview() {
   const brand = useBrandStore()
   const containerRef = useRef<HTMLDivElement>(null)

@@ -12,7 +12,17 @@ import {
   IconSun,
   IconMoon,
 } from '@tabler/icons-react'
-
+/**
+ * Deep studio tab for managing brand logo geometry, assets, clearspace, and rules.
+ * Features:
+ * - Direct vector SVG and image asset ingestion with metadata extraction.
+ * - Clearspace multiplier slider with interactive perimeter guide visualization.
+ * - Contrast verification on light and dark background tiles.
+ * - Comprehensive Do's and Don'ts guideline manager with custom addition/removal.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered logo system studio tab.
+ */
 export const LogoSystemTab: React.FC = () => {
   const brand = useBrandStore()
   const fileInputRef = useRef<HTMLInputElement>(null)

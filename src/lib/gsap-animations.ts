@@ -24,6 +24,21 @@ const getElements = (
   return [targets]
 }
 
+/**
+ * Animates elements fading in and rising upward with optional ScrollTrigger integration.
+ *
+ * @param {string | Element | Array<Element> | NodeListOf<Element>} targets - Target DOM elements or selector.
+ * @param {Object} [options] - Animation and scroll trigger options.
+ * @param {number} [options.y=40] - Starting vertical translation in px.
+ * @param {number} [options.duration=1.5] - Tween duration in seconds.
+ * @param {number} [options.stagger=0] - Delay between target element tweens.
+ * @param {number} [options.delay=0] - Initial delay in seconds.
+ * @param {string} [options.ease="expo.out"] - GSAP easing curve string.
+ * @param {string | Element | null} [options.trigger] - ScrollTrigger element.
+ * @param {string} [options.start="top 85%"] - ScrollTrigger start condition.
+ * @param {boolean} [options.retrigger] - Whether to retrigger on scroll back.
+ * @returns {gsap.core.Tween | undefined} The created GSAP tween.
+ */
 export const animateFadeUp = (
   targets: string | Element | Array<Element> | NodeListOf<Element>,
   options?: {

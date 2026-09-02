@@ -27,6 +27,14 @@ interface ProjectsState {
   isLimitReached: () => boolean
 }
 
+/**
+ * Zustand store managing the user's collection of brand projects.
+ * Features:
+ * - Real-time project query from Supabase with IndexedDB offline caching.
+ * - Project duplication, deletion, and creation.
+ * - Account project limit enforcement (e.g. 2-brand free tier limit).
+ * - Create modal visibility management.
+ */
 export const useProjectsStore = create<ProjectsState>((set, get) => ({
   projects: [],
   loading: true,

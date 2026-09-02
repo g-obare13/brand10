@@ -10,7 +10,16 @@ import {
   IconFlame,
   IconSparkles,
 } from "@tabler/icons-react"
-
+/**
+ * A live interactive preview demonstrating icon style, corner radius, and stroke weight.
+ * Features:
+ * - Real-time icon rendering using Tabler icons with brand color swatches.
+ * - Dynamic corner radius and stroke thickness adjustments.
+ * - Style variations supporting outline/stroke, filled/solid, and duotone treatments.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered iconography preview panel.
+ */
 export function StepIconographyPreview() {
   const brand = useBrandStore()
 
