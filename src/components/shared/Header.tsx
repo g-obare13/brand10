@@ -1,17 +1,25 @@
 import { LoginModal } from "@/components/shared/LoginModal"
 import { Logo } from "@/components/shared/Logo"
 import { ThemeToggler } from "@/components/shared/theme-toggler"
-import AnimatedUnderline from "@/components/ui/animated-underline"
 import { Button } from "@/components/ui/button"
 import { headerData } from "@/data/menu"
 import { animateFadeUp } from "@/lib/gsap-animations"
 import { useAuthStore } from "@/store/authStore"
-import { IconLock, IconLogout, IconMenu, IconX } from "@tabler/icons-react"
+import {
+  IconCheck,
+  IconCopy,
+  IconLock,
+  IconLogout,
+  IconMenu,
+  IconX,
+} from "@tabler/icons-react"
 import { Link, useLocation, useNavigate } from "@tanstack/react-router"
 import gsap from "gsap"
 import { useEffect, useRef, useState } from "react"
+import { Badge } from "../ui/badge"
 import Container from "../ui/container"
 import GlassPanel from "./GlassPanel"
+import ImageComponentOptimized from "./ImageComponentOptimized"
 
 export interface HeaderProps {
   action?: "default" | "logout"
@@ -33,9 +41,18 @@ export interface HeaderProps {
 export function Header({ action }: HeaderProps = {}) {
   const [isOpen, setIsOpen] = useState(false)
   const [loginModalOpen, setLoginModalOpen] = useState(false)
+  const [copiedField, setCopiedField] = useState<string | null>(null)
   const { user, initialize, signOut } = useAuthStore()
   const menuRef = useRef<HTMLDivElement>(null)
   const menuBtnRef = useRef<HTMLButtonElement>(null)
+
+  const handleCopy = (text: string, fieldId: string) => {
+    navigator.clipboard.writeText(text)
+    setCopiedField(fieldId)
+    setTimeout(() => {
+      setCopiedField((curr) => (curr === fieldId ? null : curr))
+    }, 2000)
+  }
 
   const location = useLocation()
   const navigate = useNavigate()
@@ -212,62 +229,117 @@ export function Header({ action }: HeaderProps = {}) {
             </Button>
           </div>
 
-          {/* Menu Panel */}
+          {/* Contact Card Modal */}
           <div
             ref={menuRef}
-            className="shadow-custom absolute top-[calc(100%+0.5rem)] right-0 hidden w-[90vw] rounded-3xl border bg-popover p-6 text-popover-foreground sm:w-[440px] sm:p-8 md:w-[480px] lg:w-[540px] lg:p-10"
+            className="absolute top-[calc(100%+0.75rem)] right-0 hidden w-[92vw] overflow-hidden rounded-3xl border border-white/70 bg-white/95 p-6 text-foreground shadow-2xl backdrop-blur-2xl sm:w-[480px] sm:p-8 md:w-[520px] dark:border-white/10 dark:bg-zinc-950/90"
           >
-            <div className="flex flex-col gap-10">
-              <nav className="flex flex-col gap-3">
-                {headerData.menuLinks.map((link) => {
-                  const isActive =
-                    currentPath === link.href ||
-                    (link.href !== "/" && currentPath.startsWith(link.href))
-                  return (
-                    <Link
-                      key={link.label}
-                      to={link.href}
-                      onClick={() => setIsOpen(false)}
-                      className="menu-nav-link block w-fit py-1 text-foreground no-underline opacity-0"
-                    >
-                      <AnimatedUnderline active={isActive}>
-                        <h6> {link.label}</h6>
-                      </AnimatedUnderline>
-                    </Link>
-                  )
-                })}
-              </nav>
+            {/* Ambient Background Gradient following DashboardBackground */}
+            <div className="pointer-events-none absolute -top-28 -left-20 h-72 w-72 rounded-full bg-linear-to-br from-indigo-500/20 via-sky-400/20 to-purple-500/20 blur-3xl" />
+            <div className="pointer-events-none absolute -right-16 -bottom-24 h-72 w-72 rounded-full bg-linear-to-bl from-orange-400/15 via-rose-400/15 to-amber-300/15 blur-3xl" />
+            <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-sky-50/50 via-transparent to-white/40 dark:from-sky-950/20 dark:via-transparent dark:to-zinc-950/40" />
 
-              <div className="grid grid-cols-2 gap-8 border-t border-muted/20 text-base">
-                {headerData.menuDetails.map((item) => (
-                  <div key={item.label} className="flex flex-col gap-1">
-                    <h6 className="menu-detail-item font-medium text-foreground opacity-0">
-                      {item.label}
-                    </h6>
-                    <div className="menu-detail-item font-medium opacity-0">
-                      <div className="flex flex-col items-start gap-1">
-                        {item.items.map((link) => (
-                          <Link
-                            key={link.text}
-                            to={link.href}
-                            target={
-                              link.href.startsWith("http")
-                                ? "_blank"
-                                : undefined
-                            }
-                            rel={
-                              link.href.startsWith("http")
-                                ? "noopener noreferrer"
-                                : undefined
-                            }
-                            className="text-base! font-semibold! text-foreground no-underline"
-                          >
-                            <AnimatedUnderline>{link.text}</AnimatedUnderline>
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+            <div className="relative z-10 flex flex-col gap-5">
+              {/* Avatar */}
+              <div className="menu-nav-link opacity-0">
+                <div className="border/20 relative h-20 w-20 overflow-hidden rounded-full border sm:h-24 sm:w-24">
+                  <ImageComponentOptimized
+                    src={headerData.contactCard.image}
+                    alt={headerData.contactCard.name}
+                    className="h-full w-full object-cover"
+                    imageClassName="h-full w-full object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* Name & Headline */}
+              <div className="flex flex-col gap-2">
+                <h3 className="menu-nav-link text-2xl font-bold tracking-tight text-foreground opacity-0 sm:text-3xl">
+                  {headerData.contactCard.name}
+                </h3>
+                <p className="menu-nav-link text-sm leading-snug font-semibold text-foreground/90 opacity-0 sm:text-base">
+                  {headerData.contactCard.role}
+                </p>
+              </div>
+
+              {/* Bio Description */}
+              <p className="menu-nav-link text-xs leading-relaxed text-muted-foreground opacity-0 sm:text-sm">
+                {headerData.contactCard.bio}
+              </p>
+
+              {/* Contact Pills / Actions */}
+              <div className="flex flex-wrap items-center gap-2.5 pt-2">
+                {/* Email Pill */}
+                <Badge
+                  onClick={() =>
+                    handleCopy(headerData.contactCard.email, "email")
+                  }
+                  variant={"outline"}
+                  className="menu-detail-item rounded-full"
+                  // title="Click to copy email"
+                  icon={
+                    copiedField === "email" ? (
+                      <span className="flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                        <IconCheck size={16} />
+                      </span>
+                    ) : (
+                      <IconCopy
+                        size={16}
+                        className="text-muted-foreground transition-colors group-hover:text-foreground"
+                      />
+                    )
+                  }
+                >
+                  <span>{headerData.contactCard.email}</span>
+                </Badge>
+
+                {/* Phone Pill */}
+                {/* <Badge
+                  variant={"outline"}
+                  onClick={() =>
+                    handleCopy(headerData.contactCard.phone, "phone")
+                  }
+                  className="menu-detail-item rounded-full"
+                  //  title="Click to copy phone number"
+                  icon={
+                    copiedField === "phone" ? (
+                      <span className="flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                        <IconCheck size={16} />
+                        <span>Copied</span>
+                      </span>
+                    ) : (
+                      <IconCopy
+                        size={16}
+                        className="text-muted-foreground transition-colors group-hover:text-foreground"
+                      />
+                    )
+                  }
+                >
+                  <span>{headerData.contactCard.phone}</span>
+                </Badge> */}
+
+                {/* Socials */}
+                {headerData.contactCard.socials.map((social) => (
+                  <a
+                    key={social.text}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="menu-detail-item"
+                    // title={`Visit ${social.text}`}
+                  >
+                    <Badge variant={"outline"} icon={social.icon}>
+                      {social.text}
+                    </Badge>
+                    {/* {social.text.toLowerCase().includes("git") ? (
+                     
+                    ) : (
+                      <IconBrandX
+                        size={16}
+                        className="text-muted-foreground transition-colors group-hover:text-foreground"
+                      />
+                    )} */}
+                  </a>
                 ))}
               </div>
             </div>

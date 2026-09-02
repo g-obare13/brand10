@@ -5,6 +5,7 @@ import { DashboardBackground } from "../dashboard"
 import Container from "../ui/container"
 import { Header } from "./Header"
 import WordReveal from "./WordReveal"
+import { gsap } from "gsap"
 
 /**
  * Standardized 500 / Runtime Error Component for Brandio.

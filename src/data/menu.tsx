@@ -1,3 +1,5 @@
+import { IconBrandGithub, IconBrandX, IconGlobe } from "@tabler/icons-react"
+
 export const heroData = {
   title: "One strategic ecosystem for modern digital growth.",
   subtitle: "Design-Led Engineering.",
@@ -8,6 +10,28 @@ export const heroData = {
 export const headerData = {
   chatLabel: "Get Started",
   menuLabel: "Chat with Me",
+  contactCard: {
+    label: "Contact card",
+    name: "Obare Geoffrey",
+    image: "/portfolio/obare.avif",
+    role: "Frontend Engineer & UI/UX Designer | AI Product Interfaces (RAG, LLMs) | React · TypeScript · Figma",
+    bio: "Frontend Engineer and UI/UX Designer who builds interfaces for AI-powered products, with hands-on RAG and LLM experience. 7+ years shipping production web apps for fintech, e-commerce, logistics, and SaaS. Open to software engineering roles.",
+    email: "obaregeoffrey13@gmail.com",
+    phone: "+1 (234) 567-8900",
+    socials: [
+      { icon: <IconGlobe />, text: "Portfolio", href: "https://obare27.com" },
+      {
+        icon: <IconBrandGithub />,
+        text: "Github",
+        href: "https://github.com/g-obare13",
+      },
+      {
+        icon: <IconBrandX />,
+        text: "X (Twitter)",
+        href: "https://x.com/Black_Gr00t",
+      },
+    ],
+  },
   menuLinks: [
     { label: "Services", href: "/creative-agency/services" },
     { label: "Case Studies", href: "/creative-agency/case-studies" },
