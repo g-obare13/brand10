@@ -112,7 +112,7 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
+  --background: #faf8f5;
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -225,26 +225,26 @@
     }
   }
   h1 {
-    @apply text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl lg:text-6xl;
+    @apply text-3xl font-semibold text-primary-800 sm:text-4xl md:text-5xl lg:text-6xl dark:text-primary-50;
   }
   h2 {
-    @apply text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl;
+    @apply text-3xl font-semibold text-primary-800 sm:text-4xl md:text-5xl dark:text-primary-50;
   }
   h3 {
-    @apply text-2xl font-semibold text-foreground sm:text-3xl md:text-4xl;
+    @apply text-2xl font-semibold text-primary-800 sm:text-3xl md:text-4xl dark:text-primary-50;
   }
   h4 {
-    @apply text-xl font-semibold text-foreground sm:text-2xl;
+    @apply text-xl font-semibold text-primary-800 sm:text-2xl dark:text-primary-50;
   }
   h5 {
-    @apply text-lg font-semibold text-foreground sm:text-xl;
+    @apply text-lg font-semibold text-primary-800 sm:text-xl dark:text-primary-50;
   }
   h6 {
-    @apply text-base font-semibold text-foreground sm:text-lg;
+    @apply text-base font-semibold text-primary-800 sm:text-lg dark:text-primary-50;
   }
   p {
     font-family: var(--font-sans);
-    @apply text-sm font-normal text-olive-950/90 sm:text-base lg:text-base dark:text-muted-foreground;
+    @apply text-sm font-normal text-primary-700 sm:text-base lg:text-base dark:text-muted-foreground;
   }
   label {
     @apply font-sans;

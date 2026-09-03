@@ -17,6 +17,7 @@ import { Route as DashboardGuidelinesRouteImport } from './routes/dashboard/guid
 import { Route as DashboardProjectsRouteImport } from './routes/dashboard/projects'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardTemplatesRouteImport } from './routes/dashboard/templates'
+import { Route as InsightsSlugRouteImport } from './routes/insights/$slug'
 import { Route as StudioProjectIdRouteImport } from './routes/studio.$projectId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -59,6 +60,11 @@ const DashboardTemplatesRoute = DashboardTemplatesRouteImport.update({
   path: '/templates',
   getParentRoute: () => DashboardRoute,
 } as any)
+const InsightsSlugRoute = InsightsSlugRouteImport.update({
+  id: '/insights/$slug',
+  path: '/insights/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudioProjectIdRoute = StudioProjectIdRouteImport.update({
   id: '/studio/$projectId',
   path: '/studio/$projectId',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/templates': typeof DashboardTemplatesRoute
+  '/insights/$slug': typeof InsightsSlugRoute
   '/studio/$projectId': typeof StudioProjectIdRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/templates': typeof DashboardTemplatesRoute
+  '/insights/$slug': typeof InsightsSlugRoute
   '/studio/$projectId': typeof StudioProjectIdRoute
   '/dashboard': typeof DashboardIndexRoute
 }
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/templates': typeof DashboardTemplatesRoute
+  '/insights/$slug': typeof InsightsSlugRoute
   '/studio/$projectId': typeof StudioProjectIdRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/dashboard/projects'
     | '/dashboard/settings'
     | '/dashboard/templates'
+    | '/insights/$slug'
     | '/studio/$projectId'
     | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/dashboard/projects'
     | '/dashboard/settings'
     | '/dashboard/templates'
+    | '/insights/$slug'
     | '/studio/$projectId'
     | '/dashboard'
   id:
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/dashboard/projects'
     | '/dashboard/settings'
     | '/dashboard/templates'
+    | '/insights/$slug'
     | '/studio/$projectId'
     | '/dashboard/'
   fileRoutesById: FileRoutesById
@@ -136,6 +148,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  InsightsSlugRoute: typeof InsightsSlugRoute
   StudioProjectIdRoute: typeof StudioProjectIdRoute
 }
 
@@ -197,6 +210,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTemplatesRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/insights/$slug': {
+      id: '/insights/$slug'
+      path: '/insights/$slug'
+      fullPath: '/insights/$slug'
+      preLoaderRoute: typeof InsightsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/studio/$projectId': {
       id: '/studio/$projectId'
       path: '/studio/$projectId'
@@ -232,6 +252,7 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  InsightsSlugRoute: InsightsSlugRoute,
   StudioProjectIdRoute: StudioProjectIdRoute,
 }
 export const routeTree = rootRouteImport

@@ -3,11 +3,7 @@ import { Accordion as AccordionPrimitive } from "@base-ui/react/accordion"
 import { ChevronDown, ChevronUp } from "@boxicons/react"
 import { cn } from "@/lib/utils"
 
-function Accordion({
-  className,
-  children,
-  ...props
-}: any) {
+function Accordion({ className, children, ...props }: any) {
   const { dangerouslySetInnerHTML, ...cleanProps } = props || {}
   return (
     <AccordionPrimitive.Root
@@ -40,11 +36,16 @@ function AccordionItem({
   )
 }
 
+interface AccordionTriggerProps extends AccordionPrimitive.Trigger.Props {
+  icon?: React.ReactNode
+}
+
 function AccordionTrigger({
   className,
   children,
+  icon,
   ...props
-}: AccordionPrimitive.Trigger.Props) {
+}: AccordionTriggerProps) {
   const { dangerouslySetInnerHTML, ...cleanProps } = props as any
   return (
     <AccordionPrimitive.Header className="flex">
@@ -57,16 +58,22 @@ function AccordionTrigger({
         {...cleanProps}
       >
         {children}
-        <ChevronDown
-          strokeWidth={2}
-          data-slot="accordion-trigger-icon"
-          className="pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden"
-        />
-        <ChevronUp
-          strokeWidth={2}
-          data-slot="accordion-trigger-icon"
-          className="pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline"
-        />
+        {icon !== undefined ? (
+          icon
+        ) : (
+          <>
+            <ChevronDown
+              strokeWidth={2}
+              data-slot="accordion-trigger-icon"
+              className="pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden"
+            />
+            <ChevronUp
+              strokeWidth={2}
+              data-slot="accordion-trigger-icon"
+              className="pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline"
+            />
+          </>
+        )}
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
   )
@@ -81,7 +88,10 @@ function AccordionContent({
   return (
     <AccordionPrimitive.Panel
       data-slot="accordion-content"
-      className="overflow-hidden px-4 text-sm data-open:animate-accordion-down data-closed:animate-accordion-up"
+      className={cn(
+        "overflow-hidden px-4 text-sm data-open:animate-accordion-down data-closed:animate-accordion-up",
+        className
+      )}
       {...cleanProps}
     >
       <div

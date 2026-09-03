@@ -81,6 +81,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ open, onOpenChange }) 
         dosAndDonts: brand.dosAndDonts,
         imageryMood: brand.imageryMood,
         imageryOverlay: brand.imageryOverlay,
+        imageryLinks: brand.imageryLinks,
         iconStyle: brand.iconStyle,
       })
       toast.success('Brand guidelines PDF generated.')

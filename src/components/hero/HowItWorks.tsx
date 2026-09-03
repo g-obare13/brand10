@@ -1,11 +1,11 @@
 "use client"
 
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import Container from "@/components/ui/container"
-import ImageComponentOptimized from "./ImageComponentOptimized"
-import { Badge } from "@/components/ui/badge"
+import ImageComponentOptimized from "@/components/shared/ImageComponentOptimized"
+import WordReveal from "@/components/shared/WordReveal"
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger)
@@ -63,9 +63,20 @@ const DEFAULT_PROJECTS: Project[] = [
 ]
 
 // Internal Project Card component
-const Card = ({ item }: { item: Project; linkText?: string }) => {
+const Card = ({
+  item,
+  active,
+  isMobile,
+}: {
+  item: Project
+  active: boolean
+  isMobile: boolean
+  linkText?: string
+}) => {
+  const cardRef = useRef<HTMLDivElement>(null)
+
   return (
-    <div className="flex flex-col gap-4">
+    <div ref={cardRef} className="flex flex-col gap-4">
       <div className="relative aspect-4/3 w-full overflow-hidden rounded-2xl border border-border/40 bg-muted/50">
         <ImageComponentOptimized
           src={item.img}
@@ -76,12 +87,32 @@ const Card = ({ item }: { item: Project; linkText?: string }) => {
       </div>
       <div className="flex flex-col gap-2 px-2">
         <div className="flex items-center justify-between">
-          <h4>{item.title}</h4>
-          <span className="text-xs font-semibold tracking-wider text-primary uppercase">
+          <WordReveal
+            as="h4"
+            stagger={0.03}
+            duration={1.2}
+            active={active}
+            disableScrollTrigger={!isMobile}
+            trigger={isMobile ? cardRef : undefined}
+            start="top 85%"
+          >
+            {item.title}
+          </WordReveal>
+          <span className="text-xs font-semibold text-primary uppercase dark:text-muted-foreground">
             {item.leftText}
           </span>
         </div>
-        <p className="text-muted-foreground">{item.description}</p>
+        <WordReveal
+          as="p"
+          stagger={0.02}
+          duration={1.2}
+          active={active}
+          disableScrollTrigger={!isMobile}
+          trigger={isMobile ? cardRef : undefined}
+          start="top 85%"
+        >
+          {item.description}
+        </WordReveal>
       </div>
     </div>
   )
@@ -96,16 +127,47 @@ export default function HowItWorks({
   projects = DEFAULT_PROJECTS,
   title = "How It Works",
 }: GsapProjectsSectionProps) {
+  const sectionRef = useRef<HTMLElement>(null)
   const container = useRef<HTMLDivElement>(null)
+  const [activeStep, setActiveStep] = useState(1)
+  const [sectionEntered, setSectionEntered] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   const totalProjectCount = projects.length
 
   useEffect(() => {
-    if (typeof window === "undefined" || window.innerWidth < 1024) return
+    if (typeof window === "undefined") return
+    setIsMobile(window.innerWidth < 1024)
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024)
+    }
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
     const spotlightSection = container.current
-    if (!spotlightSection) return
+    const sectionEl = sectionRef.current
+    if (!spotlightSection || !sectionEl) return
+
+    // If section is already visible on mount, mark entered immediately
+    if (sectionEl.getBoundingClientRect().top < window.innerHeight * 0.85) {
+      setSectionEntered(true)
+    }
 
     const ctx = gsap.context(() => {
+      // Early trigger for section header and initial card as soon as HowItWorks enters viewport
+      ScrollTrigger.create({
+        trigger: sectionEl,
+        start: "top 85%",
+        onEnter: () => setSectionEntered(true),
+        onEnterBack: () => setSectionEntered(true),
+      })
+
+      if (window.innerWidth < 1024) return
+
       const projectIndex =
         spotlightSection.querySelector<HTMLElement>(".project-index h1")
       const projectImagesContainer =
@@ -141,7 +203,6 @@ export default function HowItWorks({
         moveDistanceNames =
           spotlightSectionHeight - spotlightSectionPadding * 2 - containerHeight
 
-        // Ensure image container moves appropriately
         moveDistanceImages = Math.min(
           window.innerHeight - imagesHeight,
           -(imagesHeight - window.innerHeight * 0.7)
@@ -165,7 +226,9 @@ export default function HowItWorks({
             totalProjectCount
           )
 
-          projectIndex.innerHTML = `${String(currentIndex).padStart(2, "0")}<span class="text-[28px] tracking-tight font-normal text-zinc-400">/${String(totalProjectCount).padStart(2, "0")}</span>`
+          setActiveStep(currentIndex)
+
+          projectIndex.innerHTML = `${String(currentIndex).padStart(2, "0")}<span class="text-[28px] tracking-tight font-normal text-muted-foreground">/${String(totalProjectCount).padStart(2, "0")}</span>`
 
           gsap.set(projectIndex, { y: progress * moveDistanceIndex })
           gsap.set(projectImagesContainer, { y: progress * moveDistanceImages })
@@ -183,7 +246,7 @@ export default function HowItWorks({
             gsap.set(p, { y: -projectProgress * moveDistanceNames })
 
             if (projectProgress > 0 && projectProgress < 1) {
-              gsap.set(p, { color: "white" })
+              gsap.set(p, { color: "primary-50" })
             } else {
               gsap.set(p, { color: "gray" })
             }
@@ -203,14 +266,24 @@ export default function HowItWorks({
   return (
     <Container className="">
       <section
+        ref={sectionRef}
         className="relative w-full overflow-hidden pt-32 text-foreground max-lg:h-auto max-sm:pt-12"
         id="works"
       >
         <div className="relative mx-auto">
           <div className="absolute top-0 left-0 max-lg:static max-lg:mb-20 max-lg:px-0 max-md:mb-12">
-            <h2 className="relative mb-[-13svh] inline-block uppercase max-lg:mb-0">
+            <WordReveal
+              as="h2"
+              stagger={0.03}
+              duration={1.2}
+              active={sectionEntered}
+              disableScrollTrigger={!isMobile}
+              trigger={isMobile ? sectionRef : undefined}
+              start="top 85%"
+              className="relative mb-[-13svh] inline-block uppercase max-lg:mb-0"
+            >
               {title}
-            </h2>
+            </WordReveal>
           </div>
         </div>
 
@@ -219,8 +292,8 @@ export default function HowItWorks({
           className="relative mx-auto h-full min-h-svh w-full px-4 pt-36 pb-10 max-lg:min-h-auto max-lg:px-0 max-lg:pt-0 lg:px-12"
         >
           <div className="relative flex items-center justify-between max-lg:hidden">
-            <div className="project-index z-50 text-white mix-blend-difference dark:text-black dark:mix-blend-normal">
-              <h1 className="text-[140px] leading-none font-light tracking-tighter text-zinc-900 dark:text-zinc-50">
+            <div className="project-index z-50 text-primary-50 mix-blend-difference dark:text-primary-900 dark:mix-blend-normal">
+              <h1 className="text-[140px] leading-none font-light tracking-tighter text-primary-900 dark:text-primary-50">
                 01
                 <span className="text-[28px] text-muted-foreground">
                   /0{projects.length}
@@ -230,8 +303,20 @@ export default function HowItWorks({
           </div>
 
           <div className="project-images absolute top-0 left-1/2 z-10 flex w-[45%] -translate-x-1/2 flex-col gap-32 px-0 pt-[30svh] pb-[30svh] max-lg:static max-lg:w-full max-lg:translate-x-0 max-lg:gap-16 max-lg:py-0 max-lg:pt-0 max-md:gap-10">
-            {projects.map((item) => (
-              <Card key={item.title} item={item} linkText="VISIT" />
+            {projects.map((item, idx) => (
+              <Card
+                key={item.title}
+                item={item}
+                active={
+                  isMobile
+                    ? true
+                    : idx === 0
+                      ? sectionEntered
+                      : activeStep >= idx + 1
+                }
+                isMobile={isMobile}
+                linkText="VISIT"
+              />
             ))}
           </div>
 

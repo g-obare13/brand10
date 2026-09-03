@@ -4,11 +4,10 @@ import { useAuthStore } from "@/store/authStore"
 import { useBrandStore } from "@/store/brandStore"
 import { get as idbGet } from "idb-keyval"
 import {
+  IconAlertTriangle,
   IconArrowRight,
-  IconCopy,
   IconPlus,
   IconTrash,
-  IconAlertTriangle,
 } from "@tabler/icons-react"
 import { Link } from "@tanstack/react-router"
 import { useEffect, useRef, useState } from "react"
@@ -34,6 +33,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Loader } from "@/components/ui/loader"
+import ImageComponentOptimized from "@/components/shared/ImageComponentOptimized"
 
 interface ProjectsTabProps {
   onOpenCreateModal: () => void
@@ -155,10 +155,11 @@ function ProjectCardLogo({
         className="flex size-12 items-center justify-center overflow-hidden rounded-2xl border border-border/80 bg-background/80 p-2 transition-transform duration-300 group-hover:scale-105"
         style={{ borderColor: `${primaryColor}30` }}
       >
-        <img
+        <ImageComponentOptimized
           src={logoSrc}
           alt={project.brand_name || project.name}
           className="size-full object-contain"
+          imageClassName="w-full h-full object-cover"
           onError={() => setHasError(true)}
         />
       </div>
@@ -250,19 +251,21 @@ export function ProjectsTab({ onOpenCreateModal }: ProjectsTabProps) {
     <TooltipProvider delay={100}>
       <div ref={containerRef} className="space-y-6">
         {/* Welcome Header Section */}
-        <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
-          <div className="max-w-3xl space-y-4 pt-4 sm:pt-8">
-            <WordReveal as="h2" stagger={0.03} duration={1.4} start="top 90%">
-              Your Brand Projects
-            </WordReveal>
+        {hasProjects && (
+          <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+            <div className="max-w-3xl space-y-4 pt-4 sm:pt-8">
+              <WordReveal as="h2" stagger={0.03} duration={1.4} start="top 90%">
+                Your Brand Projects
+              </WordReveal>
 
-            <WordReveal as="p" stagger={0.02} duration={1.2} start="top 90%">
-              {isLoading
-                ? "Loading projects..."
-                : `${projectsStore.projects.length} of 2 slots used`}
-            </WordReveal>
+              <WordReveal as="p" stagger={0.02} duration={1.2} start="top 90%">
+                {isLoading
+                  ? "Loading projects..."
+                  : `${projectsStore.projects.length} of 2 slots used`}
+              </WordReveal>
+            </div>
           </div>
-        </div>
+        )}
 
         {isLoading ? (
           /* Loading Skeletons - Prevents Empty State Flashing */
@@ -295,7 +298,7 @@ export function ProjectsTab({ onOpenCreateModal }: ProjectsTabProps) {
         ) : hasProjects ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {projectsStore.projects.map((project: BrandProjectItem) => {
-              const primaryColor = project.primary_color || "#4f46e5"
+              const primaryColor = project.primary_color || "#624b59"
               const brandInitial = (project.brand_name || project.name || "B")
                 .charAt(0)
                 .toUpperCase()
@@ -319,37 +322,6 @@ export function ProjectsTab({ onOpenCreateModal }: ProjectsTabProps) {
                       />
 
                       <div className="flex items-center gap-1.5">
-                        <Tooltip>
-                          <TooltipTrigger
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              if (isLimitReached) return
-                              projectsStore.duplicateProject(
-                                project.id,
-                                auth.user?.id
-                              )
-                            }}
-                            className={cn(
-                              "cursor-pointer rounded-full border border-border/60 p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground",
-                              isLimitReached &&
-                                "cursor-not-allowed opacity-40 hover:bg-transparent hover:text-muted-foreground"
-                            )}
-                            aria-label="Duplicate Brand"
-                          >
-                            <IconCopy size={15} />
-                          </TooltipTrigger>
-                          <TooltipContent
-                            side="top"
-                            sideOffset={6}
-                            className="text-xs font-medium shadow-xl"
-                          >
-                            {isLimitReached
-                              ? "Project Limit Reached (Max 2)"
-                              : "Duplicate Brand"}
-                          </TooltipContent>
-                        </Tooltip>
-
                         <Tooltip>
                           <TooltipTrigger
                             type="button"

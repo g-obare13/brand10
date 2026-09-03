@@ -280,6 +280,7 @@ export interface BrandPdfProps {
   dosAndDonts?: BrandDoDontItem[]
   imageryMood?: string
   imageryOverlay?: string
+  imageryLinks?: string[]
   iconStyle?: string
 }
 

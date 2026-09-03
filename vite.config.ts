@@ -7,14 +7,9 @@ import viteReact from "@vitejs/plugin-react"
 const config = defineConfig({
   plugins: [
     tsconfigPaths({ projects: ["./tsconfig.json"] }),
-    tanstackStart({
-      router: {
-        routesDirectory: "routes",
-      },
-      srcDirectory: "src",
-    }),
-    viteReact(),
     tailwindcss(),
+    tanstackStart(),
+    viteReact(),
   ],
   ssr: {
     noExternal: [

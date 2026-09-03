@@ -52,6 +52,7 @@ export interface BrandExportModel {
   // Imagery & Iconography Styling
   imageryMood: 'minimal' | 'cinematic' | 'vibrant' | 'editorial'
   imageryOverlay: 'none' | 'tint' | 'duotone'
+  imageryLinks?: string[]
   iconStyle: 'stroke' | 'solid' | 'duotone'
   iconRadius: number
   iconStroke: number

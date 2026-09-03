@@ -6,6 +6,8 @@ interface AuthState {
   user: User | null
   session: Session | null
   loading: boolean
+  loginModalOpen: boolean
+  setLoginModalOpen: (open: boolean) => void
   initialize: () => Promise<void>
   signInWithGoogle: () => Promise<{ error: Error | null }>
   signOut: () => Promise<void>
@@ -20,6 +22,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   session: null,
   loading: true,
+  loginModalOpen: false,
+  setLoginModalOpen: (open: boolean) => set({ loginModalOpen: open }),
 
   initialize: async () => {
     if (!supabase) {
@@ -38,12 +42,20 @@ export const useAuthStore = create<AuthState>((set) => ({
         loading: false,
       })
 
-      supabase.auth.onAuthStateChange((_event, newSession) => {
+      supabase.auth.onAuthStateChange((event, newSession) => {
         set({
           session: newSession,
           user: newSession?.user || null,
           loading: false,
         })
+        if (event === "SIGNED_IN" && newSession?.user) {
+          if (
+            typeof window !== "undefined" &&
+            (window.location.pathname === "/" || window.location.pathname === "")
+          ) {
+            window.location.href = "/dashboard/projects"
+          }
+        }
       })
     } catch (err) {
       console.warn('Auth initialization fallback:', err)
@@ -58,7 +70,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin + '/dashboard',
+        redirectTo: window.location.origin + '/dashboard/projects',
       },
     })
     return { error }

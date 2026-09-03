@@ -320,87 +320,50 @@ export const ecosystemData = {
   },
 }
 
-export const footerData = {
-  logo: "ORBITKIT",
-  slogan: "Digital Growth Partners",
-  address: "New York, US\nOperating globally",
-  newsletter: {
-    title: "Stay in the loop.",
-    description:
-      "Get insights on brand strategy, design trends, and digital growth delivered to your inbox.",
-    placeholder: "Email address",
-  },
-  links: [
-    {
-      title: "Company",
-      items: [
-        { label: "About", href: "#" },
-        { label: "Work", href: "#" },
-        { label: "Contact", href: "#" },
-        { label: "Careers", href: "#" },
-      ],
-    },
-    {
-      title: "Services",
-      items: [
-        { label: "Brand Strategy", href: "#" },
-        { label: "Web Development", href: "#" },
-        { label: "UI/UX Design", href: "#" },
-        { label: "Digital Marketing", href: "#" },
-      ],
-    },
-    {
-      title: "Resources",
-      items: [
-        { label: "Case Studies", href: "#" },
-        { label: "Blog", href: "#" },
-        { label: "Process", href: "#" },
-      ],
-    },
-  ],
-  socials: [
-    { name: "LinkedIn", href: "#" },
-    { name: "Facebook", href: "#" },
-    { name: "Twitter", href: "#" },
-  ],
-  copyright: "Copyright © 2022 OrbitKit. All Rights Reserved.",
-}
-
 export const faqData = {
-  title: "General Questions asked by customers.",
+  title: "Everything you need to know about Brand10.",
   description:
-    "Our friendly team is always here to help you with quick, clear, and reliable answers whenever needed.",
+    "Explore how our AI brand studio generates living design systems, calculates mathematical clearspace rules, and exports production-ready brand decks.",
   cta: {
-    label: "Contact Sales",
+    label: "Contact Support",
     href: "#",
   },
   items: [
     {
-      question: "How does OrbitKit help brands grow their online presence?",
+      question:
+        "What is Brand10 and how does it automate brand identity creation?",
       answer:
-        "OrbitKit builds tailored strategies combining creative content, consistent posting, & analytics-driven decisions to expand reach, boost engagement, & create a loyal community around your brand.",
+        "Brand10 is an AI-powered brand studio and living design system engine. It transforms raw vector marks, color concepts, and typography choices into comprehensive design systems with automatic clearspace rules, WCAG-compliant color palettes, and interactive mockup sandboxes.",
     },
     {
       question:
-        "What social media platforms does OrbitKit specialize in managing?",
+        "How does the automated logo clearspace and exclusion zone calculator work?",
       answer:
-        "We specialize in a wide range of platforms including Instagram, TikTok, LinkedIn, and Twitter, tailoring our approach to each platform's unique audience and algorithms.",
-    },
-    {
-      question: "How soon can I expect to see real results?",
-      answer:
-        "While some improvements can be seen immediately, significant growth typically occurs within the first 3-6 months of consistent, strategic execution.",
-    },
-    {
-      question: "Do I get access to analytics and growth insights?",
-      answer:
-        "Yes, we provide comprehensive monthly reports and real-time dashboards so you can track your progress and understand the impact of our strategies.",
+        "When you upload an SVG or vector mark, Brand10 computes the geometric bounding box and exclusion coordinates based on key proportional landmarks like mark height. It calculates exact safety margins and flags forbidden alterations such as improper rotation or low-contrast surfaces.",
     },
     {
       question:
-        "What makes OrbitKit different from other social media agencies?",
+        "Are generated color palettes tested for accessibility and WCAG standards?",
       answer:
-        "Our approach is deeply rooted in brand strategy and data science. We don't just post content; we build ecosystems that drive long-term business value.",
+        "Yes. Brand10 evaluates every primary, secondary, and semantic surface against light and dark backgrounds using WCAG 2.1 AA and AAA contrast ratios. It flags failing combinations and automatically suggests accessible tints and shades to ensure compliance across all digital interfaces.",
+    },
+    {
+      question:
+        "Can I export design tokens for engineering and PDF guideline decks for clients?",
+      answer:
+        "Yes. You can export complete design token sets in CSS Custom Properties, Tailwind CSS configuration, and Figma Tokens JSON. You can also generate and download publication-ready, multi-page PDF brand guidelines decks with a single click.",
+    },
+    {
+      question:
+        "What is the Mockup Sandbox and how does real-time token sync work?",
+      answer:
+        "The Mockup Sandbox lets you preview how your brand looks across physical stationery, digital product interfaces, outdoor signage, and apparel. Any adjustment you make to colors, typography, or logo placement instantly synchronizes across all mockups simultaneously.",
+    },
+    {
+      question:
+        "Can I customize the generated design systems and add custom brand rules?",
+      answer:
+        "Every aspect of your system is fully customizable. While Brand10 establishes mathematically sound defaults, you have granular control to refine hex codes, tweak modular type scales, adjust spacing curves, and define custom brand voice rules.",
     },
   ],
 }
@@ -908,4 +871,50 @@ export const serviceFeaturesTabsData: Record<
       },
     ],
   },
+}
+
+export const footerData = {
+  logo: "ORBITKIT",
+  slogan: "Digital Growth Partners",
+  address: "New York, US\nOperating globally",
+  newsletter: {
+    title: "Stay in the loop.",
+    description:
+      "Get insights on brand strategy, design trends, and digital growth delivered to your inbox.",
+    placeholder: "Email address",
+  },
+  links: [
+    {
+      title: "Company",
+      items: [
+        { label: "About", href: "#" },
+        { label: "Work", href: "#" },
+        { label: "Contact", href: "#" },
+        { label: "Careers", href: "#" },
+      ],
+    },
+    {
+      title: "Services",
+      items: [
+        { label: "Brand Strategy", href: "#" },
+        { label: "Web Development", href: "#" },
+        { label: "UI/UX Design", href: "#" },
+        { label: "Digital Marketing", href: "#" },
+      ],
+    },
+    {
+      title: "Resources",
+      items: [
+        { label: "Case Studies", href: "#" },
+        { label: "Blog", href: "#" },
+        { label: "Process", href: "#" },
+      ],
+    },
+  ],
+  socials: [
+    { name: "LinkedIn", href: "#" },
+    { name: "Facebook", href: "#" },
+    { name: "Twitter", href: "#" },
+  ],
+  copyright: "Copyright © 2026 Brand10. All Rights Reserved.",
 }

@@ -1,4 +1,5 @@
 import { LoginModal } from "@/components/shared/LoginModal"
+import { SignOutModal } from "@/components/shared/SignOutModal"
 import { Logo } from "@/components/shared/Logo"
 import { ThemeToggler } from "@/components/shared/theme-toggler"
 import { Button } from "@/components/ui/button"
@@ -40,12 +41,14 @@ export interface HeaderProps {
  */
 export function Header({ action }: HeaderProps = {}) {
   const [isOpen, setIsOpen] = useState(false)
-  const [loginModalOpen, setLoginModalOpen] = useState(false)
   const [copiedField, setCopiedField] = useState<string | null>(null)
-  const { user, initialize, signOut } = useAuthStore()
+  const { user, initialize, loginModalOpen, setLoginModalOpen } =
+    useAuthStore()
+  const [signOutModalOpen, setSignOutModalOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const menuBtnRef = useRef<HTMLButtonElement>(null)
   const getStartedBtnRef = useRef<HTMLButtonElement>(null)
+  const signOutBtnRef = useRef<HTMLButtonElement>(null)
 
   const handleCopy = (text: string, fieldId: string) => {
     navigator.clipboard.writeText(text)
@@ -180,13 +183,14 @@ export function Header({ action }: HeaderProps = {}) {
             >
               {isDashboard ? (
                 <Button
+                  ref={signOutBtnRef}
                   gsapFill
                   variant="outline"
                   className="cursor-pointer rounded-full p-6"
                   icon={<IconLogout size={16} />}
-                  onClick={async () => {
-                    await signOut()
-                    navigate({ to: "/" })
+                  onClick={() => {
+                    setIsOpen(false)
+                    setSignOutModalOpen(!signOutModalOpen)
                   }}
                   iconPlacement="right"
                 >
@@ -358,6 +362,13 @@ export function Header({ action }: HeaderProps = {}) {
             open={loginModalOpen}
             onOpenChange={setLoginModalOpen}
             triggerRef={getStartedBtnRef}
+          />
+
+          {/* Sign Out Confirmation Modal */}
+          <SignOutModal
+            open={signOutModalOpen}
+            onOpenChange={setSignOutModalOpen}
+            triggerRef={signOutBtnRef}
           />
         </div>
       </Container>

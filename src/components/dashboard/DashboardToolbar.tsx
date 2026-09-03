@@ -62,7 +62,7 @@ export function DashboardToolbar() {
   return (
     <nav
       aria-label="Dashboard bottom navigation"
-      className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2"
+      className="fixed bottom-10 left-1/2 z-40 -translate-x-1/2"
     >
       <TooltipProvider delay={100}>
         <GlassPanel

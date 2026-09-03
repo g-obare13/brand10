@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 export interface SpotlightCardProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Accent color for ambient radial glow, tints, and expanding line (e.g. hex or rgba).
-   * @default "#6366f1"
+   * @default "#624b59"
    */
   color?: string
   /**
@@ -48,7 +48,7 @@ export interface SpotlightCardProps extends React.HTMLAttributes<HTMLDivElement>
  *
  * @component
  * @param {SpotlightCardProps} props - The component props.
- * @param {string} [props.color="#6366f1"] - Accent highlight color.
+ * @param {string} [props.color="#624b59"] - Accent highlight color.
  * @param {boolean} [props.dimmed=false] - Whether card is dimmed.
  * @param {boolean} [props.tilt=true] - Enables 3D perspective rotation on hover.
  * @param {number} [props.maxTilt=7] - Maximum tilt degree.
@@ -64,7 +64,7 @@ export const SpotlightCard = React.forwardRef<
     {
       children,
       className,
-      color = "#6366f1",
+      color = "#624b59",
       dimmed = false,
       tilt = true,
       maxTilt = 7,

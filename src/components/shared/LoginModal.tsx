@@ -55,6 +55,14 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     setIsClient(true)
   }, [])
 
+  // If user signs in while modal is open, direct to dashboard/projects
+  useEffect(() => {
+    if (auth.user && open) {
+      onOpenChange(false)
+      window.location.href = "/dashboard/projects"
+    }
+  }, [auth.user, open, onOpenChange])
+
   // Animate card & backdrop in / out synchronously
   useEffect(() => {
     if (!isClient) return
@@ -145,8 +153,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         open &&
         cardRef.current &&
         !cardRef.current.contains(event.target as Node) &&
-        triggerRef?.current &&
-        !triggerRef.current.contains(event.target as Node)
+        (!triggerRef?.current ||
+          !triggerRef.current.contains(event.target as Node))
       ) {
         onOpenChange(false)
       }

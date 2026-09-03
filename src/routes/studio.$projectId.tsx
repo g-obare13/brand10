@@ -232,9 +232,7 @@ function StudioPage() {
                         icon={
                           isSaving ? (
                             <Loader size="sm" />
-                          ) : currentStep === 5 ? (
-                            <IconSparkles size={14} />
-                          ) : (
+                          ) : currentStep === 5 ? null : (
                             <IconArrowRight size={14} />
                           )
                         }

@@ -1,9 +1,16 @@
-import chroma from 'chroma-js'
+import chroma from "chroma-js"
 
 export interface ColorSwatch {
   id: string
   name: string
-  role: 'primary' | 'secondary' | 'accent' | 'neutral' | 'background' | 'surface' | 'custom'
+  role:
+    | "primary"
+    | "secondary"
+    | "accent"
+    | "neutral"
+    | "background"
+    | "surface"
+    | "custom"
   hex: string
   rgb: { r: number; g: number; b: number }
   cmyk: { c: number; m: number; y: number; k: number }
@@ -18,15 +25,22 @@ export interface WcagResult {
   aaLarge: boolean
   aaaNormal: boolean
   aaaLarge: boolean
-  rating: 'AAA' | 'AA' | 'AA Large' | 'Fail'
+  rating: "AAA" | "AA" | "AA Large" | "Fail"
 }
 
 /**
  * Convert Hex to CMYK percentages (0-100)
  */
-export function hexToCmyk(hex: string): { c: number; m: number; y: number; k: number } {
+export function hexToCmyk(hex: string): {
+  c: number
+  m: number
+  y: number
+  k: number
+} {
   try {
-    const [r, g, b] = chroma(hex).rgb().map((v) => v / 255)
+    const [r, g, b] = chroma(hex)
+      .rgb()
+      .map((v) => v / 255)
     const k = 1 - Math.max(r, g, b)
     if (k === 1) {
       return { c: 0, m: 0, y: 0, k: 100 }
@@ -67,26 +81,26 @@ export function hexToHsl(hex: string): { h: number; s: number; l: number } {
 export function generateTonalShades(hex: string): Record<string, string> {
   try {
     const scale = chroma
-      .scale(['#ffffff', hex, '#000000'])
+      .scale(["#ffffff", hex, "#000000"])
       .domain([0, 0.5, 1])
-      .mode('lab')
+      .mode("lab")
 
     return {
-      '50': scale(0.08).hex(),
-      '100': scale(0.16).hex(),
-      '200': scale(0.28).hex(),
-      '300': scale(0.38).hex(),
-      '400': scale(0.45).hex(),
-      '500': chroma(hex).hex(),
-      '600': scale(0.58).hex(),
-      '700': scale(0.68).hex(),
-      '800': scale(0.78).hex(),
-      '900': scale(0.88).hex(),
-      '950': scale(0.94).hex(),
+      "50": scale(0.08).hex(),
+      "100": scale(0.16).hex(),
+      "200": scale(0.28).hex(),
+      "300": scale(0.38).hex(),
+      "400": scale(0.45).hex(),
+      "500": chroma(hex).hex(),
+      "600": scale(0.58).hex(),
+      "700": scale(0.68).hex(),
+      "800": scale(0.78).hex(),
+      "900": scale(0.88).hex(),
+      "950": scale(0.94).hex(),
     }
   } catch {
     return {
-      '500': hex,
+      "500": hex,
     }
   }
 }
@@ -96,26 +110,26 @@ export function generateTonalShades(hex: string): Record<string, string> {
  */
 export function createColorSwatch(
   hex: string,
-  role: ColorSwatch['role'] = 'primary',
+  role: ColorSwatch["role"] = "primary",
   customName?: string
 ): ColorSwatch {
-  const safeHex = chroma.valid(hex) ? chroma(hex).hex() : '#4f46e5'
+  const safeHex = chroma.valid(hex) ? chroma(hex).hex() : "#624b59"
   const [r, g, b] = chroma(safeHex).rgb()
   const shades = generateTonalShades(safeHex)
 
-  const defaultNames: Record<ColorSwatch['role'], string> = {
-    primary: 'Primary Brand',
-    secondary: 'Secondary Accent',
-    accent: 'Electric Accent',
-    neutral: 'Slate Neutral',
-    background: 'Canvas Background',
-    surface: 'Surface Card',
-    custom: 'Accent Color',
+  const defaultNames: Record<ColorSwatch["role"], string> = {
+    primary: "Primary Brand",
+    secondary: "Secondary Accent",
+    accent: "Electric Accent",
+    neutral: "Slate Neutral",
+    background: "Canvas Background",
+    surface: "Surface Card",
+    custom: "Accent Color",
   }
 
   return {
     id: `color-${Math.random().toString(36).substring(2, 9)}`,
-    name: customName || defaultNames[role] || 'Color',
+    name: customName || defaultNames[role] || "Color",
     role,
     hex: safeHex,
     rgb: { r, g, b },
@@ -128,10 +142,13 @@ export function createColorSwatch(
 /**
  * Calculate WCAG 2.1 Contrast Ratio between two colors
  */
-export function getWcagContrast(foregroundHex: string, backgroundHex: string): WcagResult {
+export function getWcagContrast(
+  foregroundHex: string,
+  backgroundHex: string
+): WcagResult {
   try {
-    const validFg = chroma.valid(foregroundHex) ? foregroundHex : '#000000'
-    const validBg = chroma.valid(backgroundHex) ? backgroundHex : '#ffffff'
+    const validFg = chroma.valid(foregroundHex) ? foregroundHex : "#000000"
+    const validBg = chroma.valid(backgroundHex) ? backgroundHex : "#ffffff"
     const ratio = Math.round(chroma.contrast(validFg, validBg) * 100) / 100
 
     const aaNormal = ratio >= 4.5
@@ -139,10 +156,10 @@ export function getWcagContrast(foregroundHex: string, backgroundHex: string): W
     const aaaNormal = ratio >= 7.0
     const aaaLarge = ratio >= 4.5
 
-    let rating: WcagResult['rating'] = 'Fail'
-    if (aaaNormal) rating = 'AAA'
-    else if (aaNormal) rating = 'AA'
-    else if (aaLarge) rating = 'AA Large'
+    let rating: WcagResult["rating"] = "Fail"
+    if (aaaNormal) rating = "AAA"
+    else if (aaNormal) rating = "AA"
+    else if (aaLarge) rating = "AA Large"
 
     return {
       ratio,
@@ -159,7 +176,7 @@ export function getWcagContrast(foregroundHex: string, backgroundHex: string): W
       aaLarge: false,
       aaaNormal: false,
       aaaLarge: false,
-      rating: 'Fail',
+      rating: "Fail",
     }
   }
 }
@@ -167,13 +184,13 @@ export function getWcagContrast(foregroundHex: string, backgroundHex: string): W
 /**
  * Return black or white text color for optimal readability over a given background
  */
-export function getReadableTextColor(bgHex: string): '#000000' | '#ffffff' {
+export function getReadableTextColor(bgHex: string): "#000000" | "#ffffff" {
   try {
-    const contrastWhite = chroma.contrast(bgHex, '#ffffff')
-    const contrastBlack = chroma.contrast(bgHex, '#000000')
-    return contrastWhite >= contrastBlack ? '#ffffff' : '#000000'
+    const contrastWhite = chroma.contrast(bgHex, "#ffffff")
+    const contrastBlack = chroma.contrast(bgHex, "#000000")
+    return contrastWhite >= contrastBlack ? "#ffffff" : "#000000"
   } catch {
-    return '#000000'
+    return "#000000"
   }
 }
 
@@ -190,8 +207,8 @@ function sRgbToY(rgb: [number, number, number]): number {
  */
 export function calculateApca(textHex: string, bgHex: string): number {
   try {
-    const validTxt = chroma.valid(textHex) ? textHex : '#000000'
-    const validBg = chroma.valid(bgHex) ? bgHex : '#ffffff'
+    const validTxt = chroma.valid(textHex) ? textHex : "#000000"
+    const validBg = chroma.valid(bgHex) ? bgHex : "#ffffff"
     const txtRgb = chroma(validTxt).rgb()
     const bgRgb = chroma(validBg).rgb()
 
@@ -232,7 +249,7 @@ export function formatOklch(hex: string): string {
     const safeH = isNaN(h) ? 0 : Math.round(h)
     return `oklch(${l.toFixed(3)} ${c.toFixed(3)} ${safeH})`
   } catch {
-    return 'oklch(0 0 0)'
+    return "oklch(0 0 0)"
   }
 }
 
@@ -247,6 +264,6 @@ export function formatHsl(hex: string): string {
     const safeL = Math.round((isNaN(l) ? 0 : l) * 100)
     return `hsl(${safeH}, ${safeS}%, ${safeL}%)`
   } catch {
-    return 'hsl(0, 0%, 0%)'
+    return "hsl(0, 0%, 0%)"
   }
 }

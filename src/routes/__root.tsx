@@ -13,13 +13,14 @@ import { supabase } from "@/lib/supabase"
 import { useAuthStore } from "@/store/authStore"
 import { Toaster } from "sonner"
 import "sonner/dist/styles.css"
-import appCss from "@/styles.css?url"
+import "@/styles.css"
 import { ScrollManager } from "@/components/shared/ScrollManager"
+import { ProgressiveBlur } from "@/components/shared/ProgressiveBlur"
 
 initConsole()
 
 /** Routes that do NOT require authentication */
-export const PUBLIC_ROUTES = ["/", "/login", "/auth/callback"]
+const PUBLIC_ROUTES = ["/", "/login", "/auth/callback", "/insights"]
 
 export const Route = createRootRoute({
   head: () => ({
@@ -131,10 +132,6 @@ export const Route = createRootRoute({
         rel: "manifest",
         href: "/site.webmanifest",
       },
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
     ],
   }),
   beforeLoad: async (ctx) => {
@@ -225,8 +222,17 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body
         suppressHydrationWarning
-        className="min-h-screen bg-background text-foreground antialiased transition-colors duration-150 selection:bg-primary/20 selection:text-primary"
+        className="relative min-h-screen bg-background text-foreground antialiased transition-colors duration-150 selection:bg-primary/20 selection:text-primary"
       >
+        <ProgressiveBlur
+          className="z-40"
+          direction="top"
+          gradient
+          layers={4}
+          maxBlur={16}
+          position="fixed"
+          size="7rem"
+        />
         <ScrollManager>
           <ThemeProvider>
             {children}
@@ -240,6 +246,15 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             />
           </ThemeProvider>
         </ScrollManager>
+
+        <ProgressiveBlur
+          className="z-40"
+          direction="bottom"
+          layers={4}
+          maxBlur={16}
+          position="fixed"
+          size="5rem"
+        />
 
         {/* <TanStackDevtools
           config={{

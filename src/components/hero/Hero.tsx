@@ -7,7 +7,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useEffect, useRef } from "react"
 import Container from "@/components/ui/container"
 import { useBrandStore } from "@/store/brandStore"
+import { useAuthStore } from "@/store/authStore"
 import { DashboardBackground } from "@/components/dashboard"
+import { MagneticCards } from "@/components/shared/MagneticCards"
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger)
@@ -24,10 +26,10 @@ if (typeof window !== "undefined") {
 export function Hero() {
   const navigate = useNavigate()
   const brand = useBrandStore()
+  const { user, setLoginModalOpen } = useAuthStore()
 
   const heroRef = useRef<HTMLElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -79,6 +81,13 @@ export function Hero() {
     })
   }
 
+  const items = [
+    { src: "/showcases/maximalism.avif", alt: "Card one" },
+    { src: "/showcases/minimalist.jpg", alt: "Card one" },
+    { src: "/showcases/semi-flat.avif", alt: "Card one" },
+    { src: "/showcases/neo-brutalism.jpg", alt: "Card one" },
+  ]
+
   return (
     <section
       ref={heroRef}
@@ -87,9 +96,17 @@ export function Hero() {
       {/* Ambient background canvas */}
       <DashboardBackground position="absolute" opacity="opacity-75" />
 
+      {/* Magnetic Cards anchored to the bottom-right of the full screen height */}
+      <div className="pointer-events-auto absolute right-4 bottom-2 z-0 hidden h-80 w-full max-w-2xl md:block lg:right-8 lg:bottom-6 lg:h-96 lg:max-w-2xl xl:right-16">
+        <MagneticCards items={items} />
+      </div>
+
       <Container className="relative z-10 flex w-full flex-col items-start justify-start">
         {/* Hero Content with curtain parallax depth */}
-        <div ref={contentRef} className="w-full max-w-4xl space-y-6 text-left">
+        <div
+          ref={contentRef}
+          className="relative z-10 w-full max-w-4xl space-y-6 text-left"
+        >
           <WordReveal as="h1" stagger={0.03} duration={1.4} start="top 90%">
             Create comprehensive brand guidelines in minutes with Brand
             <span className="font-heading text-5xl font-semibold text-primary lg:text-6xl">
@@ -109,7 +126,13 @@ export function Hero() {
           {/* Hero CTA Action Buttons */}
           <div ref={ctaRef} className="flex flex-wrap items-center gap-4 pt-2">
             <Button
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => {
+                if (user) {
+                  navigate({ to: "/dashboard/projects" })
+                } else {
+                  setLoginModalOpen(true)
+                }
+              }}
               variant={"shiny"}
               size={"pill"}
               gsapFill

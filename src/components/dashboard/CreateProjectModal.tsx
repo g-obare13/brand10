@@ -1,14 +1,17 @@
 import { useNavigate } from "@tanstack/react-router"
+import { IconX } from "@tabler/icons-react"
 import gsap from "gsap"
 import React, { useEffect, useRef, useState } from "react"
-import { animateFadeUp } from "@/lib/gsap-animations"
-import { useAuthStore } from "@/store/authStore"
-import { useProjectsStore } from "@/store/projectsStore"
-import { useBrandStore } from "@/store/brandStore"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader } from "@/components/ui/loader"
+import { NoiseTexture } from "@/components/shared/NoiseTexture"
+import { animateFadeUp } from "@/lib/gsap-animations"
+import { useAuthStore } from "@/store/authStore"
+import { useBrandStore } from "@/store/brandStore"
+import { useProjectsStore } from "@/store/projectsStore"
 
 interface CreateProjectModalProps {
   isOpen: boolean
@@ -18,15 +21,18 @@ interface CreateProjectModalProps {
 /**
  * Modal dialog for initiating a new brand system project.
  * Features:
- * - GSAP animated bottom sheet / backdrop transitions.
+ * - GSAP animated card and backdrop blur transitions matching LoginModal.
+ * - Ultra-refined frosted glassmorphism with specular highlights and noise texture.
+ * - Ambient illumination glow effects.
+ * - Circular close button in top right corner.
+ * - Staggered entrance animation for form controls.
  * - Project initialization into Supabase with automatic redirection to the step wizard.
- * - Integration with authStore and projectsStore.
  *
  * @component
  * @param {CreateProjectModalProps} props - The component props.
  * @param {boolean} props.isOpen - Whether modal is visible.
  * @param {() => void} props.onClose - Callback triggered on dismiss.
- * @returns {React.ReactElement | null} The modal element or null if closed.
+ * @returns {React.ReactElement} The modal element.
  */
 export function CreateProjectModal({
   isOpen,
@@ -40,96 +46,133 @@ export function CreateProjectModal({
   const [projectName, setProjectName] = useState("")
   const [createError, setCreateError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isClient, setIsClient] = useState(false)
 
-  const overlayRef = useRef<HTMLDivElement>(null)
-  const sheetRef = useRef<HTMLDivElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
+  const backdropRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const prevOpenRef = useRef<boolean>(false)
 
-  const triggerClose = () => {
-    if (!overlayRef.current || !sheetRef.current) {
-      onClose()
-      return
-    }
-
-    gsap.to(overlayRef.current, {
-      opacity: 0,
-      duration: 0.25,
-      ease: "power2.in",
-    })
-
-    gsap.to(sheetRef.current, {
-      y: 60,
-      opacity: 0,
-      scale: 0.96,
-      duration: 0.25,
-      ease: "power2.in",
-      onComplete: () => {
-        gsap.set(overlayRef.current, { display: "none" })
-        setProjectName("")
-        setCreateError(null)
-        onClose()
-      },
-    })
-  }
-
+  // Client-only initialization
   useEffect(() => {
-    if (isOpen) {
-      if (overlayRef.current && sheetRef.current) {
-        gsap.set(overlayRef.current, { display: "flex", opacity: 0 })
-        gsap.to(overlayRef.current, {
-          opacity: 1,
-          duration: 0.35,
-          ease: "power2.out",
-        })
+    setIsClient(true)
+  }, [])
 
+  // Animate card & backdrop in / out synchronously
+  useEffect(() => {
+    if (!isClient) return
+    if (prevOpenRef.current === isOpen) return
+    prevOpenRef.current = isOpen
+
+    const card = cardRef.current
+    const backdrop = backdropRef.current
+    const container = containerRef.current
+    if (!card) return
+
+    const animItems = card.querySelectorAll(".sheet-item-anim")
+
+    // Kill any in-flight animations
+    gsap.killTweensOf([card, backdrop, ...Array.from(animItems)])
+
+    if (isOpen) {
+      // Fade in blurred background backdrop
+      if (backdrop) {
+        gsap.set(backdrop, { display: "block" })
         gsap.fromTo(
-          sheetRef.current,
-          { y: 80, opacity: 0, scale: 0.95 },
+          backdrop,
+          { opacity: 0 },
           {
-            y: 0,
             opacity: 1,
-            scale: 1,
-            duration: 0.48,
-            ease: "power3.out",
-            delay: 0.05,
-            onComplete: () => {
-              inputRef.current?.focus()
-            },
+            duration: 0.35,
+            ease: "power2.out",
           }
         )
-
-        const items = sheetRef.current.querySelectorAll(".sheet-item-anim")
-        if (items.length > 0) {
-          animateFadeUp(Array.from(items), {
-            y: 18,
-            duration: 0.45,
-            stagger: 0.06,
-            delay: 0.12,
-            ease: "power2.out",
-          })
-        }
       }
-    } else if (overlayRef.current) {
-      gsap.set(overlayRef.current, { display: "none" })
-    }
-  }, [isOpen])
 
+      if (container) {
+        gsap.set(container, { display: "flex" })
+      }
+
+      // Animate modal card in
+      gsap.fromTo(
+        card,
+        { opacity: 0, y: 16, scale: 0.96 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.45,
+          ease: "power3.out",
+          onComplete: () => {
+            inputRef.current?.focus()
+          },
+        }
+      )
+
+      // Animate internal items with staggered fadeUp
+      if (animItems.length > 0) {
+        gsap.set(animItems, { opacity: 0, y: 16 })
+        animateFadeUp(Array.from(animItems), {
+          y: 16,
+          duration: 0.45,
+          stagger: 0.07,
+          ease: "power2.out",
+          delay: 0.1,
+        })
+      }
+    } else {
+      // Animate backdrop out
+      if (backdrop) {
+        gsap.to(backdrop, {
+          opacity: 0,
+          duration: 0.25,
+          ease: "power2.in",
+          onComplete: () => {
+            gsap.set(backdrop, { display: "none" })
+          },
+        })
+      }
+
+      // Animate card out
+      gsap.to(card, {
+        opacity: 0,
+        y: 16,
+        scale: 0.96,
+        duration: 0.25,
+        ease: "power2.in",
+        onComplete: () => {
+          if (container) {
+            gsap.set(container, { display: "none" })
+          }
+          gsap.set(animItems, { opacity: 0, y: 16 })
+          setProjectName("")
+          setCreateError(null)
+        },
+      })
+    }
+  }, [isOpen, isClient])
+
+  // Escape key detection
   useEffect(() => {
+    if (!isOpen) return
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        triggerClose()
+      if (e.key === "Escape") {
+        onClose()
       }
     }
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [isOpen])
+  }, [isOpen, onClose])
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     setCreateError(null)
 
     if (projectsStore.isLimitReached()) {
-      setCreateError("You have reached the maximum limit of 2 brand projects.")
+      const msg = "You have reached the maximum limit of 2 brand projects."
+      setCreateError(msg)
+      toast.error(msg)
       return
     }
 
@@ -141,86 +184,127 @@ export function CreateProjectModal({
       )
       if (error) {
         setCreateError(error)
+        toast.error(error)
       } else if (project) {
         brand.setProjectId(project.id)
         brand.setBrandName(project.name || projectName)
-        triggerClose()
-        navigate({
-          to: "/studio/$projectId",
-          params: { projectId: project.id },
-        })
+        onClose()
+        toast.success(`Created project "${project.name || projectName}"`)
+        try {
+          await navigate({
+            to: "/studio/$projectId",
+            params: { projectId: project.id },
+            search: { step: 1 },
+          })
+        } catch {
+          window.location.href = `/studio/${project.id}`
+        }
       }
+    } catch (err: any) {
+      const msg = err?.message || "Failed to create project"
+      setCreateError(msg)
+      toast.error(msg)
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <div
-      ref={overlayRef}
-      style={{ display: "none" }}
-      onClick={(e) => {
-        if (e.target === overlayRef.current) {
-          triggerClose()
-        }
-      }}
-      className="fixed inset-0 z-50 flex items-end justify-center bg-background/70 p-4 pb-20 backdrop-blur-md sm:p-6 sm:pb-24"
-    >
+    <>
+      {/* Full-screen background blur backdrop */}
       <div
-        ref={sheetRef}
-        className="w-full max-w-md space-y-6 rounded-3xl border border-border/80 bg-card/95 p-8 text-card-foreground shadow-2xl backdrop-blur-xl"
+        ref={backdropRef}
+        aria-hidden="true"
+        style={{ display: "none" }}
+        onClick={onClose}
+        className="fixed inset-0 z-50 bg-black/35 opacity-0 backdrop-blur-md transition-colors dark:bg-black/60"
+      />
+
+      {/* Modal Container */}
+      <div
+        ref={containerRef}
+        style={{ display: "none" }}
+        className="fixed inset-0 z-50 pointer-events-none flex items-end justify-center p-4 pb-20 sm:p-6 sm:pb-24"
       >
-        <div className="sheet-item-anim flex items-center gap-3">
-          <div>
-            <h5>Create New Brand Studio</h5>
-            <p>Give your new brand identity workspace a name.</p>
+        <div
+          ref={cardRef}
+          className="pointer-events-auto relative w-full max-w-md overflow-hidden rounded-3xl border border-border/80 bg-card/90 p-6 text-foreground shadow-2xl backdrop-blur-2xl sm:p-8 dark:border-white/10 dark:bg-zinc-950/90"
+        >
+          {/* Subtle, refined ambient illumination */}
+          <div className="pointer-events-none absolute -top-24 -right-16 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-20 -left-16 h-56 w-56 rounded-full bg-primary/5 blur-3xl" />
+
+          {/* Subtle organic noise grain */}
+          <NoiseTexture
+            noiseOpacity={0.02}
+            frequency={0.5}
+            className="pointer-events-none absolute inset-0 mix-blend-overlay"
+          />
+
+          {/* Close Button */}
+          <Button
+            type="button"
+            onClick={onClose}
+            className="absolute top-4 right-4 z-20 flex size-8 cursor-pointer rounded-full"
+            aria-label="Close"
+            variant="outline"
+          >
+            <IconX size={16} />
+          </Button>
+
+          {/* Modal Header */}
+          <div className="sheet-item-anim flex items-center gap-3 opacity-0">
+            <div>
+              <h5>Create New Brand Project</h5>
+              <p>Give your new brand identity workspace a name.</p>
+            </div>
           </div>
+
+          {createError && (
+            <div className="mt-4 rounded-2xl border border-destructive/20 bg-destructive/10 p-3.5 text-xs text-destructive">
+              {createError}
+            </div>
+          )}
+
+          <form onSubmit={handleCreate} className="mt-6 space-y-5">
+            <div className="sheet-item-anim opacity-0">
+              <Label className="mb-2">Brand / Project Name</Label>
+              <Input
+                ref={inputRef}
+                type="text"
+                required
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
+                placeholder="e.g. Lumina AI, Solstice Motors"
+              />
+            </div>
+
+            <div className="sheet-item-anim flex justify-end gap-3 pt-2 opacity-0">
+              <Button
+                type="button"
+                variant="outline"
+                size="pill"
+                gsapFill
+                onClick={onClose}
+                className="rounded-full"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="shiny"
+                size="pill"
+                gsapFill
+                disabled={isSubmitting}
+                className="rounded-full"
+                icon={isSubmitting ? <Loader /> : undefined}
+              >
+                {isSubmitting ? "Creating..." : "Create Studio"}
+              </Button>
+            </div>
+          </form>
         </div>
-
-        {createError && (
-          <div className="sheet-item-anim rounded-2xl border border-destructive/20 bg-destructive/10 p-3.5 text-xs text-destructive">
-            {createError}
-          </div>
-        )}
-
-        <form onSubmit={handleCreate} className="space-y-5">
-          <div className="sheet-item-anim">
-            <Label className="mb-2">Brand / Project Name</Label>
-            <Input
-              ref={inputRef}
-              type="text"
-              required
-              value={projectName}
-              onChange={(e) => setProjectName(e.target.value)}
-              placeholder="e.g. Lumina AI, Solstice Motors"
-            />
-          </div>
-
-          <div className="sheet-item-anim flex justify-end gap-3 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="pill"
-              gsapFill
-              onClick={triggerClose}
-              className="rounded-full"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="shiny"
-              size="pill"
-              gsapFill
-              disabled={isSubmitting}
-              className="rounded-full"
-              icon={isSubmitting && <Loader />}
-            >
-              {isSubmitting ? "Creating..." : "Create Studio"}
-            </Button>
-          </div>
-        </form>
       </div>
-    </div>
+    </>
   )
 }

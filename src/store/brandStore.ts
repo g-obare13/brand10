@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import type { ColorSwatch } from '@/lib/colorUtils'
 import { createColorSwatch } from '@/lib/colorUtils'
 import { supabase } from '@/lib/supabase'
+import { IMAGERY_MOOD_IMAGE_ARRAYS } from '@/data/wizard'
 
 export interface BrandToneRatings {
   formal: number // 0 (Ultra Casual) to 100 (Formal Corporate)
@@ -56,6 +57,7 @@ export interface BrandState {
   // Imagery & Photography System
   imageryMood: 'minimal' | 'cinematic' | 'vibrant' | 'editorial'
   imageryOverlay: 'none' | 'tint' | 'duotone'
+  imageryLinks: string[]
 
   // Iconography System
   iconStyle: 'stroke' | 'solid' | 'duotone'
@@ -124,6 +126,7 @@ export interface BrandState {
   setImagery: (updates: {
     mood?: 'minimal' | 'cinematic' | 'vibrant' | 'editorial'
     overlay?: 'none' | 'tint' | 'duotone'
+    links?: string[]
   }) => void
 
   // Iconography actions
@@ -377,6 +380,7 @@ export const useBrandStore = create<BrandState>()(
       // Imagery & Photography
       imageryMood: 'minimal',
       imageryOverlay: 'none',
+      imageryLinks: IMAGERY_MOOD_IMAGE_ARRAYS.minimal,
 
       // Iconography
       iconStyle: 'stroke',
@@ -589,10 +593,19 @@ export const useBrandStore = create<BrandState>()(
       },
 
       setImagery: (updates) => {
-        set((state) => ({
-          imageryMood: updates.mood || state.imageryMood,
-          imageryOverlay: updates.overlay || state.imageryOverlay,
-        }))
+        set((state) => {
+          const newMood = updates.mood || state.imageryMood
+          const newLinks =
+            updates.links ||
+            (updates.mood && updates.mood in IMAGERY_MOOD_IMAGE_ARRAYS
+              ? IMAGERY_MOOD_IMAGE_ARRAYS[updates.mood]
+              : state.imageryLinks)
+          return {
+            imageryMood: newMood,
+            imageryOverlay: updates.overlay || state.imageryOverlay,
+            imageryLinks: newLinks,
+          }
+        })
       },
 
       setIconography: (updates) => {
@@ -731,6 +744,11 @@ export const useBrandStore = create<BrandState>()(
               dosAndDonts: data.dos_and_donts || get().dosAndDonts,
               imageryMood: data.imagery_mood || 'minimal',
               imageryOverlay: data.imagery_overlay || 'none',
+              imageryLinks:
+                data.logo_variants?.imagery_links ||
+                (data.imagery_mood && data.imagery_mood in IMAGERY_MOOD_IMAGE_ARRAYS
+                  ? IMAGERY_MOOD_IMAGE_ARRAYS[data.imagery_mood as keyof typeof IMAGERY_MOOD_IMAGE_ARRAYS]
+                  : IMAGERY_MOOD_IMAGE_ARRAYS.minimal),
               iconStyle: data.icon_style || 'stroke',
               iconRadius: Number(data.icon_radius) || 4,
               iconStroke: Number(data.icon_stroke) || 2.0,
@@ -858,6 +876,7 @@ export const useBrandStore = create<BrandState>()(
             logo_variants: {
               secondary_url: secondaryLogo,
               custom_fonts: state.customFonts || [],
+              imagery_links: state.imageryLinks || [],
             },
             clearspace_multiplier: state.clearspaceMultiplier,
             color_palette: state.colorPalette,

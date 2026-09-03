@@ -172,8 +172,7 @@ export function StepColors() {
           </div>
 
           {/* Style Guidance Micro-Tip */}
-          <div className="colors-item-anim flex items-start gap-2.5 rounded-xl border border-border/70 bg-muted/30 p-3 text-[11px] text-muted-foreground">
-            <IconSparkles size={14} className="mt-0.5 shrink-0 text-primary" />
+          <div className="colors-item-anim flex items-start gap-2.5 rounded-xl p-3 text-[11px] text-muted-foreground">
             <div>
               <span className="mr-1 font-semibold text-foreground">
                 {activeMovement.label} Style:

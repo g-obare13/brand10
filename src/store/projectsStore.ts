@@ -1,6 +1,7 @@
-import { create } from 'zustand'
-import { supabase } from '@/lib/supabase'
-import { get as idbGet } from 'idb-keyval'
+import { create } from "zustand"
+import { supabase } from "@/lib/supabase"
+import { get as idbGet } from "idb-keyval"
+import { IMAGERY_MOOD_IMAGE_ARRAYS } from "@/data/wizard"
 
 export interface BrandProjectItem {
   id: string
@@ -21,9 +22,11 @@ interface ProjectsState {
   openCreateModal: () => void
   closeCreateModal: () => void
   fetchProjects: (userId?: string) => Promise<void>
-  createProject: (name: string, userId?: string) => Promise<{ project: BrandProjectItem | null; error: string | null }>
+  createProject: (
+    name: string,
+    userId?: string
+  ) => Promise<{ project: BrandProjectItem | null; error: string | null }>
   deleteProject: (id: string, userId?: string) => Promise<void>
-  duplicateProject: (id: string, userId?: string) => Promise<void>
   isLimitReached: () => boolean
 }
 
@@ -31,7 +34,7 @@ interface ProjectsState {
  * Zustand store managing the user's collection of brand projects.
  * Features:
  * - Real-time project query from Supabase with IndexedDB offline caching.
- * - Project duplication, deletion, and creation.
+ * - Project creation and deletion.
  * - Account project limit enforcement (e.g. 2-brand free tier limit).
  * - Create modal visibility management.
  */
@@ -53,7 +56,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
     if (!supabase || !userId) {
       // Local fallback in memory or localStorage
       try {
-        const saved = localStorage.getItem('brandio_local_projects')
+        const saved = localStorage.getItem("brandio_local_projects")
         if (saved) {
           const parsed: BrandProjectItem[] = JSON.parse(saved)
           const withLogos = await Promise.all(
@@ -90,8 +93,9 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
 
     try {
       const { data, error } = await supabase
-        .from('brand_projects')
-        .select(`
+        .from("brand_projects")
+        .select(
+          `
           id,
           name,
           created_at,
@@ -102,16 +106,20 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
             color_palette,
             vision
           )
-        `)
-        .order('updated_at', { ascending: false })
+        `
+        )
+        .order("updated_at", { ascending: false })
 
       if (error) throw error
 
       const formatted: BrandProjectItem[] = await Promise.all(
         data.map(async (item: any) => {
-          const bd = Array.isArray(item.brand_data) ? item.brand_data[0] : item.brand_data
+          const bd = Array.isArray(item.brand_data)
+            ? item.brand_data[0]
+            : item.brand_data
           const palette = bd?.color_palette || []
-          const primaryColor = palette.find((c: any) => c.role === 'primary')?.hex || '#4f46e5'
+          const primaryColor =
+            palette.find((c: any) => c.role === "primary")?.hex || "#624b59"
 
           let logoUrl = bd?.logo_url
           if (!logoUrl) {
@@ -130,7 +138,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
 
           return {
             id: item.id,
-            name: item.name || 'Untitled Brand',
+            name: item.name || "Untitled Brand",
             created_at: item.created_at,
             updated_at: item.updated_at,
             logo_url: logoUrl,
@@ -143,17 +151,20 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
 
       set({ projects: formatted, loading: false })
     } catch (err: any) {
-      console.warn('Failed to fetch Supabase projects:', err)
-      set({ error: err.message || 'Could not load projects', loading: false })
+      console.warn("Failed to fetch Supabase projects:", err)
+      set({ error: err.message || "Could not load projects", loading: false })
     }
   },
 
   createProject: async (name, userId) => {
     if (get().isLimitReached()) {
-      return { project: null, error: 'Maximum of 2 projects allowed on this plan.' }
+      return {
+        project: null,
+        error: "Maximum of 2 projects allowed on this plan.",
+      }
     }
 
-    const trimmedName = name.trim() || 'Untitled Brand'
+    const trimmedName = name.trim() || "Untitled Brand"
     const newId = `project-${Math.random().toString(36).substring(2, 9)}`
     const now = new Date().toISOString()
     const newProject: BrandProjectItem = {
@@ -162,130 +173,136 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
       brand_name: trimmedName,
       created_at: now,
       updated_at: now,
-      primary_color: '#4f46e5',
+      primary_color: "#624b59",
     }
 
     if (!supabase || !userId) {
       const updated = [newProject, ...get().projects].slice(0, 2)
       set({ projects: updated })
       try {
-        localStorage.setItem('brandio_local_projects', JSON.stringify(updated))
+        localStorage.setItem("brandio_local_projects", JSON.stringify(updated))
         const initialBrandState = {
           projectId: newId,
           brandName: trimmedName,
-          tagline: '',
-          mission: '',
-          vision: '',
-          coreValues: ['Excellence', 'Innovation', 'Integrity', 'Velocity'],
+          tagline: "",
+          mission: "",
+          vision: "",
+          coreValues: ["Excellence", "Innovation", "Integrity", "Velocity"],
           toneRatings: { formal: 60, playful: 20, minimalist: 85, bold: 90 },
-          displayFont: 'Plus Jakarta Sans',
-          bodyFont: 'Inter',
-          monoFont: 'JetBrains Mono',
+          displayFont: "Plus Jakarta Sans",
+          bodyFont: "Inter",
+          monoFont: "JetBrains Mono",
           baseFontSize: 16,
           typeScaleRatio: 1.25,
           clearspaceMultiplier: 1.0,
           dosAndDonts: [
             {
-              id: '1',
-              type: 'dont',
+              id: "1",
+              type: "dont",
               rule: "Don't use outdated versions",
               detail:
-                'If the brand has had past logo iterations, only the current approved version should appear.',
+                "If the brand has had past logo iterations, only the current approved version should appear.",
             },
             {
-              id: '2',
-              type: 'dont',
+              id: "2",
+              type: "dont",
               rule: "Don't add effects",
               detail:
                 "No drop shadows, gradients, outlines, bevels, or glows unless that's part of the actual logo design.",
             },
             {
-              id: '3',
-              type: 'dont',
+              id: "3",
+              type: "dont",
               rule: "Don't recolor outside the approved palette",
-              detail: 'No random or off-brand colors applied to the mark.',
+              detail: "No random or off-brand colors applied to the mark.",
             },
             {
-              id: '4',
-              type: 'dont',
+              id: "4",
+              type: "dont",
               rule: "Don't rotate",
               detail:
-                'Keep the logo at its intended orientation unless a rotated lockup is explicitly part of the system.',
+                "Keep the logo at its intended orientation unless a rotated lockup is explicitly part of the system.",
             },
             {
-              id: '5',
-              type: 'dont',
+              id: "5",
+              type: "dont",
               rule: "Don't stretch or distort",
               detail:
-                'Never scale non-proportionally (squishing horizontally or vertically).',
+                "Never scale non-proportionally (squishing horizontally or vertically).",
             },
           ],
           colorPalette: [
             {
-              id: 'primary',
-              hex: '#4f46e5',
-              name: 'Primary Indigo',
-              role: 'primary',
+              id: "primary",
+              hex: "#624b59",
+              name: "Primary Indigo",
+              role: "primary",
               rgb: { r: 79, g: 70, b: 229 },
               cmyk: { c: 66, m: 69, y: 0, k: 10 },
               hsl: { h: 243, s: 75, l: 59 },
               shades: {
-                50: '#eef2ff',
-                100: '#e0e7ff',
-                200: '#c7d2fe',
-                300: '#a5b4fc',
-                400: '#818cf8',
-                500: '#6366f1',
-                600: '#4f46e5',
-                700: '#4338ca',
-                800: '#3730a3',
-                900: '#312e81',
-                950: '#1e1b4b',
+                50: "#eef2ff",
+                100: "#e0e7ff",
+                200: "#c7d2fe",
+                300: "#a5b4fc",
+                400: "#818cf8",
+                500: "#6366f1",
+                600: "#624b59",
+                700: "#4338ca",
+                800: "#3730a3",
+                900: "#312e81",
+                950: "#1e1b4b",
               },
             },
             {
-              id: 'secondary',
-              hex: '#06b6d4',
-              name: 'Cyber Cyan',
-              role: 'secondary',
+              id: "secondary",
+              hex: "#06b6d4",
+              name: "Cyber Cyan",
+              role: "secondary",
               rgb: { r: 6, g: 182, b: 212 },
               cmyk: { c: 97, m: 14, y: 0, k: 17 },
               hsl: { h: 189, s: 94, l: 43 },
               shades: {},
             },
             {
-              id: 'neutral',
-              hex: '#0f172a',
-              name: 'Midnight Slate',
-              role: 'neutral',
+              id: "neutral",
+              hex: "#0f172a",
+              name: "Midnight Slate",
+              role: "neutral",
               rgb: { r: 15, g: 23, b: 42 },
               cmyk: { c: 64, m: 45, y: 0, k: 84 },
               hsl: { h: 222, s: 47, l: 11 },
               shades: {},
             },
             {
-              id: 'background',
-              hex: '#ffffff',
-              name: 'Pure Surface',
-              role: 'background',
+              id: "background",
+              hex: "#ffffff",
+              name: "Pure Surface",
+              role: "background",
               rgb: { r: 255, g: 255, b: 255 },
               cmyk: { c: 0, m: 0, y: 0, k: 0 },
               hsl: { h: 0, s: 0, l: 100 },
               shades: {},
             },
           ],
-          activeTab: 'overview',
+          imageryMood: "minimal",
+          imageryOverlay: "none",
+          imageryLinks: IMAGERY_MOOD_IMAGE_ARRAYS.minimal,
+          activeTab: "overview",
           isSaving: false,
           lastSavedAt: now,
         }
-        localStorage.setItem(`brandio_local_brand_${newId}`, JSON.stringify(initialBrandState))
+        localStorage.setItem(
+          `brandio_local_brand_${newId}`,
+          JSON.stringify(initialBrandState)
+        )
       } catch {}
       return { project: newProject, error: null }
     }
 
     try {
       const { data, error } = await supabase
-        .from('brand_projects')
+        .from("brand_projects")
         .insert([{ user_id: userId, name: trimmedName }])
         .select()
         .single()
@@ -294,52 +311,52 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
 
       const initialPalette = [
         {
-          id: 'primary',
-          hex: '#4f46e5',
-          name: 'Primary Indigo',
-          role: 'primary',
+          id: "primary",
+          hex: "#624b59",
+          name: "Primary Indigo",
+          role: "primary",
           rgb: { r: 79, g: 70, b: 229 },
           cmyk: { c: 66, m: 69, y: 0, k: 10 },
           hsl: { h: 243, s: 75, l: 59 },
           shades: {
-            50: '#eef2ff',
-            100: '#e0e7ff',
-            200: '#c7d2fe',
-            300: '#a5b4fc',
-            400: '#818cf8',
-            500: '#6366f1',
-            600: '#4f46e5',
-            700: '#4338ca',
-            800: '#3730a3',
-            900: '#312e81',
-            950: '#1e1b4b',
+            50: "#eef2ff",
+            100: "#e0e7ff",
+            200: "#c7d2fe",
+            300: "#a5b4fc",
+            400: "#818cf8",
+            500: "#6366f1",
+            600: "#624b59",
+            700: "#4338ca",
+            800: "#3730a3",
+            900: "#312e81",
+            950: "#1e1b4b",
           },
         },
         {
-          id: 'secondary',
-          hex: '#06b6d4',
-          name: 'Cyber Cyan',
-          role: 'secondary',
+          id: "secondary",
+          hex: "#06b6d4",
+          name: "Cyber Cyan",
+          role: "secondary",
           rgb: { r: 6, g: 182, b: 212 },
           cmyk: { c: 97, m: 14, y: 0, k: 17 },
           hsl: { h: 189, s: 94, l: 43 },
           shades: {},
         },
         {
-          id: 'neutral',
-          hex: '#0f172a',
-          name: 'Midnight Slate',
-          role: 'neutral',
+          id: "neutral",
+          hex: "#0f172a",
+          name: "Midnight Slate",
+          role: "neutral",
           rgb: { r: 15, g: 23, b: 42 },
           cmyk: { c: 64, m: 45, y: 0, k: 84 },
           hsl: { h: 222, s: 47, l: 11 },
           shades: {},
         },
         {
-          id: 'background',
-          hex: '#ffffff',
-          name: 'Pure Surface',
-          role: 'background',
+          id: "background",
+          hex: "#ffffff",
+          name: "Pure Surface",
+          role: "background",
           rgb: { r: 255, g: 255, b: 255 },
           cmyk: { c: 0, m: 0, y: 0, k: 0 },
           hsl: { h: 0, s: 0, l: 100 },
@@ -348,22 +365,27 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
       ]
 
       // Initialize brand_data row with user-chosen name and sensible defaults
-      await supabase.from('brand_data').insert([
+      await supabase.from("brand_data").insert([
         {
           project_id: data.id,
           brand_name: data.name,
-          tagline: '',
-          mission: '',
-          vision: '',
-          core_values: ['Excellence', 'Innovation', 'Integrity', 'Velocity'],
+          tagline: "",
+          mission: "",
+          vision: "",
+          core_values: ["Excellence", "Innovation", "Integrity", "Velocity"],
           tone_ratings: { formal: 60, playful: 20, minimalist: 85, bold: 90 },
           color_palette: initialPalette,
-          display_font: 'Plus Jakarta Sans',
-          body_font: 'Inter',
-          monospace_font: 'JetBrains Mono',
+          display_font: "Plus Jakarta Sans",
+          body_font: "Inter",
+          monospace_font: "JetBrains Mono",
           base_font_size: 16,
           type_scale_ratio: 1.25,
           clearspace_multiplier: 1.0,
+          imagery_mood: "minimal",
+          imagery_overlay: "none",
+          logo_variants: {
+            imagery_links: IMAGERY_MOOD_IMAGE_ARRAYS.minimal,
+          },
         },
       ])
 
@@ -373,13 +395,13 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
         created_at: data.created_at,
         updated_at: data.updated_at,
         brand_name: data.name,
-        primary_color: '#4f46e5',
+        primary_color: "#624b59",
       }
 
       set({ projects: [createdItem, ...get().projects] })
       return { project: createdItem, error: null }
     } catch (err: any) {
-      return { project: null, error: err.message || 'Could not create project' }
+      return { project: null, error: err.message || "Could not create project" }
     }
   },
 
@@ -387,59 +409,26 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
     const filtered = get().projects.filter((p) => p.id !== id)
     set({ projects: filtered })
     try {
-      localStorage.setItem('brandio_local_projects', JSON.stringify(filtered))
+      localStorage.setItem("brandio_local_projects", JSON.stringify(filtered))
       localStorage.removeItem(`brandio_local_brand_${id}`)
     } catch {}
 
     if (supabase) {
       try {
         // Delete child brand_data explicitly and then brand_projects
-        await supabase.from('brand_data').delete().eq('project_id', id)
-        const { error } = await supabase.from('brand_projects').delete().eq('id', id)
+        await supabase.from("brand_data").delete().eq("project_id", id)
+        const { error } = await supabase
+          .from("brand_projects")
+          .delete()
+          .eq("id", id)
         if (error) {
-          console.error('Failed to delete project from Supabase:', error)
+          console.error("Failed to delete project from Supabase:", error)
           if (userId) {
             get().fetchProjects(userId)
           }
         }
       } catch (err) {
-        console.error('Failed to delete project:', err)
-      }
-    }
-  },
-
-  duplicateProject: async (id: string, userId?: string) => {
-    if (get().isLimitReached()) {
-      return
-    }
-    const source = get().projects.find((p) => p.id === id)
-    if (!source) return
-
-    const { project } = await get().createProject(`${source.name} (Copy)`, userId)
-    if (!project) return
-
-    // Copy brand_data if available
-    if (supabase && project.id) {
-      try {
-        const { data: sourceData } = await supabase
-          .from('brand_data')
-          .select('*')
-          .eq('project_id', id)
-          .maybeSingle()
-
-        if (sourceData) {
-          const { id: _unusedId, project_id: _unusedProjId, ...rest } = sourceData
-          await supabase
-            .from('brand_data')
-            .update({
-              ...rest,
-              brand_name: `${source.name} (Copy)`,
-              updated_at: new Date().toISOString(),
-            })
-            .eq('project_id', project.id)
-        }
-      } catch (err) {
-        console.warn('Failed to copy full brand data for duplicate:', err)
+        console.error("Failed to delete project:", err)
       }
     }
   },
