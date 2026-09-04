@@ -15,8 +15,8 @@ interface A4PageFrameProps {
   id: string
   pageNumber: number
   totalPages: number
-  sectionNumber: string
-  sectionTitle: string
+  sectionNumber?: string
+  sectionTitle?: string
   brandName: string
   styleTheme: PreviewStyleId
   displayFont: string
@@ -24,6 +24,7 @@ interface A4PageFrameProps {
   monoFont: string
   children: React.ReactNode
   isCover?: boolean
+  websiteUrl?: string
   className?: string
 }
 
@@ -36,7 +37,7 @@ export function A4PageFrame({
   id,
   pageNumber,
   totalPages,
-  sectionNumber,
+  sectionNumber: _sectionNumber,
   sectionTitle,
   brandName,
   styleTheme,
@@ -45,6 +46,7 @@ export function A4PageFrame({
   monoFont,
   children,
   isCover = false,
+  websiteUrl: _websiteUrl = "www.brand10.vercel.app",
   className,
 }: A4PageFrameProps) {
   // Determine page theme classes based on selected style
@@ -107,7 +109,8 @@ export function A4PageFrame({
     },
   }
 
-  const currentTheme = themeStyles[styleTheme] ?? themeStyles["quiet-precision"]
+  const currentTheme = themeStyles[styleTheme]
+  const currentYear = new Date().getFullYear()
 
   return (
     <div
@@ -115,7 +118,7 @@ export function A4PageFrame({
       data-page={pageNumber}
       className={cn(
         "preview-a4-page relative mx-auto flex flex-col justify-between overflow-hidden shadow-2xl transition-all duration-300 print:shadow-none print:m-0",
-        "w-[794px] min-h-[1123px] max-h-[1123px] p-12 border",
+        "w-[794px] min-w-[794px] max-w-[794px] h-[1123px] min-h-[1123px] max-h-[1123px] p-12 border",
         currentTheme.pageBg,
         className
       )}
@@ -127,60 +130,55 @@ export function A4PageFrame({
         } as React.CSSProperties
       }
     >
-      {/* Top Header - Omitted on Cover for artistic presentation */}
+      {/* Top Header - Omitted on Cover */}
       {!isCover && (
-        <header
-          className={cn(
-            "flex items-center justify-between pb-4 border-b text-xs transition-colors shrink-0",
-            currentTheme.headerBorder,
-            currentTheme.metaColor
-          )}
-        >
-          <div className="flex items-center gap-3">
-            <span className="font-mono font-semibold tracking-wider uppercase">
-              {sectionNumber}
-            </span>
-            <span className="h-3 w-px bg-current opacity-30" />
-            <span className="font-medium tracking-wide uppercase">
-              {sectionTitle}
-            </span>
+        <header className="shrink-0 space-y-2 pb-2">
+          <div className="flex items-center justify-between text-xs tracking-tight text-black">
+            <div className="font-semibold uppercase tracking-wider text-[11px] text-zinc-900">
+              {sectionTitle || "Brand Guidelines"}
+            </div>
+
+            <div className="text-xs font-semibold text-black/80">
+              {currentYear}
+            </div>
           </div>
 
-          <div className="flex items-center gap-3 font-mono text-[11px]">
-            <span className="font-semibold">{brandName || "Brand System"}</span>
-            <span className="opacity-40">|</span>
-            <span className="tracking-widest uppercase">Guidelines</span>
+          {/* Custom line UI in header: thin hairline on left, gap, thick black accent bar on right */}
+          <div className="flex w-full items-end gap-3 pt-0.5">
+            <div className="h-px flex-1 bg-zinc-300" />
+            <div className="h-1 w-28 bg-black" />
           </div>
         </header>
       )}
 
       {/* Main Page Content Body */}
-      <main className="flex-1 py-6 flex flex-col justify-between overflow-hidden">
+      <main className="flex-1 py-4 flex flex-col justify-between overflow-hidden">
         {children}
       </main>
 
-      {/* Bottom Footer */}
-      <footer
-        className={cn(
-          "flex items-center justify-between pt-4 border-t text-[11px] font-mono shrink-0",
-          currentTheme.footerBorder,
-          currentTheme.metaColor
-        )}
-      >
-        <div className="flex items-center gap-2">
-          <span>{brandName || "Brand"} Guidelines</span>
-          <span className="opacity-30">•</span>
-          <span className="capitalize">{styleTheme} Edition</span>
-        </div>
+      {/* Bottom Footer - Omitted on Cover */}
+      {!isCover && (
+        <footer className="shrink-0 space-y-3 pt-2">
+          {/* Custom line UI in footer: thin hairline on left, gap, thick black accent bar on right */}
+          <div className="flex w-full items-end gap-3">
+            <div className="h-px flex-1 bg-zinc-300" />
+            <div className="h-1 w-28 bg-black" />
+          </div>
 
-        <div className="flex items-center gap-4">
-          <span className="opacity-70">Confidential</span>
-          <span className="font-semibold">
-            {pageNumber.toString().padStart(2, "0")} /{" "}
-            {totalPages.toString().padStart(2, "0")}
-          </span>
-        </div>
-      </footer>
+          <div className="flex items-center justify-between text-xs text-black">
+            <div className="font-semibold tracking-tight text-zinc-900">
+              {brandName || "Brand"}
+            </div>
+
+            <div className="text-xs text-zinc-600 font-medium">
+              <span>
+                {pageNumber.toString().padStart(2, "0")} /{" "}
+                {totalPages.toString().padStart(2, "0")}
+              </span>
+            </div>
+          </div>
+        </footer>
+      )}
     </div>
   )
 }

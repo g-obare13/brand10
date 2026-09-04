@@ -1,25 +1,24 @@
-import { useEffect, useRef, useState } from "react"
-import { useBrandStore } from "@/store/brandStore"
-import { loadGoogleFont } from "@/lib/fontLoader"
 import { Button } from "@/components/ui/button"
-import { Loader } from "@/components/ui/loader"
-import { cn } from "@/lib/utils"
-import type { PreviewStyleId } from "./pages/A4PageFrame"
-import { PageCover } from "./pages/PageCover"
-import { PageLogo } from "./pages/PageLogo"
-import { PageColors } from "./pages/PageColors"
-import { PageTypography } from "./pages/PageTypography"
-import { PageImagery } from "./pages/PageImagery"
-import { PageTouchpoints } from "./pages/PageTouchpoints"
+import { loadGoogleFont } from "@/lib/fontLoader"
+import { useBrandStore } from "@/store/brandStore"
 import {
+  IconChevronLeft,
+  IconChevronRight,
   IconZoomIn,
   IconZoomOut,
   IconZoomReset,
-  IconChevronLeft,
-  IconChevronRight,
-  IconPrinter,
-  IconDownload,
 } from "@tabler/icons-react"
+import { useEffect, useRef, useState } from "react"
+import type { PreviewStyleId } from "./pages/A4PageFrame"
+import { PageColors } from "./pages/PageColors"
+import { PageCover } from "./pages/PageCover"
+import { PageFoundation } from "./pages/PageFoundation"
+import { PageImagery } from "./pages/PageImagery"
+import { PageLogo } from "./pages/PageLogo"
+import { PageSecondaryLogo } from "./pages/PageSecondaryLogo"
+import { PageTableOfContents } from "./pages/PageTableOfContents"
+import { PageTouchpoints } from "./pages/PageTouchpoints"
+import { PageTypography } from "./pages/PageTypography"
 
 interface PdfDocumentCanvasProps {
   styleTheme: PreviewStyleId
@@ -33,8 +32,8 @@ export function PdfDocumentCanvas({
   styleTheme,
   activePage,
   onPageChange,
-  onDownloadPdf,
-  isDownloadingPdf = false,
+  onDownloadPdf: _onDownloadPdf,
+  isDownloadingPdf: _isDownloadingPdf = false,
 }: PdfDocumentCanvasProps) {
   const brand = useBrandStore()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -135,12 +134,13 @@ export function PdfDocumentCanvas({
   }
 
   const handleZoomIn = () => setZoom((prev) => Math.min(1.3, prev + 0.1))
-  const handleZoomOut = () => setZoom((prev) => Math.max(0.5, prev - 0.1))
+  const handleZoomOut = () => setZoom((prev) => Math.max(0.4, prev - 0.1))
   const handleZoomReset = () => setZoom(0.85)
 
-  const handlePrint = () => {
-    window.print()
-  }
+  const hasSecondaryLogo = Boolean(
+    brand.secondarySvgContent?.trim() || brand.secondaryLogoUrl?.trim()
+  )
+  const totalPages = hasSecondaryLogo ? 9 : 8
 
   const primaryColor =
     brand.colorPalette.find((c) => c.role === "primary")?.hex || "#6366f1"
@@ -167,16 +167,16 @@ export function PdfDocumentCanvas({
           </Button>
 
           <span className="min-w-16 text-center font-medium">
-            {activePage} / 6
+            {activePage} / {totalPages}
           </span>
 
           <Button
             variant="ghost"
             size="sm"
             onClick={() => {
-              if (activePage < 6) scrollToPage(activePage + 1)
+              if (activePage < totalPages) scrollToPage(activePage + 1)
             }}
-            disabled={activePage >= 6}
+            disabled={activePage >= totalPages}
             className="size-8 p-0 text-primary-300 hover:bg-primary-50/10 hover:text-primary-50"
             title="Next Page"
           >
@@ -286,23 +286,64 @@ export function PdfDocumentCanvas({
               monoFont={brand.monoFont}
             />
 
-            {/* Page 2: Logo System & Geometry */}
+            {/* Page 2: Table of Contents */}
+            <PageTableOfContents
+              brandName={brand.brandName}
+              styleTheme={styleTheme}
+              displayFont={brand.displayFont}
+              bodyFont={brand.bodyFont}
+              monoFont={brand.monoFont}
+              totalPages={totalPages}
+            />
+
+            {/* Page 3: Brand Strategy & Foundation */}
+            <PageFoundation
+              brandName={brand.brandName}
+              tagline={brand.tagline}
+              mission={brand.mission}
+              vision={brand.vision}
+              coreValues={brand.coreValues}
+              brandPillars={brand.brandPillars}
+              styleTheme={styleTheme}
+              displayFont={brand.displayFont}
+              bodyFont={brand.bodyFont}
+              monoFont={brand.monoFont}
+              pageNumber={3}
+              totalPages={totalPages}
+            />
+
+            {/* Page 4: Primary Logo System & Geometry */}
             <PageLogo
               brandName={brand.brandName}
               primaryColor={primaryColor}
               svgContent={brand.svgContent}
               rasterDataUri={brand.rasterDataUri}
-              secondarySvgContent={brand.secondarySvgContent}
-              isVector={brand.isVector}
-              clearspaceMultiplier={brand.clearspaceMultiplier}
               dosAndDonts={brand.dosAndDonts}
               styleTheme={styleTheme}
               displayFont={brand.displayFont}
               bodyFont={brand.bodyFont}
               monoFont={brand.monoFont}
+              pageNumber={4}
+              totalPages={totalPages}
             />
 
-            {/* Page 3: Color Matrix & Palette */}
+            {/* Page 5: Secondary Logo & Lockup (Rendered on its own page if it exists) */}
+            {hasSecondaryLogo && (
+              <PageSecondaryLogo
+                brandName={brand.brandName}
+                primaryColor={primaryColor}
+                secondarySvgContent={brand.secondarySvgContent}
+                secondaryLogoUrl={brand.secondaryLogoUrl}
+                styleTheme={styleTheme}
+                displayFont={brand.displayFont}
+                bodyFont={brand.bodyFont}
+                monoFont={brand.monoFont}
+                pageNumber={5}
+                totalPages={totalPages}
+              />
+            )}
+
+            {/* Page 5 or 6: Color Matrix & Palette */}
             <PageColors
               brandName={brand.brandName}
               colors={brand.colorPalette}
@@ -310,9 +351,11 @@ export function PdfDocumentCanvas({
               displayFont={brand.displayFont}
               bodyFont={brand.bodyFont}
               monoFont={brand.monoFont}
+              pageNumber={hasSecondaryLogo ? 6 : 5}
+              totalPages={totalPages}
             />
 
-            {/* Page 4: Typography Hierarchy */}
+            {/* Page 6 or 7: Typography Hierarchy */}
             <PageTypography
               brandName={brand.brandName}
               displayFont={brand.displayFont}
@@ -321,9 +364,11 @@ export function PdfDocumentCanvas({
               typeScaleRatio={brand.typeScaleRatio}
               baseFontSize={brand.baseFontSize}
               styleTheme={styleTheme}
+              pageNumber={hasSecondaryLogo ? 7 : 6}
+              totalPages={totalPages}
             />
 
-            {/* Page 5: Imagery & Mood Direction */}
+            {/* Page 7 or 8: Imagery & Mood Direction */}
             <PageImagery
               brandName={brand.brandName}
               imageryMood={brand.imageryMood}
@@ -333,9 +378,11 @@ export function PdfDocumentCanvas({
               displayFont={brand.displayFont}
               bodyFont={brand.bodyFont}
               monoFont={brand.monoFont}
+              pageNumber={hasSecondaryLogo ? 8 : 7}
+              totalPages={totalPages}
             />
 
-            {/* Page 6: Touchpoint Specs & Governance */}
+            {/* Page 8 or 9: Touchpoint Specs & Governance */}
             <PageTouchpoints
               brandName={brand.brandName}
               iconStyle={brand.iconStyle}
@@ -346,6 +393,8 @@ export function PdfDocumentCanvas({
               displayFont={brand.displayFont}
               bodyFont={brand.bodyFont}
               monoFont={brand.monoFont}
+              pageNumber={hasSecondaryLogo ? 9 : 8}
+              totalPages={totalPages}
             />
           </div>
         </div>

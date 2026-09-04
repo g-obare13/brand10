@@ -13,6 +13,7 @@ import type { ColorSwatch } from "@/lib/colorUtils"
 import { getWcagContrast } from "@/lib/colorUtils"
 import { computeTypeScale } from "@/lib/fontLoader"
 import type { BrandDoDontItem } from "@/store/brandStore"
+import { DEFAULT_DOS_AND_DONTS } from "@/store/brandStore"
 import type { PreviewStyleId } from "@/components/wizard/preview/pages/A4PageFrame"
 import { IMAGERY_MOOD_IMAGE_ARRAYS } from "@/data/wizard"
 
@@ -944,37 +945,8 @@ export const BrandPdfDeck: React.FC<BrandPdfProps> = ({
               }}
             >
               {(dosAndDonts.length > 0
-                ? dosAndDonts.slice(0, 4)
-                : [
-                    {
-                      id: "1",
-                      type: "do" as const,
-                      rule: "Use approved vectors",
-                      detail:
-                        "Always scale proportionately using source vector assets.",
-                    },
-                    {
-                      id: "2",
-                      type: "dont" as const,
-                      rule: "Do not distort",
-                      detail:
-                        "Never skew, rotate off-axis, or alter geometry.",
-                    },
-                    {
-                      id: "3",
-                      type: "do" as const,
-                      rule: "Maintain contrast",
-                      detail:
-                        "Ensure background values pass minimum accessibility requirements.",
-                    },
-                    {
-                      id: "4",
-                      type: "dont" as const,
-                      rule: "Do not add unapproved effects",
-                      detail:
-                        "No unapproved drop shadows, outer glows, or bevels.",
-                    },
-                  ]
+                ? dosAndDonts
+                : DEFAULT_DOS_AND_DONTS
               ).map((item) => (
                 <View
                   key={item.id}

@@ -13,6 +13,8 @@ interface PageImageryProps {
   displayFont: string
   bodyFont: string
   monoFont: string
+  pageNumber?: number
+  totalPages?: number
 }
 
 export function PageImagery({
@@ -23,6 +25,8 @@ export function PageImagery({
   displayFont,
   bodyFont,
   monoFont,
+  pageNumber = 7,
+  totalPages = 8,
 }: PageImageryProps) {
   // Map styleTheme to available imagery mood arrays
   const moodMap: Record<PreviewStyleId, "minimal" | "cinematic" | "vibrant" | "editorial"> = {
@@ -78,8 +82,8 @@ export function PageImagery({
   return (
     <A4PageFrame
       id="page-05"
-      pageNumber={5}
-      totalPages={6}
+      pageNumber={pageNumber}
+      totalPages={totalPages}
       sectionNumber="05"
       sectionTitle="Imagery & Mood Direction"
       brandName={brandName}

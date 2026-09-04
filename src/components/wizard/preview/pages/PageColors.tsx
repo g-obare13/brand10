@@ -13,6 +13,8 @@ interface PageColorsProps {
   displayFont: string
   bodyFont: string
   monoFont: string
+  pageNumber?: number
+  totalPages?: number
 }
 
 export function PageColors({
@@ -22,6 +24,8 @@ export function PageColors({
   displayFont,
   bodyFont,
   monoFont,
+  pageNumber = 5,
+  totalPages = 8,
 }: PageColorsProps) {
   // Safe default colors if empty
   const activeColors = colors.length > 0 ? colors.slice(0, 5) : [
@@ -35,8 +39,8 @@ export function PageColors({
   return (
     <A4PageFrame
       id="page-03"
-      pageNumber={3}
-      totalPages={6}
+      pageNumber={pageNumber}
+      totalPages={totalPages}
       sectionNumber="03"
       sectionTitle="Color Matrix & Palette"
       brandName={brandName}

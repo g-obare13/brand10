@@ -24,13 +24,15 @@ export function PdfPreviewStudio({ projectId }: PdfPreviewStudioProps) {
   const brand = useBrandStore()
 
   // Track initial style from store designMovement or tone matching from stepFoundation
+  const matchedMovement = DESIGN_MOVEMENTS.find((m) =>
+    Object.entries(m.tones).every(
+      ([k, v]) => brand.toneRatings[k as keyof BrandToneRatings] === v
+    )
+  )?.id
+
   const initialStyle: PreviewStyleId =
-    (brand.designMovement as PreviewStyleId) ||
-    (DESIGN_MOVEMENTS.find((m) =>
-      Object.entries(m.tones).every(
-        ([k, v]) => brand.toneRatings[k as keyof BrandToneRatings] === v
-      )
-    )?.id as PreviewStyleId) ||
+    (brand.designMovement as PreviewStyleId | undefined) ??
+    (matchedMovement as PreviewStyleId | undefined) ??
     "quiet-precision"
 
   const [activeStyle, setActiveStyle] = useState<PreviewStyleId>(initialStyle)

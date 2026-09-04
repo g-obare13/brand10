@@ -1,4 +1,5 @@
 import { DESIGN_MOVEMENTS } from "@/data/wizard"
+import type { BrandPillar } from "@/store/brandStore"
 import { useBrandStore } from "@/store/brandStore"
 import { getPreviewTheme } from "./previewTheme"
 import type { PreviewStyleConfig } from "./previewTheme"
@@ -73,7 +74,18 @@ export function StepFoundationPreviewSkeleton({
         </div>
       </div>
 
-      {/* 3. Live UI Component Demos Skeleton */}
+      {/* 3. Pillars Skeleton */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className={theme.tileCard}>
+            <Skeleton className="h-3 w-8 rounded-md" />
+            <Skeleton className="my-1.5 h-4 w-20 rounded-md" />
+            <Skeleton className="h-3 w-full rounded-md" />
+          </div>
+        ))}
+      </div>
+
+      {/* 4. Live UI Component Demos Skeleton */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className={theme.interactiveCard}>
           <div className="flex items-center justify-between">
@@ -218,6 +230,42 @@ export function StepFoundationPreview({
               "Define the future world your brand is actively shaping over the next decade."}
             &rdquo;
           </p>
+        </div>
+      </div>
+
+      {/* 3. Core Brand Pillars Preview Grid */}
+      <div className="space-y-2.5">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-semibold text-muted-foreground uppercase">
+            Brand Pillars
+          </span>
+          <Badge className={theme.badge}>3 Pillars</Badge>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {[0, 1, 2].map((idx) => {
+            const pillar = (brand.brandPillars as (BrandPillar | undefined)[])[idx]
+            const title = pillar ? pillar.title.trim() : ""
+            const desc = pillar ? pillar.desc.trim() : ""
+            return (
+              <div
+                key={idx}
+                className={`${theme.tileCard} preview-card-anim flex flex-col justify-between space-y-2 p-3.5`}
+              >
+                <div className="space-y-1">
+                  <div className="text-[11px] font-bold text-muted-foreground">
+                    0{idx + 1}
+                  </div>
+                  <div className="text-sm font-semibold text-foreground">
+                    {title || `Pillar 0${idx + 1}`}
+                  </div>
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    {desc || "Awaiting pillar description in Step 1."}
+                  </p>
+                </div>
+              </div>
+            )
+          })}
         </div>
       </div>
 

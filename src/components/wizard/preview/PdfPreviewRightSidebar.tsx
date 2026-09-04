@@ -6,14 +6,11 @@ import { Badge } from "@/components/ui/badge"
 import { Loader } from "@/components/ui/loader"
 import { buildAndDownloadZip } from "@/lib/zipBuilder"
 import { toast } from "sonner"
-import { cn } from "@/lib/utils"
 import {
   IconDownload,
   IconPackage,
   IconPrinter,
-  IconSparkles,
   IconArrowRight,
-  IconExternalLink,
   IconDeviceFloppy,
 } from "@tabler/icons-react"
 

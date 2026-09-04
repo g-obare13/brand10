@@ -21,6 +21,48 @@ export interface BrandDoDontItem {
   detail: string
 }
 
+export const DEFAULT_DOS_AND_DONTS: BrandDoDontItem[] = [
+  {
+    id: '1',
+    type: 'dont',
+    rule: "Don't use outdated versions",
+    detail:
+      'If the brand has had past logo iterations, only the current approved version should appear.',
+  },
+  {
+    id: '2',
+    type: 'dont',
+    rule: "Don't add effects",
+    detail:
+      "No drop shadows, gradients, outlines, bevels, or glows unless that's part of the actual logo design.",
+  },
+  {
+    id: '3',
+    type: 'dont',
+    rule: "Don't recolor outside the approved palette",
+    detail: 'No random or off-brand colors applied to the mark.',
+  },
+  {
+    id: '4',
+    type: 'dont',
+    rule: "Don't rotate",
+    detail:
+      'Keep the logo at its intended orientation unless a rotated lockup is explicitly part of the system.',
+  },
+  {
+    id: '5',
+    type: 'dont',
+    rule: "Don't stretch or distort",
+    detail:
+      'Never scale non-proportionally (squishing horizontally or vertically).',
+  },
+]
+
+export interface BrandPillar {
+  title: string
+  desc: string
+}
+
 export interface BrandState {
   projectId: string
   brandName: string
@@ -28,6 +70,7 @@ export interface BrandState {
   mission: string
   vision: string
   coreValues: string[]
+  brandPillars: BrandPillar[]
   toneRatings: BrandToneRatings
   designMovement?: string
 
@@ -81,6 +124,8 @@ export interface BrandState {
   setCoreValues: (values: string[]) => void
   addCoreValue: (val: string) => void
   removeCoreValue: (index: number) => void
+  setBrandPillars: (pillars: BrandPillar[]) => void
+  setPillar: (index: number, pillar: Partial<BrandPillar>) => void
   setToneRating: (key: keyof BrandToneRatings, value: number) => void
   setDesignMovement: (movementId: string | null) => void
 
@@ -101,6 +146,7 @@ export interface BrandState {
   setClearspaceMultiplier: (multiplier: number) => void
   addDoDont: (item: Omit<BrandDoDontItem, 'id'>) => void
   removeDoDont: (id: string) => void
+  setDosAndDonts: (rules: BrandDoDontItem[]) => void
 
   // Color actions
   setColorPalette: (colors: ColorSwatch[]) => void
@@ -301,7 +347,7 @@ export async function deleteLogoFromSupabase(
         .from(bucket)
         .list(loc.path, { limit: 100, search: loc.prefix })
 
-      if (!error && data) {
+      if (!error) {
         data
           .filter((f) => f.name.startsWith(loc.prefix))
           .forEach((f) => pathsToDelete.add(`${loc.path}/${f.name}`))
@@ -413,7 +459,7 @@ export async function deleteCustomFontFromSupabase(
         .from(bucket)
         .list(loc.path, { limit: 100, search: loc.prefix })
 
-      if (!error && data) {
+      if (!error) {
         data
           .filter((f) => f.name.startsWith(loc.prefix))
           .forEach((f) => pathsToDelete.add(`${loc.path}/${f.name}`))
@@ -454,7 +500,8 @@ export const useBrandStore = create<BrandState>()(
       tagline: '',
       mission: '',
       vision: '',
-      coreValues: ['Excellence', 'Innovation', 'Integrity', 'Velocity'],
+      coreValues: [],
+      brandPillars: [],
       toneRatings: { formal: 60, playful: 20, minimalist: 85, bold: 90 },
       designMovement: 'quiet-precision',
 
@@ -462,42 +509,7 @@ export const useBrandStore = create<BrandState>()(
       isVector: true,
       aspectRatio: 1.0,
       clearspaceMultiplier: 1.0,
-      dosAndDonts: [
-        {
-          id: '1',
-          type: 'dont',
-          rule: "Don't use outdated versions",
-          detail:
-            'If the brand has had past logo iterations, only the current approved version should appear.',
-        },
-        {
-          id: '2',
-          type: 'dont',
-          rule: "Don't add effects",
-          detail:
-            "No drop shadows, gradients, outlines, bevels, or glows unless that's part of the actual logo design.",
-        },
-        {
-          id: '3',
-          type: 'dont',
-          rule: "Don't recolor outside the approved palette",
-          detail: 'No random or off-brand colors applied to the mark.',
-        },
-        {
-          id: '4',
-          type: 'dont',
-          rule: "Don't rotate",
-          detail:
-            'Keep the logo at its intended orientation unless a rotated lockup is explicitly part of the system.',
-        },
-        {
-          id: '5',
-          type: 'dont',
-          rule: "Don't stretch or distort",
-          detail:
-            'Never scale non-proportionally (squishing horizontally or vertically).',
-        },
-      ],
+      dosAndDonts: DEFAULT_DOS_AND_DONTS,
 
       // Colors
       colorPalette: defaultApex.colors,
@@ -539,6 +551,27 @@ export const useBrandStore = create<BrandState>()(
       },
       removeCoreValue: (index) => {
         set({ coreValues: get().coreValues.filter((_, i) => i !== index) })
+      },
+      setBrandPillars: (pillars) => {
+        set({
+          brandPillars: pillars,
+          coreValues: pillars.map((p) => p.title).filter(Boolean),
+        })
+      },
+      setPillar: (index, pillar) => {
+        const current = [...get().brandPillars]
+        while (current.length <= index) {
+          current.push({ title: '', desc: '' })
+        }
+        const existing = current[index] ?? { title: '', desc: '' }
+        current[index] = {
+          title: pillar.title !== undefined ? pillar.title : existing.title,
+          desc: pillar.desc !== undefined ? pillar.desc : existing.desc,
+        }
+        set({
+          brandPillars: current,
+          coreValues: current.map((p) => p.title).filter(Boolean),
+        })
       },
       setToneRating: (key, value) => {
         set({ toneRatings: { ...get().toneRatings, [key]: value } })
@@ -647,6 +680,9 @@ export const useBrandStore = create<BrandState>()(
       },
       removeDoDont: (id) => {
         set({ dosAndDonts: get().dosAndDonts.filter((r) => r.id !== id) })
+      },
+      setDosAndDonts: (rules) => {
+        set({ dosAndDonts: rules })
       },
 
       setColorPalette: (colors) => set({ colorPalette: colors }),
@@ -974,7 +1010,8 @@ export const useBrandStore = create<BrandState>()(
               tagline: data.tagline || '',
               mission: data.mission || '',
               vision: data.vision || '',
-              coreValues: data.core_values || ['Excellence', 'Innovation', 'Integrity', 'Velocity'],
+              coreValues: data.core_values || [],
+              brandPillars: data.brand_pillars || [],
               toneRatings: data.tone_ratings || defaultApex.toneRatings,
               designMovement: data.design_movement || data.tone_ratings?.design_movement || 'quiet-precision',
               logoUrl: data.logo_url,
@@ -990,7 +1027,10 @@ export const useBrandStore = create<BrandState>()(
               baseFontSize: Number(data.base_font_size) || 16,
               typeScaleRatio: Number(data.type_scale_ratio) || 1.25,
               customFonts: data.logo_variants?.custom_fonts || [],
-              dosAndDonts: data.dos_and_donts || get().dosAndDonts,
+              dosAndDonts:
+                Array.isArray(data.dos_and_donts) && data.dos_and_donts.length > 0
+                  ? data.dos_and_donts
+                  : DEFAULT_DOS_AND_DONTS,
               imageryMood: data.imagery_mood || 'minimal',
               imageryOverlay: data.imagery_overlay || 'none',
               imageryLinks:
@@ -1032,7 +1072,10 @@ export const useBrandStore = create<BrandState>()(
               baseFontSize: 16,
               typeScaleRatio: 1.25,
               clearspaceMultiplier: 1.0,
-              dosAndDonts: get().dosAndDonts,
+              dosAndDonts:
+                get().dosAndDonts.length > 0
+                  ? get().dosAndDonts
+                  : DEFAULT_DOS_AND_DONTS,
               imageryMood: 'minimal',
               imageryOverlay: 'none',
               iconStyle: 'stroke',
@@ -1095,6 +1138,15 @@ export const useBrandStore = create<BrandState>()(
           return
         }
 
+        const effectiveDosAndDonts =
+          state.dosAndDonts.length > 0
+            ? state.dosAndDonts
+            : DEFAULT_DOS_AND_DONTS
+
+        if (state.dosAndDonts.length === 0) {
+          set({ dosAndDonts: DEFAULT_DOS_AND_DONTS })
+        }
+
         set({ isSaving: true, syncStatus: 'saving', saveError: null })
         try {
           const primaryLogo =
@@ -1116,6 +1168,7 @@ export const useBrandStore = create<BrandState>()(
             mission: state.mission,
             vision: state.vision,
             core_values: state.coreValues,
+            brand_pillars: state.brandPillars,
             tone_ratings: {
               ...state.toneRatings,
               design_movement: state.designMovement,
@@ -1134,7 +1187,7 @@ export const useBrandStore = create<BrandState>()(
             monospace_font: state.monoFont,
             base_font_size: state.baseFontSize,
             type_scale_ratio: state.typeScaleRatio,
-            dos_and_donts: state.dosAndDonts,
+            dos_and_donts: effectiveDosAndDonts,
             imagery_mood: state.imageryMood,
             imagery_overlay: state.imageryOverlay,
             icon_style: state.iconStyle,

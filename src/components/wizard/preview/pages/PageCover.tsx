@@ -1,7 +1,5 @@
-import { Badge } from "@/components/ui/badge"
-import { A4PageFrame  } from "./A4PageFrame"
-import type {PreviewStyleId} from "./A4PageFrame";
-import { cn } from "@/lib/utils"
+import type { PreviewStyleId } from "./A4PageFrame"
+import { A4PageFrame } from "./A4PageFrame"
 
 interface PageCoverProps {
   brandName: string
@@ -9,7 +7,7 @@ interface PageCoverProps {
   mission: string
   vision: string
   coreValues: string[]
-  primaryColor: string
+  primaryColor?: string
   secondaryColor?: string
   svgContent?: string
   rasterDataUri?: string
@@ -17,167 +15,154 @@ interface PageCoverProps {
   displayFont: string
   bodyFont: string
   monoFont: string
+  totalPages?: number
+  websiteUrl?: string
 }
 
 export function PageCover({
   brandName,
-  tagline,
-  mission,
-  vision,
-  coreValues,
-  primaryColor,
-  secondaryColor = "#0ea5e9",
+  primaryColor = "#18181b",
   svgContent,
   rasterDataUri,
   styleTheme,
   displayFont,
   bodyFont,
   monoFont,
+  totalPages = 9,
+  websiteUrl = "www.brand10.vercel.app",
 }: PageCoverProps) {
-  const monogram = (brandName || "Brand").charAt(0).toUpperCase()
-  const activeYear = new Date().getFullYear()
+  const currentYear = new Date().getFullYear()
 
   return (
     <A4PageFrame
       id="page-01"
       pageNumber={1}
-      totalPages={6}
-      sectionNumber="01"
-      sectionTitle="Identity Overview"
+      totalPages={totalPages}
       brandName={brandName}
       styleTheme={styleTheme}
       displayFont={displayFont}
       bodyFont={bodyFont}
       monoFont={monoFont}
       isCover
+      websiteUrl={websiteUrl}
+      className="overflow-hidden border border-zinc-200 bg-white p-0 shadow-2xl"
     >
-      <div className="flex h-full flex-col justify-between py-6">
-        {/* Top Cover Header Bar */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Badge variant="outline" className="font-mono text-[11px] uppercase tracking-wider">
-              Brand Guidelines
-            </Badge>
-            <Badge variant="default" className="capitalize text-[11px]">
-              {styleTheme} Edition
-            </Badge>
-          </div>
-          <span className="font-mono text-xs opacity-60">Vol. {activeYear}</span>
-        </div>
-
-        {/* Hero Identity Centerpiece */}
-        <div className="my-auto space-y-8">
-          {/* Logo / Monogram Lockup */}
-          <div className="flex items-center gap-6">
-            {svgContent ? (
-              <div
-                className="flex size-20 items-center justify-center rounded-2xl border border-black/10 bg-white p-3 shadow-md dark:border-white/10 dark:bg-zinc-900"
-                dangerouslySetInnerHTML={{ __html: svgContent }}
-              />
-            ) : rasterDataUri ? (
-              <img
-                src={rasterDataUri}
-                alt={brandName}
-                className="size-20 rounded-2xl border border-black/10 object-contain p-2 shadow-md dark:border-white/10"
-              />
-            ) : (
-              <div
-                className="flex size-20 items-center justify-center rounded-2xl font-bold text-3xl text-white shadow-lg"
-                style={{ backgroundColor: primaryColor }}
-              >
-                {monogram}
-              </div>
-            )}
-
-            <div className="space-y-1">
-              <span className="font-mono text-[11px] font-semibold tracking-widest uppercase opacity-60">
-                Official Brand Manual
-              </span>
-              <div className="h-1 w-12 rounded-full" style={{ backgroundColor: primaryColor }} />
-            </div>
-          </div>
-
-          {/* Brand Name Title */}
-          <div className="space-y-3">
-            <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl">
-              {brandName || "Brand Architecture"}
-            </h1>
-            <p className="lead max-w-xl text-lg font-light">
-              {tagline || "Comprehensive visual design systems, tokens, and brand governance specifications."}
-            </p>
-          </div>
-
-          {/* Mission & Vision Pillars */}
-          <div className="grid grid-cols-2 gap-6 pt-4">
+      <div className="relative flex h-full w-full flex-col justify-between overflow-hidden bg-white p-12 text-black select-none lg:p-16">
+        {/* Subtle Decorative Logo Watermark Shape (75% height, clipped halfway by cover) */}
+        <div className="pointer-events-none absolute top-1/2 -right-[420px] flex size-[840px] -translate-y-1/2 items-center justify-center overflow-hidden select-none">
+          {svgContent ? (
             <div
-              className={cn(
-                "rounded-2xl border p-5 transition-colors",
-                styleTheme === "cinematic"
-                  ? "border-zinc-800 bg-zinc-900/60"
-                  : "border-zinc-200/80 bg-zinc-50/70"
-              )}
-            >
-              <div className="mb-2 flex items-center justify-between">
-                <Badge variant="outline" className="text-[10px] uppercase font-mono">
-                  Mission
-                </Badge>
-              </div>
-              <p className="text-xs leading-relaxed opacity-80">
-                {mission || "Empowering users with coherent, accessible, and delightful design systems built for modern digital scale."}
-              </p>
-            </div>
-
-            <div
-              className={cn(
-                "rounded-2xl border p-5 transition-colors",
-                styleTheme === "cinematic"
-                  ? "border-zinc-800 bg-zinc-900/60"
-                  : "border-zinc-200/80 bg-zinc-50/70"
-              )}
-            >
-              <div className="mb-2 flex items-center justify-between">
-                <Badge variant="outline" className="text-[10px] uppercase font-mono">
-                  Vision
-                </Badge>
-              </div>
-              <p className="text-xs leading-relaxed opacity-80">
-                {vision || "Setting the benchmark for cross-platform visual harmony and effortless brand identity expression."}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Metadata & Core Values */}
-        <div className="space-y-4 pt-8">
-          {coreValues.length > 0 && (
-            <div className="space-y-2">
-              <span className="font-mono text-[10px] font-semibold tracking-widest uppercase opacity-60">
-                Guiding Core Values
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {coreValues.map((val, idx) => (
-                  <Badge key={idx} variant="outline" className="text-xs font-normal">
-                    {val}
-                  </Badge>
-                ))}
-              </div>
+              className="flex size-full items-center justify-center text-zinc-200 opacity-70 [&_*]:!fill-current [&_*]:!stroke-current [&_svg]:size-full [&_svg]:max-h-full [&_svg]:max-w-full"
+              dangerouslySetInnerHTML={{ __html: svgContent }}
+            />
+          ) : rasterDataUri ? (
+            <img
+              src={rasterDataUri}
+              alt=""
+              className="size-full object-contain opacity-15 grayscale"
+            />
+          ) : (
+            <div className="text-[600px] leading-none font-bold text-zinc-100 select-none">
+              {(brandName || "B").charAt(0).toUpperCase()}
             </div>
           )}
+        </div>
 
-          <div className="flex items-center justify-between border-t border-current/10 pt-4 font-mono text-[11px] opacity-60">
-            <span>Standard A4 Specification</span>
-            <div className="flex items-center gap-2">
-              <span
-                className="inline-block size-2 rounded-full"
-                style={{ backgroundColor: primaryColor }}
-              />
-              <span
-                className="inline-block size-2 rounded-full"
-                style={{ backgroundColor: secondaryColor }}
-              />
-              <span>Color Harmonized</span>
+        {/* Top Header Bar on Cover with line UI */}
+        <div className="relative z-10 space-y-4">
+          <div className="flex items-center justify-between">
+            {/* Logo on the far left */}
+            <div className="flex items-center">
+              {svgContent ? (
+                <div
+                  className="flex h-14 max-w-[280px] items-center justify-start overflow-hidden [&_svg]:h-full [&_svg]:w-auto [&_svg]:max-w-full [&_svg]:object-contain"
+                  dangerouslySetInnerHTML={{ __html: svgContent }}
+                />
+              ) : rasterDataUri ? (
+                <img
+                  src={rasterDataUri}
+                  alt={brandName}
+                  className="h-14 w-auto max-w-[280px] object-contain"
+                />
+              ) : (
+                <div
+                  className="flex size-14 shrink-0 items-center justify-center rounded-xl text-lg font-bold text-white shadow-xs"
+                  style={{ backgroundColor: primaryColor || "#18181b" }}
+                >
+                  {(brandName || "B").charAt(0).toUpperCase()}
+                </div>
+              )}
             </div>
-            <span>Published {activeYear}</span>
+
+            {/* Current Year at far end */}
+            <div className="text-sm font-semibold text-black/80">
+              {currentYear}
+            </div>
+          </div>
+
+          {/* Custom line UI in header: thin hairline on left, gap, thick black accent bar on right */}
+          <div className="flex w-full items-end gap-3 pt-1">
+            <div className="h-px flex-1 bg-zinc-300" />
+            <div className="h-1 w-28 bg-black" />
+          </div>
+        </div>
+
+        {/* Hero Title Section with Brand Name beneath */}
+        <div className="relative z-10 my-auto max-w-xl space-y-4 py-8">
+          <h1 className="text-6xl text-black sm:text-7xl lg:text-8xl">
+            Brand
+            <br />
+            Guidelines.
+          </h1>
+          <p className="text-2xl font-semibold text-zinc-700 sm:text-3xl">
+            {brandName || "Brand Architecture"}
+          </p>
+        </div>
+
+        {/* Bottom Footer Colophon Card on Cover */}
+        <div className="relative z-10 w-full space-y-4 rounded-none border border-zinc-800 bg-zinc-950 p-6 text-white shadow-xl">
+          {/* Top 2-Column Meta Details */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-12">
+            {/* Left Column: Prepared for & Organization */}
+            <div className="space-y-1 sm:col-span-7">
+              <div className="text-xs text-zinc-400">Prepared for:</div>
+              <div className="text-lg font-bold tracking-tight text-white">
+                {brandName || "Brand Identity System"}
+              </div>
+            </div>
+
+            {/* Right Column: Issued Date & Validity */}
+            <div className="space-y-3 sm:col-span-5 sm:text-right">
+              <div>
+                <div className="text-xs text-zinc-400">
+                  Documentation Issued:
+                </div>
+                <div className="text-xs font-semibold text-white">
+                  {currentYear} Release
+                </div>
+              </div>
+
+              <div>
+                <div className="text-xs text-zinc-400">Governance Status:</div>
+                <div className="text-xs font-semibold text-white">
+                  Active Standard
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Statement of Confidentiality Divider & Disclaimer */}
+          <div className="space-y-1 border-t border-zinc-800/80 pt-3">
+            <div className="text-xs font-medium text-zinc-300">
+              Statement of Confidentiality
+            </div>
+            <p className="text-[10px] leading-relaxed text-zinc-400">
+              This brand manual and supporting identity assets contain
+              proprietary standards for {brandName || "this organization"}.
+              These materials are published for official brand implementation,
+              digital design, print production, and authorized ecosystem
+              partners.
+            </p>
           </div>
         </div>
       </div>

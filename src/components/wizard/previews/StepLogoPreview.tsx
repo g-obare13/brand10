@@ -1,5 +1,4 @@
-import type { BrandDoDontItem } from "@/store/brandStore"
-import { useBrandStore } from "@/store/brandStore"
+import { DEFAULT_DOS_AND_DONTS, useBrandStore } from "@/store/brandStore"
 import { Badge } from "@/components/ui/badge"
 import { Loader } from "@/components/ui/loader"
 import { cn } from "@/lib/utils"
@@ -17,43 +16,6 @@ import {
 export interface StepLogoPreviewProps {
   isLoading?: boolean
 }
-
-const LOGO_DONTS: BrandDoDontItem[] = [
-  {
-    id: "1",
-    type: "dont",
-    rule: "Don't use outdated versions",
-    detail:
-      "If the brand has had past logo iterations, only the current approved version should appear.",
-  },
-  {
-    id: "2",
-    type: "dont",
-    rule: "Don't add effects",
-    detail:
-      "No drop shadows, gradients, outlines, bevels, or glows unless that's part of the actual logo design.",
-  },
-  {
-    id: "3",
-    type: "dont",
-    rule: "Don't recolor outside the approved palette",
-    detail: "No random or off-brand colors applied to the mark.",
-  },
-  {
-    id: "4",
-    type: "dont",
-    rule: "Don't rotate",
-    detail:
-      "Keep the logo at its intended orientation unless a rotated lockup is explicitly part of the system.",
-  },
-  {
-    id: "5",
-    type: "dont",
-    rule: "Don't stretch or distort",
-    detail:
-      "Never scale non-proportionally (squishing horizontally or vertically).",
-  },
-]
 
 interface BlueprintFrameProps {
   svgUri?: string | null
@@ -457,15 +419,20 @@ export function StepLogoPreview({ isLoading }: StepLogoPreviewProps = {}) {
           </span>
           <Badge className={theme.badge}>
             {
-              (brand.dosAndDonts.length > 0 ? brand.dosAndDonts : LOGO_DONTS)
-                .length
+              (brand.dosAndDonts.length > 0
+                ? brand.dosAndDonts
+                : DEFAULT_DOS_AND_DONTS
+              ).length
             }{" "}
             Rules
           </Badge>
         </div>
 
         <div className="grid grid-cols-1 gap-3">
-          {(brand.dosAndDonts.length > 0 ? brand.dosAndDonts : LOGO_DONTS).map(
+          {(brand.dosAndDonts.length > 0
+            ? brand.dosAndDonts
+            : DEFAULT_DOS_AND_DONTS
+          ).map(
             (item, idx) => {
               return (
                 // <div

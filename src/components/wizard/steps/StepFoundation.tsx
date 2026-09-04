@@ -52,6 +52,16 @@ export function StepFoundationSkeleton() {
           <Skeleton className="h-4 w-28 rounded-md" />
           <Skeleton className="h-20 w-full rounded-xl" />
         </div>
+
+        {/* Pillars Skeleton */}
+        <div className="space-y-2 pt-1">
+          <Skeleton className="h-4 w-44 rounded-md" />
+          <div className="grid grid-cols-3 gap-3">
+            <Skeleton className="h-10 rounded-xl" />
+            <Skeleton className="h-10 rounded-xl" />
+            <Skeleton className="h-10 rounded-xl" />
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -82,11 +92,15 @@ export function StepFoundation({ isLoading }: StepFoundationProps = {}) {
       brandName: state.brandName,
       mission: state.mission,
       vision: state.vision,
+      coreValues: state.coreValues,
+      brandPillars: state.brandPillars,
       designMovement: state.designMovement,
       toneRatings: state.toneRatings,
       setBrandName: state.setBrandName,
       setMission: state.setMission,
       setVision: state.setVision,
+      setCoreValues: state.setCoreValues,
+      setPillar: state.setPillar,
       setDesignMovement: state.setDesignMovement,
       setToneRating: state.setToneRating,
     }))
@@ -153,9 +167,7 @@ export function StepFoundation({ isLoading }: StepFoundationProps = {}) {
       className="relative flex h-full flex-col space-y-6"
     >
       {/* Title Header */}
-      <h2 className="mb-2">
-        {brand.brandName || "Strategic Foundation"}
-      </h2>
+      <h2 className="mb-2">{brand.brandName || "Strategic Foundation"}</h2>
 
       <div className="space-y-6">
         {/* Brand Name Input */}
@@ -238,6 +250,76 @@ export function StepFoundation({ isLoading }: StepFoundationProps = {}) {
             rows={3}
             placeholder="What future world is your brand actively building over the next decade?"
           />
+        </div>
+
+        {/* Core Brand Pillars (3 Pillars) */}
+        <div className="foundation-item space-y-3 pt-1">
+          <div className="space-y-1">
+            <Label>Core Brand Pillars (3 Pillars)</Label>
+            <p className="text-xs text-muted-foreground">
+              Define the 3 primary pillars and short descriptions that anchor
+              your brand strategy.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {[0, 1, 2].map((idx) => {
+              const currentPillar = brand.brandPillars[idx] ?? {
+                title: "",
+                desc: "",
+              }
+              return (
+                <div
+                  key={idx}
+                  className="space-y-2.5 rounded-2xl border border-border/80 bg-background/50 p-3.5"
+                >
+                  <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+                    Pillar 0{idx + 1}
+                  </span>
+
+                  <div className="space-y-1">
+                    <Label className="text-[11px] text-muted-foreground">
+                      Title
+                    </Label>
+                    <Input
+                      value={currentPillar.title}
+                      onChange={(e) => {
+                        brand.setPillar(idx, { title: e.target.value })
+                      }}
+                      placeholder={
+                        idx === 0
+                          ? "e.g. Precision"
+                          : idx === 1
+                            ? "e.g. Clarity"
+                            : "e.g. Authenticity"
+                      }
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label className="text-[11px] text-muted-foreground">
+                      Short Description
+                    </Label>
+                    <Textarea
+                      rows={2}
+                      value={currentPillar.desc}
+                      onChange={(e) => {
+                        brand.setPillar(idx, { desc: e.target.value })
+                      }}
+                      placeholder={
+                        idx === 0
+                          ? "e.g. Rigorous attention to detail and proportion in every output."
+                          : idx === 1
+                            ? "e.g. Communicating purpose without unnecessary decoration or friction."
+                            : "e.g. Honest expression of materials, identity, and promises."
+                      }
+                      className="resize-none text-xs"
+                    />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
       </div>
 

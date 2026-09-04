@@ -11,6 +11,8 @@ interface PageTypographyProps {
   typeScaleRatio: number
   baseFontSize: number
   styleTheme: PreviewStyleId
+  pageNumber?: number
+  totalPages?: number
 }
 
 export function PageTypography({
@@ -21,6 +23,8 @@ export function PageTypography({
   typeScaleRatio,
   baseFontSize = 16,
   styleTheme,
+  pageNumber = 6,
+  totalPages = 8,
 }: PageTypographyProps) {
   const displayFamily = displayFont || "Inter"
   const bodyFamily = bodyFont || "Inter"
@@ -29,8 +33,8 @@ export function PageTypography({
   return (
     <A4PageFrame
       id="page-04"
-      pageNumber={4}
-      totalPages={6}
+      pageNumber={pageNumber}
+      totalPages={totalPages}
       sectionNumber="04"
       sectionTitle="Typography & Scale Hierarchy"
       brandName={brandName}

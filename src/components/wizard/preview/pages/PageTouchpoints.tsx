@@ -23,6 +23,8 @@ interface PageTouchpointsProps {
   displayFont: string
   bodyFont: string
   monoFont: string
+  pageNumber?: number
+  totalPages?: number
 }
 
 export function PageTouchpoints({
@@ -35,14 +37,16 @@ export function PageTouchpoints({
   displayFont,
   bodyFont,
   monoFont,
+  pageNumber = 8,
+  totalPages = 8,
 }: PageTouchpointsProps) {
   const activeYear = new Date().getFullYear()
 
   return (
     <A4PageFrame
       id="page-06"
-      pageNumber={6}
-      totalPages={6}
+      pageNumber={pageNumber}
+      totalPages={totalPages}
       sectionNumber="06"
       sectionTitle="System Specs & Governance"
       brandName={brandName}
