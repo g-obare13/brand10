@@ -2,7 +2,6 @@ import { createFileRoute, Outlet } from "@tanstack/react-router"
 import { useEffect } from "react"
 import {
   CreateProjectModal,
-  DashboardBackground,
   DashboardHero,
   DashboardToolbar,
 } from "@/components/dashboard"
@@ -44,9 +43,7 @@ function DashboardLayout() {
   const authLoading = useAuthStore((state) => state.loading)
   const initializeAuth = useAuthStore((state) => state.initialize)
   const projectCount = useProjectsStore((state) => state.projects.length)
-  const isCreateModalOpen = useProjectsStore(
-    (state) => state.isCreateModalOpen
-  )
+  const isCreateModalOpen = useProjectsStore((state) => state.isCreateModalOpen)
   const openCreateModal = useProjectsStore((state) => state.openCreateModal)
   const closeCreateModal = useProjectsStore((state) => state.closeCreateModal)
   const fetchProjects = useProjectsStore((state) => state.fetchProjects)
@@ -66,7 +63,7 @@ function DashboardLayout() {
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-background text-foreground transition-colors duration-200 selection:bg-primary/20 selection:text-primary">
       {/* Dynamic WebGL Aurora Ambient Glow */}
-      <DashboardBackground />
+      {/* <DashboardBackground /> */}
 
       {/* Navigation Header */}
       <Header action="logout" />

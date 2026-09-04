@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import { supabase } from "@/lib/supabase"
-import { get as idbGet } from "idb-keyval"
+import { del as idbDel, get as idbGet } from "idb-keyval"
 import { IMAGERY_MOOD_IMAGE_ARRAYS } from "@/data/wizard"
 
 export interface BrandProjectItem {
@@ -12,6 +12,98 @@ export interface BrandProjectItem {
   brand_name?: string
   primary_color?: string
   vision?: string
+}
+
+async function deleteProjectStorageAssets(projectId: string, userId?: string) {
+  if (!supabase) return
+
+  const storageTargets = [
+    { bucket: "brand-logos", path: userId || projectId, prefix: `${projectId}_` },
+    { bucket: "brand-fonts", path: userId || projectId, prefix: `${projectId}_` },
+  ]
+
+  for (const target of storageTargets) {
+    const { data, error } = await supabase.storage
+      .from(target.bucket)
+      .list(target.path, { limit: 1000, search: target.prefix })
+
+    if (error) throw error
+
+    const matchingPaths = data
+      .filter((file) => file.name.startsWith(target.prefix))
+      .map((file) => `${target.path}/${file.name}`)
+
+    if (matchingPaths.length > 0) {
+      const { error: removeError } = await supabase.storage
+        .from(target.bucket)
+        .remove(matchingPaths)
+      if (removeError) throw removeError
+    }
+  }
+
+  if (userId) {
+    for (const bucket of ["brand-logos", "brand-fonts"]) {
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .list(projectId, { limit: 1000 })
+      if (error) throw error
+
+      const legacyPaths = data.map((file) => `${projectId}/${file.name}`)
+      if (legacyPaths.length > 0) {
+        const { error: removeError } = await supabase.storage
+          .from(bucket)
+          .remove(legacyPaths)
+        if (removeError) throw removeError
+      }
+    }
+  }
+}
+
+async function deleteProjectLocalAssets(projectId: string) {
+  try {
+    localStorage.removeItem(`brandio_local_brand_${projectId}`)
+    await Promise.all([
+      idbDel(`brand_svg_${projectId}`),
+      idbDel(`brand_raster_${projectId}`),
+      idbDel(`brand_secondary_svg_${projectId}`),
+    ])
+  } catch {}
+}
+
+async function findProjectLogoInStorage(projectId: string, userId: string) {
+  if (!supabase) return undefined
+
+  const locations = [
+    { path: userId, prefix: `${projectId}_` },
+    { path: projectId, prefix: "" },
+  ]
+
+  for (const location of locations) {
+    const { data, error } = await supabase.storage
+      .from("brand-logos")
+      .list(location.path, { limit: 1000 })
+
+    if (error) continue
+
+    const logoName = data
+      .filter((file) => {
+        const isSupportedLogo = /\.(svg|png|jpe?g|webp)$/i.test(file.name)
+        return isSupportedLogo && file.name.startsWith(location.prefix)
+      })
+      .sort((a, b) =>
+        (b.created_at || b.updated_at || "").localeCompare(
+          a.created_at || a.updated_at || ""
+        )
+      )[0]?.name
+
+    if (logoName) {
+      const filePath = `${location.path}/${logoName}`
+      return supabase.storage.from("brand-logos").getPublicUrl(filePath).data
+        .publicUrl
+    }
+  }
+
+  return undefined
 }
 
 interface ProjectsState {
@@ -134,6 +226,10 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
                 }
               }
             } catch {}
+          }
+
+          if (!logoUrl && userId) {
+            logoUrl = await findProjectLogoInStorage(item.id, userId)
           }
 
           return {
@@ -410,11 +506,13 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
     set({ projects: filtered })
     try {
       localStorage.setItem("brandio_local_projects", JSON.stringify(filtered))
-      localStorage.removeItem(`brandio_local_brand_${id}`)
     } catch {}
+
+    await deleteProjectLocalAssets(id)
 
     if (supabase) {
       try {
+        await deleteProjectStorageAssets(id, userId)
         // Delete child brand_data explicitly and then brand_projects
         await supabase.from("brand_data").delete().eq("project_id", id)
         const { error } = await supabase

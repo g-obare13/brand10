@@ -82,7 +82,7 @@ DROP POLICY IF EXISTS "Users can upload own logos" ON storage.objects;
 CREATE POLICY "Users can upload own logos" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'brand-logos' AND (storage.foldername(name))[1] = auth.uid()::text);
 
 DROP POLICY IF EXISTS "Users can view own logos" ON storage.objects;
-CREATE POLICY "Users can view own logos" ON storage.objects FOR SELECT USING (bucket_id = 'brand-logos');
+CREATE POLICY "Users can view own logos" ON storage.objects FOR SELECT USING (bucket_id = 'brand-logos' AND (storage.foldername(name))[1] = auth.uid()::text);
 
 DROP POLICY IF EXISTS "Users can delete own logos" ON storage.objects;
 CREATE POLICY "Users can delete own logos" ON storage.objects FOR DELETE USING (bucket_id = 'brand-logos' AND (storage.foldername(name))[1] = auth.uid()::text);
@@ -96,7 +96,7 @@ DROP POLICY IF EXISTS "Users can upload own fonts" ON storage.objects;
 CREATE POLICY "Users can upload own fonts" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'brand-fonts' AND (storage.foldername(name))[1] = auth.uid()::text);
 
 DROP POLICY IF EXISTS "Users can view own fonts" ON storage.objects;
-CREATE POLICY "Users can view own fonts" ON storage.objects FOR SELECT USING (bucket_id = 'brand-fonts');
+CREATE POLICY "Users can view own fonts" ON storage.objects FOR SELECT USING (bucket_id = 'brand-fonts' AND (storage.foldername(name))[1] = auth.uid()::text);
 
 DROP POLICY IF EXISTS "Users can delete own fonts" ON storage.objects;
 CREATE POLICY "Users can delete own fonts" ON storage.objects FOR DELETE USING (bucket_id = 'brand-fonts' AND (storage.foldername(name))[1] = auth.uid()::text);
