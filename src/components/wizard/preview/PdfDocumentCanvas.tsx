@@ -12,13 +12,13 @@ import { useEffect, useRef, useState } from "react"
 import type { PreviewStyleId } from "./pages/A4PageFrame"
 import { PageColorInfo } from "./pages/PageColorInfo"
 import { PageColors } from "./pages/PageColors"
+import { PageBackCover } from "./pages/PageBackCover"
 import { PageCover } from "./pages/PageCover"
 import { PageFoundation } from "./pages/PageFoundation"
 import { PageImagery } from "./pages/PageImagery"
 import { PageLogo } from "./pages/PageLogo"
 import { PageSecondaryLogo } from "./pages/PageSecondaryLogo"
 import { PageTableOfContents } from "./pages/PageTableOfContents"
-import { PageTouchpoints } from "./pages/PageTouchpoints"
 import { PageTypography } from "./pages/PageTypography"
 import { PageTypographyBody } from "./pages/PageTypographyBody"
 
@@ -400,6 +400,7 @@ export function PdfDocumentCanvas({
               brandName={brand.brandName}
               imageryMood={brand.imageryMood}
               imageryOverlay={brand.imageryOverlay}
+              imageryLinks={brand.imageryLinks}
               primaryColor={primaryColor}
               styleTheme={styleTheme}
               displayFont={brand.displayFont}
@@ -409,13 +410,15 @@ export function PdfDocumentCanvas({
               totalPages={totalPages}
             />
 
-            {/* Page 10 or 11: Touchpoint Specs & Governance */}
-            <PageTouchpoints
+            {/* Page 10 or 11: Back Cover Page */}
+            <PageBackCover
               brandName={brand.brandName}
-              iconStyle={brand.iconStyle}
-              iconRadius={brand.iconRadius}
-              iconStroke={brand.iconStroke}
+              tagline={brand.tagline}
+              mission={brand.mission}
               primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
+              svgContent={brand.svgContent}
+              rasterDataUri={brand.rasterDataUri}
               styleTheme={styleTheme}
               displayFont={brand.displayFont}
               bodyFont={brand.bodyFont}

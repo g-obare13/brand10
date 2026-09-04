@@ -21,22 +21,17 @@ const DEFAULT_SECTIONS: TableOfContentItem[] = [
   {
     num: "03",
     title: "Color Palette & Harmony",
-    desc: "Primary, secondary, and accent swatches with RGB, HEX, and WCAG accessibility standards.",
+    desc: "Primary, secondary, and accent swatches with tonal colorimetry and accessibility standards.",
   },
   {
     num: "04",
     title: "Typography Hierarchy",
-    desc: "Display, body, and monospace font pairings, modular scale ratios, and typesetting rules.",
+    desc: "Modular scale display headings, secondary body systems, character sets, and typesetting rules.",
   },
   {
     num: "05",
     title: "Imagery & Art Direction",
-    desc: "Photography style, mood direction, color overlays, and composition standards.",
-  },
-  {
-    num: "06",
-    title: "Touchpoints & Specifications",
-    desc: "Iconography styling, digital applications, corner radii, and production governance.",
+    desc: "Photography art direction, ambient lighting, compositional balance, and asset attribution.",
   },
 ]
 
