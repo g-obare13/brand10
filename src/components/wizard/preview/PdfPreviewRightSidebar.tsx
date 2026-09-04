@@ -14,6 +14,7 @@ import {
   IconSparkles,
   IconArrowRight,
   IconExternalLink,
+  IconDeviceFloppy,
 } from "@tabler/icons-react"
 
 export interface SectionOutlineItem {
@@ -30,42 +31,48 @@ export const OUTLINE_SECTIONS: SectionOutlineItem[] = [
     title: "Brand Foundation",
     page: 1,
     stepNumber: 1,
-    summary: "Hero brand identity, mission, vision statements, and core brand values.",
+    summary:
+      "Hero brand identity, mission, vision statements, and core brand values.",
   },
   {
     number: "02",
     title: "Logo System",
     page: 2,
     stepNumber: 2,
-    summary: "Primary marks, dark mode variants, clearspace geometry, and usage rules.",
+    summary:
+      "Primary marks, dark mode variants, clearspace geometry, and usage rules.",
   },
   {
     number: "03",
     title: "Color Matrix",
     page: 3,
     stepNumber: 3,
-    summary: "Primary and secondary swatches, WCAG contrast ratings, and tonal scales.",
+    summary:
+      "Primary and secondary swatches, WCAG contrast ratings, and tonal scales.",
   },
   {
     number: "04",
     title: "Typography Scale",
     page: 4,
     stepNumber: 4,
-    summary: "Display, body, and monospace font pairings with modular type ladder.",
+    summary:
+      "Display, body, and monospace font pairings with modular type ladder.",
   },
   {
     number: "05",
     title: "Imagery Direction",
     page: 5,
     stepNumber: 5,
-    summary: "Moodboard photography art direction, lighting standards, and overlays.",
+    summary:
+      "Moodboard photography art direction, lighting standards, and overlays.",
   },
   {
     number: "06",
     title: "System Specs",
     page: 6,
     stepNumber: 6,
-    summary: "Iconography geometry, token export manifest, and governance signoff.",
+    summary:
+      "Iconography geometry, token export manifest, and governance signoff.",
   },
 ]
 
@@ -147,103 +154,72 @@ export function PdfPreviewRightSidebar({
   }
 
   return (
-    <aside className="flex flex-col gap-5 rounded-3xl border border-border/80 bg-card/85 p-5 backdrop-blur-xl shadow-sm">
+    <aside className="flex flex-col gap-5 rounded-3xl bg-card/85 p-5 backdrop-blur-xl">
       {/* 1. Document Outline / Table of Contents (Matching PDFCN screenshot) */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="font-mono text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+          <span className="text-xs font-medium text-muted-foreground">
             Document Outline
           </span>
-          <Badge variant="outline" className="font-mono text-[10px]">
+          <Badge variant="outline" className="text-xs">
             {OUTLINE_SECTIONS.length} Sections
           </Badge>
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-3">
           {OUTLINE_SECTIONS.map((section) => {
             const isActive = activePage === section.page
 
             return (
-              <button
+              <Badge
                 key={section.page}
-                type="button"
                 onClick={() => onNavigateToPage(section.page)}
-                className={cn(
-                  "group flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-left text-xs transition-all duration-150",
-                  isActive
-                    ? "border border-primary/40 bg-primary/10 font-semibold text-primary shadow-xs"
-                    : "border border-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                )}
+                variant={isActive ? "default" : "outline"}
+                className="w-full"
+                icon={<span>{section.number}</span>}
+                iconPosition="left"
               >
-                <div className="flex items-center gap-2.5">
-                  <span
-                    className={cn(
-                      "font-mono text-[11px]",
-                      isActive ? "text-primary font-bold" : "opacity-50"
-                    )}
-                  >
-                    {section.number}
-                  </span>
-                  <span>{section.title}</span>
-                </div>
-
-                <span
-                  className={cn(
-                    "font-mono text-[10px]",
-                    isActive ? "text-primary" : "opacity-40"
-                  )}
-                >
-                  P.{section.page}
-                </span>
-              </button>
+                <span>{section.title}</span>
+              </Badge>
             )
           })}
         </div>
       </div>
 
       {/* 2. Active Section Inspector & Quick Jump */}
-      <div className="rounded-2xl border border-border/60 bg-muted/30 p-4 space-y-2.5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 font-bold text-xs text-foreground">
-            <span>{activeSection.title}</span>
-            <IconExternalLink size={12} className="opacity-60" />
-          </div>
-          <Badge variant="outline" className="text-[10px] font-mono">
-            Page {activeSection.page}
-          </Badge>
-        </div>
-
-        <p className="text-[11px] text-muted-foreground leading-relaxed">
-          {activeSection.summary}
-        </p>
-
+      <div className="space-y-2.5">
         <Button
-          variant="outline"
-          size="sm"
+          variant="default"
+          size="default"
+          gsapFill
           onClick={() => handleJumpToStep(activeSection.stepNumber)}
-          className="w-full text-xs font-semibold cursor-pointer justify-between"
+          className="w-fit cursor-pointer rounded-full"
+          icon={<IconArrowRight size={13} />}
         >
           <span>Edit in Step {activeSection.stepNumber}</span>
-          <IconArrowRight size={13} />
         </Button>
       </div>
 
       {/* 3. Production Export Hub */}
       <div className="space-y-2.5 border-t border-border/60 pt-4">
-        <span className="font-mono text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
-          Export & Production
-        </span>
+        {/* <span className="text-xs">Export & Production</span> */}
 
-        <div className="space-y-2">
+        <div className="mt-2 space-y-2">
           {/* Download PDF Button */}
           <Button
             variant="shiny"
             size="pill"
             onClick={onDownloadPdf}
             disabled={isDownloadingPdf}
-            className="w-full text-xs font-semibold cursor-pointer justify-center"
-            icon={isDownloadingPdf ? <Loader size="sm" /> : <IconDownload size={14} />}
-            iconPlacement="left"
+            className="w-full cursor-pointer justify-center"
+            icon={
+              isDownloadingPdf ? (
+                <Loader size="sm" />
+              ) : (
+                <IconDownload size={14} />
+              )
+            }
+            iconPlacement="right"
           >
             {isDownloadingPdf ? "Compiling PDF..." : "Download Brand PDF"}
           </Button>
@@ -254,9 +230,9 @@ export function PdfPreviewRightSidebar({
             size="pill"
             onClick={handleZipExport}
             disabled={isZipping}
-            className="w-full text-xs font-semibold cursor-pointer justify-center"
+            className="w-full cursor-pointer justify-center"
             icon={isZipping ? <Loader size="sm" /> : <IconPackage size={14} />}
-            iconPlacement="left"
+            iconPlacement="right"
           >
             {isZipping ? "Creating ZIP..." : "Download Assets ZIP"}
           </Button>
@@ -266,9 +242,9 @@ export function PdfPreviewRightSidebar({
             variant="outline"
             size="pill"
             onClick={() => window.print()}
-            className="w-full text-xs font-semibold cursor-pointer justify-center"
+            className="w-full cursor-pointer justify-center"
             icon={<IconPrinter size={14} />}
-            iconPlacement="left"
+            iconPlacement="right"
           >
             Print Guidelines
           </Button>
@@ -282,11 +258,13 @@ export function PdfPreviewRightSidebar({
           size="pill"
           onClick={handleFinish}
           disabled={isFinishing}
-          className="w-full text-xs font-semibold cursor-pointer justify-center"
-          icon={isFinishing ? <Loader size="sm" /> : <IconSparkles size={14} />}
-          iconPlacement="left"
+          className="w-full cursor-pointer justify-center"
+          icon={
+            isFinishing ? <Loader size="sm" /> : <IconDeviceFloppy size={14} />
+          }
+          iconPlacement="right"
         >
-          {isFinishing ? "Saving System..." : "Finish & Open Studio"}
+          {isFinishing ? "Saving System..." : "Save"}
         </Button>
       </div>
     </aside>

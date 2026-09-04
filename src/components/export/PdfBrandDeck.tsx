@@ -33,6 +33,46 @@ interface ThemeColors {
 }
 
 const THEME_TOKENS: Record<PreviewStyleId, ThemeColors> = {
+  "quiet-precision": {
+    pageBg: "#ffffff",
+    text: "#18181b",
+    textMuted: "#71717a",
+    border: "#e4e4e7",
+    cardBg: "#f8fafc",
+    cardBorder: "#e2e8f0",
+    badgeBg: "#f1f5f9",
+    badgeText: "#334155",
+  },
+  "expressive-energy": {
+    pageBg: "#09090b",
+    text: "#fafafa",
+    textMuted: "#a1a1aa",
+    border: "#27272a",
+    cardBg: "#141418",
+    cardBorder: "#27272a",
+    badgeBg: "#22242a",
+    badgeText: "#e2e8f0",
+  },
+  "soft-tactility": {
+    pageBg: "#fafaf9",
+    text: "#18181b",
+    textMuted: "#78716c",
+    border: "#e7e5e4",
+    cardBg: "#f5f5f4",
+    cardBorder: "#e7e5e4",
+    badgeBg: "#e7e5e4",
+    badgeText: "#292524",
+  },
+  "editorial-character": {
+    pageBg: "#faf8f5",
+    text: "#18181b",
+    textMuted: "#78716c",
+    border: "#eae5dc",
+    cardBg: "#f5f0e8",
+    cardBorder: "#eae5dc",
+    badgeBg: "#ebe5db",
+    badgeText: "#292524",
+  },
   minimal: {
     pageBg: "#ffffff",
     text: "#18181b",
@@ -275,7 +315,17 @@ export const BrandPdfDeck: React.FC<BrandPdfProps> = ({
   const monogram = (brandName || "Brand").charAt(0).toUpperCase()
   const activeYear = new Date().getFullYear()
   const typeScale = computeTypeScale(baseFontSize, typeScaleRatio)
-  const resolvedMood = styleTheme === "candid" ? "editorial" : styleTheme
+  const moodMap: Record<string, "minimal" | "cinematic" | "vibrant" | "editorial"> = {
+    "quiet-precision": "minimal",
+    "expressive-energy": "vibrant",
+    "soft-tactility": "minimal",
+    "editorial-character": "editorial",
+    candid: "editorial",
+    minimal: "minimal",
+    cinematic: "cinematic",
+    vibrant: "vibrant",
+  }
+  const resolvedMood = moodMap[styleTheme] ?? "minimal"
   const moodImages = IMAGERY_MOOD_IMAGE_ARRAYS[resolvedMood]
 
   const renderHeader = (sectionNumber: string, sectionTitle: string) => (

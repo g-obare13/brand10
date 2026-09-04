@@ -1,8 +1,10 @@
 import { useState } from "react"
 import { useBrandStore } from "@/store/brandStore"
+import type { BrandToneRatings } from "@/store/brandStore"
 import { downloadBrandPdf } from "@/components/export/PdfBrandDeck"
 import { toast } from "sonner"
-import type { PreviewStyleId } from "./pages/A4PageFrame"
+import { DESIGN_MOVEMENTS } from "@/data/wizard"
+import type { PreviewStyleId } from "@/components/wizard/preview/pages/A4PageFrame"
 import { PdfPreviewStylesSidebar } from "./PdfPreviewStylesSidebar"
 import { PdfDocumentCanvas } from "./PdfDocumentCanvas"
 import { PdfPreviewRightSidebar } from "./PdfPreviewRightSidebar"
@@ -14,16 +16,22 @@ interface PdfPreviewStudioProps {
 /**
  * 3-Column Interactive Brand Guidelines PDF Preview Studio.
  * Inspired by pdfcn.dev / Takumi document preview.
- * - Left Panel: 4 Presentation Styles (Minimal, Cinematic, Vibrant, Candid)
+ * - Left Panel: Presentation Styles (StepFoundation Design Movements)
  * - Center Panel: Multi-page A4 document renderer with interactive zoom and page jumper
  * - Right Panel: Document outline, active section inspector, and export hub
  */
 export function PdfPreviewStudio({ projectId }: PdfPreviewStudioProps) {
   const brand = useBrandStore()
 
-  // Map initial store imageryMood to a valid PreviewStyleId
+  // Track initial style from store designMovement or tone matching from stepFoundation
   const initialStyle: PreviewStyleId =
-    brand.imageryMood === "editorial" ? "candid" : brand.imageryMood
+    (brand.designMovement as PreviewStyleId) ||
+    (DESIGN_MOVEMENTS.find((m) =>
+      Object.entries(m.tones).every(
+        ([k, v]) => brand.toneRatings[k as keyof BrandToneRatings] === v
+      )
+    )?.id as PreviewStyleId) ||
+    "quiet-precision"
 
   const [activeStyle, setActiveStyle] = useState<PreviewStyleId>(initialStyle)
   const [activePage, setActivePage] = useState<number>(1)
@@ -31,11 +39,15 @@ export function PdfPreviewStudio({ projectId }: PdfPreviewStudioProps) {
 
   const handleSelectStyle = (style: PreviewStyleId) => {
     setActiveStyle(style)
-    // Synchronize to store imagery mood so other components stay updated
-    brand.setImagery({
-      mood: style === "candid" ? "editorial" : style,
-    })
-    toast.success(`Theme updated to ${style.charAt(0).toUpperCase() + style.slice(1)} style`)
+    // Synchronize to store designMovement and tone ratings from stepFoundation
+    brand.setDesignMovement(style)
+    const movement = DESIGN_MOVEMENTS.find((m) => m.id === style)
+    if (movement) {
+      Object.entries(movement.tones).forEach(([key, val]) => {
+        brand.setToneRating(key as keyof BrandToneRatings, val)
+      })
+    }
+    toast.success(`Theme updated to ${movement?.label ?? style} style`)
   }
 
   const handleNavigateToPage = (pageNum: number) => {
@@ -66,7 +78,7 @@ export function PdfPreviewStudio({ projectId }: PdfPreviewStudioProps) {
         rasterDataUri: brand.rasterDataUri,
         clearspaceMultiplier: brand.clearspaceMultiplier,
         dosAndDonts: brand.dosAndDonts,
-        imageryMood: activeStyle === "candid" ? "editorial" : activeStyle,
+        imageryMood: brand.imageryMood,
         imageryOverlay: brand.imageryOverlay,
         imageryLinks: brand.imageryLinks,
         iconStyle: brand.iconStyle,

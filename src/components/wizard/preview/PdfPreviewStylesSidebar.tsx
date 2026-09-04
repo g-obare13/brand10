@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import type { PreviewStyleId } from "./pages/A4PageFrame"
+import { DESIGN_MOVEMENTS } from "@/data/wizard"
+import type { PreviewStyleId } from "@/components/wizard/preview/pages/A4PageFrame"
 import { IconCheck } from "@tabler/icons-react"
 
 export interface StyleOption {
@@ -13,44 +14,53 @@ export interface StyleOption {
   gradient: string
 }
 
-export const PREVIEW_STYLES: StyleOption[] = [
+const MOVEMENT_META: Record<
+  string,
   {
-    id: "minimal",
-    title: "Minimal",
+    subtitle: string
+    paletteAccent: string
+    gradient: string
+  }
+> = {
+  "quiet-precision": {
     subtitle: "Clean & Architectural",
-    badge: "Modern Clean",
-    description: "Generous whitespace, refined hairline borders, and neutral tonal balance.",
     paletteAccent: "#71717a",
     gradient: "from-zinc-100 to-zinc-200 dark:from-zinc-900 dark:to-zinc-800",
   },
-  {
-    id: "cinematic",
-    title: "Cinematic",
-    subtitle: "Moody & High Contrast",
-    badge: "Obsidian Deep",
-    description: "Deep dark backdrops, intense directional lighting, and glowing accent rims.",
-    paletteAccent: "#3b82f6",
-    gradient: "from-zinc-900 via-blue-950 to-zinc-950",
-  },
-  {
-    id: "vibrant",
-    title: "Vibrant",
-    subtitle: "Dynamic & Colorful",
-    badge: "Playful Energy",
-    description: "High chroma gradients, energetic visual punch, and modern glass accents.",
+  "expressive-energy": {
+    subtitle: "Dynamic & Bold",
     paletteAccent: "#ec4899",
     gradient: "from-fuchsia-500/20 via-rose-500/20 to-amber-500/20",
   },
-  {
-    id: "candid",
-    title: "Candid",
-    subtitle: "Editorial & Tactile",
-    badge: "Human Story",
-    description: "Warm paper texture tones, natural light framing, and documentary warmth.",
+  "soft-tactility": {
+    subtitle: "Organic & Tactile",
+    paletteAccent: "#0ea5e9",
+    gradient: "from-sky-500/20 via-teal-500/20 to-indigo-500/20",
+  },
+  "editorial-character": {
+    subtitle: "Refined & Literary",
     paletteAccent: "#d97706",
     gradient: "from-amber-100 to-stone-200 dark:from-amber-950/30 dark:to-stone-900",
   },
-]
+}
+
+export const PREVIEW_STYLES: StyleOption[] = DESIGN_MOVEMENTS.map((movement) => {
+  const meta = MOVEMENT_META[movement.id] ?? {
+    subtitle: movement.vibe,
+    paletteAccent: "#71717a",
+    gradient: "from-zinc-100 to-zinc-200 dark:from-zinc-900 dark:to-zinc-800",
+  }
+
+  return {
+    id: movement.id as PreviewStyleId,
+    title: movement.label,
+    subtitle: meta.subtitle,
+    badge: movement.badge,
+    description: movement.tagline || movement.description,
+    paletteAccent: meta.paletteAccent,
+    gradient: meta.gradient,
+  }
+})
 
 interface PdfPreviewStylesSidebarProps {
   activeStyle: PreviewStyleId
@@ -62,20 +72,16 @@ export function PdfPreviewStylesSidebar({
   onSelectStyle,
 }: PdfPreviewStylesSidebarProps) {
   return (
-    <aside className="flex flex-col gap-4 rounded-3xl border border-border/80 bg-card/85 p-5 backdrop-blur-xl shadow-sm">
+    <aside className="flex flex-col gap-4 rounded-3xl bg-card/85 p-5 backdrop-blur-xl">
       {/* Header */}
+
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <span className="font-mono text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
-            Document Styles
-          </span>
-          <Badge variant="outline" className="font-mono text-[10px]">
-            {PREVIEW_STYLES.length} Styles
-          </Badge>
+          <h4 className="mb-2"> Select Presentation Style</h4>
         </div>
-        <h3 className="text-base font-bold text-foreground">Select Presentation Style</h3>
-        <p className="text-xs text-muted-foreground">
-          Choose a visual aesthetic for your brand manual. All pages update dynamically.
+        <p className="mb-2">
+          Choose a visual aesthetic for your brand manual. All pages update
+          dynamically.
         </p>
       </div>
 
@@ -110,13 +116,13 @@ export function PdfPreviewStylesSidebar({
                   </span>
                   <Badge
                     variant={isSelected ? "default" : "outline"}
-                    className="text-[10px] py-0 h-4.5"
+                    className="h-4.5 py-0 text-[10px]"
                   >
                     {style.badge}
                   </Badge>
                 </div>
 
-                <div className="text-[11px] text-muted-foreground leading-relaxed">
+                <div className="text-[11px] leading-relaxed text-muted-foreground">
                   {style.description}
                 </div>
 

@@ -57,7 +57,10 @@ export function PdfDocumentCanvas({
                 weight: w,
                 style: "normal",
               })
-              face.load().then((loaded) => document.fonts.add(loaded)).catch(() => {})
+              face
+                .load()
+                .then((loaded) => document.fonts.add(loaded))
+                .catch(() => {})
             } catch {}
           })
         } catch {}
@@ -74,20 +77,30 @@ export function PdfDocumentCanvas({
                 weight: w,
                 style: "normal",
               })
-              face.load().then((loaded) => document.fonts.add(loaded)).catch(() => {})
+              face
+                .load()
+                .then((loaded) => document.fonts.add(loaded))
+                .catch(() => {})
             } catch {}
           })
         } catch {}
       })
     }
-  }, [brand.displayFont, brand.bodyFont, brand.monoFont, brand.stagedFontFiles, brand.customFonts])
+  }, [
+    brand.displayFont,
+    brand.bodyFont,
+    brand.monoFont,
+    brand.stagedFontFiles,
+    brand.customFonts,
+  ])
 
   // Track page scroll to sync active page index
   useEffect(() => {
     const container = scrollContainerRef.current
     if (!container) return
 
-    const pageElements = container.querySelectorAll<HTMLElement>(".preview-a4-page")
+    const pageElements =
+      container.querySelectorAll<HTMLElement>(".preview-a4-page")
     if (pageElements.length === 0) return
 
     const observer = new IntersectionObserver(
@@ -135,11 +148,11 @@ export function PdfDocumentCanvas({
     brand.colorPalette.find((c) => c.role === "secondary")?.hex || "#0ea5e9"
 
   return (
-    <div className="flex flex-col rounded-3xl border border-border/80 bg-zinc-900/90 shadow-lg backdrop-blur-xl overflow-hidden">
+    <div className="flex flex-col overflow-hidden rounded-3xl border border-border/80 bg-primary-900/90 shadow-lg backdrop-blur-xl">
       {/* Top Floating Control Bar (Inspired by PDFCN / Takumi toolbar) */}
-      <div className="flex items-center justify-between border-b border-border/60 bg-zinc-950/70 px-4 py-3 text-xs text-zinc-300">
+      <div className="flex items-center justify-between border-b border-border/60 bg-primary-950 px-4 py-3 text-xs text-primary-300">
         {/* Left: Page Counter & Prev/Next */}
-        <div className="flex items-center gap-2 font-mono">
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="sm"
@@ -147,7 +160,7 @@ export function PdfDocumentCanvas({
               if (activePage > 1) scrollToPage(activePage - 1)
             }}
             disabled={activePage <= 1}
-            className="size-8 p-0 text-zinc-300 hover:text-white hover:bg-white/10"
+            className="size-8 p-0 text-primary-300 hover:bg-primary-50/10 hover:text-primary-50"
             title="Previous Page"
           >
             <IconChevronLeft size={16} />
@@ -164,7 +177,7 @@ export function PdfDocumentCanvas({
               if (activePage < 6) scrollToPage(activePage + 1)
             }}
             disabled={activePage >= 6}
-            className="size-8 p-0 text-zinc-300 hover:text-white hover:bg-white/10"
+            className="size-8 p-0 text-primary-300 hover:bg-primary-50/10 hover:text-primary-50"
             title="Next Page"
           >
             <IconChevronRight size={16} />
@@ -172,77 +185,51 @@ export function PdfDocumentCanvas({
         </div>
 
         {/* Center: Document Title & Selected Font Indicator */}
-        <div className="hidden sm:flex items-center gap-2 text-zinc-400 font-mono text-[11px]">
-          <span className="text-zinc-200 font-medium">{brand.brandName || "Brand Manual"}</span>
-          <span>•</span>
-          <span>A4 Format</span>
-          <span>•</span>
-          <span className="text-zinc-300">{brand.displayFont}</span>
+        <div className="hidden items-center gap-2 text-sm text-primary-400 sm:flex">
+          <span className="font-medium text-primary-200">
+            {brand.brandName || "Brand Manual"}
+          </span>
         </div>
 
         {/* Right: Zoom & Export Controls */}
         <div className="flex items-center gap-1 sm:gap-2">
           {/* Zoom controls */}
-          <div className="flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[11px]">
-            <button
-              type="button"
+          <div className="flex items-center gap-1 rounded-full border border-primary-50/10 bg-primary-50/5 px-2 py-0.5 font-mono text-xs">
+            <Button
+              variant={"ghost"}
               onClick={handleZoomOut}
-              className="cursor-pointer p-1 text-zinc-400 hover:text-white transition-colors"
+              className="cursor-pointer p-1 text-primary-400 transition-colors hover:bg-transparent hover:text-primary-50"
               title="Zoom Out"
             >
               <IconZoomOut size={14} />
-            </button>
-            <span className="w-10 text-center text-zinc-300">
+            </Button>
+            <span className="w-10 text-center text-primary-300">
               {Math.round(zoom * 100)}%
             </span>
-            <button
-              type="button"
+            <Button
+              variant={"ghost"}
               onClick={handleZoomIn}
-              className="cursor-pointer p-1 text-zinc-400 hover:text-white transition-colors"
+              className="cursor-pointer p-1 text-primary-400 transition-colors hover:bg-transparent hover:text-primary-50"
               title="Zoom In"
             >
               <IconZoomIn size={14} />
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              variant={"ghost"}
               onClick={handleZoomReset}
-              className="cursor-pointer border-l border-white/10 pl-1.5 py-1 text-zinc-400 hover:text-white transition-colors"
+              className="cursor-pointer p-1 text-primary-400 transition-colors hover:bg-transparent hover:text-primary-50"
               title="Reset Zoom"
             >
               <IconZoomReset size={14} />
-            </button>
+            </Button>
           </div>
-
-          {/* Quick Print Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handlePrint}
-            className="size-8 p-0 text-zinc-300 hover:text-white hover:bg-white/10 cursor-pointer"
-            title="Print Document"
-          >
-            <IconPrinter size={16} />
-          </Button>
-
-          {/* Quick Download PDF Button */}
-          <Button
-            variant="shiny"
-            size="sm"
-            onClick={onDownloadPdf}
-            disabled={isDownloadingPdf}
-            className="h-8 rounded-full px-3 text-xs font-semibold cursor-pointer"
-            icon={isDownloadingPdf ? <Loader size="sm" /> : <IconDownload size={14} />}
-            iconPlacement="left"
-          >
-            {isDownloadingPdf ? "Exporting..." : "Download PDF"}
-          </Button>
         </div>
       </div>
 
       {/* Main Canvas Scroll Area with Floating Quick-Jump Rail */}
-      <div className="relative flex-1 min-h-0">
+      <div className="relative min-h-0 flex-1">
         {/* Floating Quick Page Rail to see and scrub between all 6 pages at once */}
-        <div className="absolute right-3 top-6 z-20 hidden lg:flex flex-col gap-1.5 rounded-2xl border border-white/10 bg-zinc-900/90 p-1.5 shadow-2xl backdrop-blur-md">
+        {/* <div className="absolute top-6 right-3 z-20 hidden flex-col gap-1.5 rounded-2xl border border-primary-50/10 bg-primary-900/90 p-1.5 shadow-2xl backdrop-blur-md lg:flex">
           {[
             { num: 1, label: "Cover" },
             { num: 2, label: "Logo" },
@@ -259,27 +246,27 @@ export function PdfDocumentCanvas({
                 onClick={() => scrollToPage(p.num)}
                 title={`Page ${p.num}: ${p.label}`}
                 className={cn(
-                  "group relative flex size-7 items-center justify-center rounded-xl font-mono text-[11px] transition-all cursor-pointer",
+                  "group relative flex size-7 cursor-pointer items-center justify-center rounded-xl font-mono text-[11px] transition-all",
                   isCurrent
-                    ? "bg-primary text-primary-foreground font-bold shadow-xs scale-105"
-                    : "text-zinc-400 hover:bg-white/10 hover:text-white"
+                    ? "scale-105 bg-primary font-bold text-primary-foreground shadow-xs"
+                    : "text-primary-400 hover:bg-primary-50/10 hover:text-primary-50"
                 )}
               >
                 <span>{p.num}</span>
-                <span className="pointer-events-none absolute right-full mr-2 hidden rounded-md bg-zinc-900 px-2 py-1 text-[11px] font-medium text-white shadow-md group-hover:block whitespace-nowrap border border-white/10">
+                <span className="pointer-events-none absolute right-full mr-2 hidden rounded-md border border-primary-50/10 bg-primary-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-primary-50 shadow-md group-hover:block">
                   {p.num}. {p.label}
                 </span>
               </button>
             )
           })}
-        </div>
+        </div> */}
 
         <div
           ref={scrollContainerRef}
-          className="relative h-full overflow-y-auto max-h-[820px] p-6 lg:p-10 bg-zinc-950/80 custom-scrollbar scroll-smooth flex flex-col items-center"
+          className="custom-scrollbar relative flex h-full max-h-205 flex-col items-center overflow-y-auto scroll-smooth bg-primary-950/80 p-6 lg:p-10"
         >
           <div
-            className="transition-transform duration-200 origin-top space-y-12 pb-16"
+            className="origin-top space-y-12 pb-16 transition-transform duration-200"
             style={{ transform: `scale(${zoom})` }}
           >
             {/* Page 1: Cover & Foundation */}

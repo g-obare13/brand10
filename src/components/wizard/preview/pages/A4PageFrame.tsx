@@ -1,7 +1,15 @@
 import React from "react"
 import { cn } from "@/lib/utils"
 
-export type PreviewStyleId = "minimal" | "cinematic" | "vibrant" | "candid"
+export type PreviewStyleId =
+  | "quiet-precision"
+  | "expressive-energy"
+  | "soft-tactility"
+  | "editorial-character"
+  | "minimal"
+  | "cinematic"
+  | "vibrant"
+  | "candid"
 
 interface A4PageFrameProps {
   id: string
@@ -49,6 +57,30 @@ export function A4PageFrame({
       metaColor: string
     }
   > = {
+    "quiet-precision": {
+      pageBg: "bg-white text-zinc-900 border-zinc-200",
+      headerBorder: "border-zinc-200",
+      footerBorder: "border-zinc-200",
+      metaColor: "text-zinc-500",
+    },
+    "expressive-energy": {
+      pageBg: "bg-zinc-950 text-zinc-50 border-zinc-800",
+      headerBorder: "border-zinc-800/80",
+      footerBorder: "border-zinc-800/80",
+      metaColor: "text-zinc-400",
+    },
+    "soft-tactility": {
+      pageBg: "bg-[#f8f9fa] text-zinc-900 border-zinc-200",
+      headerBorder: "border-zinc-200",
+      footerBorder: "border-zinc-200",
+      metaColor: "text-zinc-500",
+    },
+    "editorial-character": {
+      pageBg: "bg-[#faf8f5] text-zinc-900 border-[#eae5dc]",
+      headerBorder: "border-[#e5dfd5]",
+      footerBorder: "border-[#e5dfd5]",
+      metaColor: "text-stone-500",
+    },
     minimal: {
       pageBg: "bg-white text-zinc-900 border-zinc-200",
       headerBorder: "border-zinc-200",
@@ -75,7 +107,7 @@ export function A4PageFrame({
     },
   }
 
-  const currentTheme = themeStyles[styleTheme]
+  const currentTheme = themeStyles[styleTheme] ?? themeStyles["quiet-precision"]
 
   return (
     <div

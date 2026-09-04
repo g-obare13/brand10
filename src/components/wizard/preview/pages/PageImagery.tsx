@@ -24,11 +24,37 @@ export function PageImagery({
   bodyFont,
   monoFont,
 }: PageImageryProps) {
-  // Map candid -> editorial for image lookup
-  const resolvedMood = styleTheme === "candid" ? "editorial" : styleTheme
+  // Map styleTheme to available imagery mood arrays
+  const moodMap: Record<PreviewStyleId, "minimal" | "cinematic" | "vibrant" | "editorial"> = {
+    "quiet-precision": "minimal",
+    "expressive-energy": "vibrant",
+    "soft-tactility": "minimal",
+    "editorial-character": "editorial",
+    minimal: "minimal",
+    cinematic: "cinematic",
+    vibrant: "vibrant",
+    candid: "editorial",
+  }
+  const resolvedMood = moodMap[styleTheme]
   const images = IMAGERY_MOOD_IMAGE_ARRAYS[resolvedMood]
 
   const moodDescriptions: Record<PreviewStyleId, { title: string; desc: string }> = {
+    "quiet-precision": {
+      title: "Quiet Precision & Architectural",
+      desc: "Intentional whitespace, structured grids, and uncompromising clarity.",
+    },
+    "expressive-energy": {
+      title: "Expressive Energy & Chromatic",
+      desc: "High-voltage contrast, saturated palettes, and kinetic presence.",
+    },
+    "soft-tactility": {
+      title: "Soft Tactility & Dimensional",
+      desc: "Molded surfaces, soft ambient shadows, and organic physical depth.",
+    },
+    "editorial-character": {
+      title: "Editorial Character & Poise",
+      desc: "Publication poise, refined typography, and narrative sophistication.",
+    },
     minimal: {
       title: "Studio Minimal & High-Key",
       desc: "Clean soft shadows, high-key ambient light, pure neutral backdrops, and deliberate negative space.",
