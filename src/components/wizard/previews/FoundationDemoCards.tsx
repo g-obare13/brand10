@@ -72,7 +72,7 @@ export function MovementClaimableBalance({
           type="button"
           className={theme.buttonPrimary}
           style={
-            theme.id !== "minimalism"
+            theme.id !== "editorial-character" && theme.id !== "minimalism"
               ? { backgroundColor: primaryColor }
               : undefined
           }
@@ -136,7 +136,7 @@ export function MovementNewMilestone({ theme, primaryColor }: DemoCardsProps) {
           type="button"
           className={theme.buttonPrimary}
           style={
-            theme.id !== "minimalism"
+            theme.id !== "editorial-character" && theme.id !== "minimalism"
               ? { backgroundColor: primaryColor }
               : undefined
           }

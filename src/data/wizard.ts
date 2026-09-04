@@ -17,73 +17,59 @@ export interface DesignMovement {
 
 export const DESIGN_MOVEMENTS: DesignMovement[] = [
   {
-    id: "semi-flat",
-    label: "Flat Design",
-    badge: "Semi-Flat",
-    vibe: "Clean, functional, and highly polished.",
-    bestFor: "Corporate web apps, SaaS dashboards, and e-commerce platforms.",
+    id: "quiet-precision",
+    label: "Quiet Precision",
+    badge: "Clarity",
+    vibe: "Clean, disciplined, and systematically structured.",
+    bestFor: "Enterprise SaaS, modern dashboards, and high-performance digital tools.",
     description:
-      "The absolute baseline for the modern web. Strips away heavy real-world textures to focus on crisp vector shapes, highly readable typography, and structured grids with subtle soft drop shadows.",
+      "Stripped of unnecessary ornamentation, Quiet Precision relies on mathematical grid alignment, crisp typography, and generous negative space to cultivate effortless cognitive focus.",
     tagline:
-      "Precision-engineered structured grid for modern digital products.",
+      "Intentional whitespace, structured grids, and uncompromising clarity.",
     image: "/showcases/semi-flat.avif",
-    tones: { formal: 65, playful: 25, minimalist: 75, bold: 60 },
+    tones: { formal: 75, playful: 20, minimalist: 90, bold: 50 },
   },
   {
-    id: "minimalism",
-    label: "Minimalism",
-    badge: "Less is More",
-    vibe: "Premium, calm, and sophisticated.",
+    id: "expressive-energy",
+    label: "Expressive Energy",
+    badge: "Dynamic",
+    vibe: "Bold, vibrant, and unapologetically confident.",
     bestFor:
-      "Luxury brand sites, creative portfolios, and clean editorial publications.",
+      "Creative software, forward-thinking fintech, and culture-shaping brands.",
     description:
-      "The discipline of 'less is more'. Handles visual hierarchy by stripping away container boxes and borders completely in favor of massive whitespace, careful alignment, and elegant typography.",
+      "Harnesses high-contrast boundaries, saturated chromatic accents, and kinetic typographic scale to make an indelible brand statement that commands user attention.",
     tagline:
-      "Pure elegance through massive whitespace and high-contrast typography.",
-    image: "/showcases/minimalist.jpg",
-    tones: { formal: 80, playful: 10, minimalist: 95, bold: 35 },
-  },
-  {
-    id: "neumorphism",
-    label: "Neumorphism",
-    badge: "Soft UI",
-    vibe: "Futuristic, monochromatic, and softly tactile.",
-    bestFor:
-      "Smart-home dashboards, fitness trackers, and custom financial tool concepts.",
-    description:
-      "A style that merges flat simplicity with tactile feel. Components look molded directly out of the screen material using paired soft inner and outer shadows to look extruded or physically pressed.",
-    tagline:
-      "Tactile interface components extruded smoothly from ambient soft shadows.",
-    image: "/showcases/neumorphism.avif",
-    tones: { formal: 45, playful: 45, minimalist: 85, bold: 45 },
-  },
-  {
-    id: "neo-brutalism",
-    label: "Neo-Brutalism",
-    badge: "Raw & Edgy",
-    vibe: "Edgy, loud, and intentionally unpolished.",
-    bestFor:
-      "Creative software, modern fintech platforms, and web3 interfaces.",
-    description:
-      "A highly usable, commercial adaptation of web brutalism. Explicitly breaks standard corporate templates with thick unblurred black outlines, solid background colors, and high-voltage contrast.",
-    tagline:
-      "Raw HTML energy, unblurred solid drop shadows, and high-voltage contrast.",
-    image: "/showcases/neo-brutalism.jpg",
-    tones: { formal: 15, playful: 85, minimalist: 30, bold: 95 },
-  },
-  {
-    id: "maximalism",
-    label: "Maximalism",
-    badge: "Sensory Heavy",
-    vibe: "Bold, saturated, and sensory-heavy.",
-    bestFor:
-      "Creative portfolios, experimental interfaces, and attention-dominating brands.",
-    description:
-      "The direct visual counter-movement to minimalism. Rejects empty whitespace in favor of packed layouts, dense typography, overlapping textures, and massive, layered visual collages.",
-    tagline:
-      "Rich visual density, unapologetic chromatic saturation, and sensory collages.",
+      "High-voltage contrast, saturated palettes, and kinetic presence.",
     image: "/showcases/maximalism.avif",
-    tones: { formal: 10, playful: 95, minimalist: 10, bold: 100 },
+    tones: { formal: 15, playful: 90, minimalist: 20, bold: 95 },
+  },
+  {
+    id: "soft-tactility",
+    label: "Soft Tactility",
+    badge: "Physical",
+    vibe: "Organic, ambient, and gently dimensional.",
+    bestFor:
+      "Hardware companions, wellness platforms, and spatial interface concepts.",
+    description:
+      "Merges digital minimalism with soft physical affordance. Components emerge naturally from the background canvas with dual inner and outer ambient shadows that mimic smooth physical extrusion.",
+    tagline:
+      "Molded surfaces, soft ambient shadows, and organic physical depth.",
+    image: "/showcases/neumorphism.avif",
+    tones: { formal: 50, playful: 40, minimalist: 80, bold: 45 },
+  },
+  {
+    id: "editorial-character",
+    label: "Editorial Character",
+    badge: "Curated",
+    vibe: "Sophisticated, cultured, and thoughtfully literary.",
+    bestFor:
+      "Luxury publications, creative studios, and narrative-driven commerce.",
+    description:
+      "Translates the timeless restraint of high-end editorial print into digital space, pairing expressive serif-led typography with delicate hairline rules and generous, literary composition.",
+    tagline:
+      "Publication poise, refined typography, and narrative sophistication.",
+    image: "/showcases/minimalist.jpg",
+    tones: { formal: 85, playful: 15, minimalist: 85, bold: 40 },
   },
 ]
 

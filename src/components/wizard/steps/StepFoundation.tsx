@@ -202,7 +202,7 @@ export function StepFoundation({ isLoading }: StepFoundationProps = {}) {
         {/* Design Movement Presets Selector as Badges */}
         <div className="foundation-item space-y-2.5 pt-1">
           <div className="flex items-center justify-between">
-            <Label>Design Movement Style</Label>
+            <Label>Style Direction</Label>
           </div>
 
           <div className="flex flex-wrap gap-2">

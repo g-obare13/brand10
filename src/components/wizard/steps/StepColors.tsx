@@ -176,16 +176,19 @@ export function StepColors() {
               <span className="mr-1 font-semibold text-foreground">
                 {activeMovement.label} Style:
               </span>
-              {activeMovement.id === "minimalism" &&
-                "Minimalism thrives on quiet, muted palettes with high contrast against spacious canvas backgrounds."}
-              {activeMovement.id === "neo-brutalism" &&
-                "Neo-brutalism works best with bold, saturated primary accents paired with stark high-contrast boundaries."}
-              {activeMovement.id === "neumorphism" &&
-                "Neumorphism relies on gentle, low-contrast tonal steps to simulate soft physical extrusion and indentations."}
-              {activeMovement.id === "maximalism" &&
-                "Maximalism embraces hyper-vibrant saturation, energetic secondary accents, and vivid contrast."}
-              {activeMovement.id === "semi-flat" &&
-                "Clean, balanced primary and secondary tones offer maximum clarity and interface readability across modern devices."}
+              {(activeMovement.id === "quiet-precision" ||
+                activeMovement.id === "semi-flat") &&
+                "Quiet Precision favors disciplined neutral foundations with crisp, purposeful primary accents for maximum cognitive clarity."}
+              {(activeMovement.id === "expressive-energy" ||
+                activeMovement.id === "maximalism" ||
+                activeMovement.id === "neo-brutalism") &&
+                "Expressive Energy thrives on bold chromatic contrast, saturated primary tones, and unapologetic accent energy."}
+              {(activeMovement.id === "soft-tactility" ||
+                activeMovement.id === "neumorphism") &&
+                "Soft Tactility relies on gentle, low-contrast tonal steps to simulate soft physical extrusion and ambient indentations."}
+              {(activeMovement.id === "editorial-character" ||
+                activeMovement.id === "minimalism") &&
+                "Editorial Character pairs warm, literary neutrals with rich, ink-like dark accents for refined storytelling poise."}
             </div>
           </div>
         </div>
