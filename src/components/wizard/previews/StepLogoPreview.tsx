@@ -1,12 +1,22 @@
 import type { BrandDoDontItem } from "@/store/brandStore"
 import { useBrandStore } from "@/store/brandStore"
 import { Badge } from "@/components/ui/badge"
+import { Loader } from "@/components/ui/loader"
 import { cn } from "@/lib/utils"
 import GlassPanel from "@/components/shared/GlassPanel"
-import { IconCheck, IconX } from "@tabler/icons-react"
 import { DESIGN_MOVEMENTS } from "@/data/wizard"
 import { getPreviewTheme } from "./previewTheme"
 import { Circle } from "@boxicons/react"
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemTitle,
+} from "@/components/ui/item"
+
+export interface StepLogoPreviewProps {
+  isLoading?: boolean
+}
 
 const LOGO_DONTS: BrandDoDontItem[] = [
   {
@@ -53,6 +63,7 @@ interface BlueprintFrameProps {
   isDark?: boolean
   size?: "lg" | "sm"
   isSecondary?: boolean
+  isLoading?: boolean
 }
 
 /**
@@ -67,6 +78,7 @@ interface BlueprintFrameProps {
  * @param {boolean} [props.isDark=false] - Whether dark mode styling should apply.
  * @param {"lg" | "sm"} [props.size="lg"] - Scale of blueprint markers and dimensions.
  * @param {boolean} [props.isSecondary=false] - Whether this frame represents the secondary lockup.
+ * @param {boolean} [props.isLoading=false] - Whether vector logo is loading or rendering.
  * @returns {React.ReactElement} The rendered blueprint container frame.
  */
 function BlueprintFrame({
@@ -77,6 +89,7 @@ function BlueprintFrame({
   isDark = false,
   size = "lg",
   isSecondary = false,
+  isLoading = false,
 }: BlueprintFrameProps) {
   const outerOffset = size === "lg" ? 14 : 10
   const overshoot = size === "lg" ? 16 : 12
@@ -92,7 +105,7 @@ function BlueprintFrame({
           className={cn(
             "font-bold tracking-tight select-none",
             size === "lg" ? "text-2xl sm:text-3xl" : "text-base sm:text-lg",
-            isDark ? "text-white" : "text-zinc-900"
+            isDark ? "text-primary-50" : "text-primary-900"
           )}
         >
           {prefix}
@@ -106,7 +119,7 @@ function BlueprintFrame({
         className={cn(
           "font-bold tracking-tight select-none",
           size === "lg" ? "text-2xl sm:text-3xl" : "text-base sm:text-lg",
-          isDark ? "text-white" : "text-zinc-900"
+          isDark ? "text-primary-50" : "text-primary-900"
         )}
       >
         {name}
@@ -198,7 +211,9 @@ function BlueprintFrame({
             : "min-h-10 min-w-24 px-4 py-1.5"
         )}
       >
-        {svgUri ? (
+        {isLoading ? (
+          <Loader size={size === "lg" ? "md" : "sm"} />
+        ) : svgUri ? (
           <img
             src={svgUri}
             alt={isSecondary ? "Secondary Logo" : "Primary Logo"}
@@ -225,10 +240,13 @@ function BlueprintFrame({
  * - Dynamic Brand Do's and Don'ts usage guidelines display.
  *
  * @component
+ * @param {StepLogoPreviewProps} [props] - The component props.
+ * @param {boolean} [props.isLoading] - Optional manual override for loading skeleton state.
  * @returns {React.ReactElement} The rendered logo system preview panel.
  */
-export function StepLogoPreview() {
+export function StepLogoPreview({ isLoading }: StepLogoPreviewProps = {}) {
   const brand = useBrandStore()
+  const effectiveLoading = isLoading ?? (brand.isLoading || !brand.projectId)
   const primaryColor =
     brand.colorPalette.find((c) => c.role === "primary")?.hex || "#6366f1"
 
@@ -294,7 +312,8 @@ export function StepLogoPreview() {
                 brandName={brand.brandName}
                 primaryColor={primaryColor}
                 size="lg"
-                className="bg-white/95 shadow-xs"
+                className="bg-primary-50/95 shadow-xs"
+                isLoading={effectiveLoading}
               />
               <span className={theme.badgeText}>Primary Vector Geometry</span>
             </div>
@@ -305,7 +324,7 @@ export function StepLogoPreview() {
             {/* Top: Light Canvas */}
             <div
               className={cn(
-                "preview-card-anim flex min-h-26 flex-1 items-center justify-center bg-white/90 p-4 dark:bg-card/90",
+                "preview-card-anim flex min-h-26 flex-1 items-center justify-center bg-primary-50/90 p-4 dark:bg-card/90",
                 theme.tileCard
               )}
             >
@@ -314,14 +333,15 @@ export function StepLogoPreview() {
                 brandName={brand.brandName}
                 primaryColor={primaryColor}
                 size="sm"
-                className="bg-white"
+                className="bg-primary-50"
+                isLoading={effectiveLoading}
               />
             </div>
 
             {/* Bottom: Dark Canvas */}
             <div
               className={cn(
-                "preview-card-anim flex min-h-26 flex-1 items-center justify-center border-zinc-800 bg-zinc-950 p-4",
+                "preview-card-anim flex min-h-26 flex-1 items-center justify-center border-primary-800 bg-primary-950 p-4",
                 theme.tileCard
               )}
             >
@@ -329,8 +349,10 @@ export function StepLogoPreview() {
                 svgUri={primarySvgUri}
                 brandName={brand.brandName}
                 primaryColor={primaryColor}
+                className="bg-primary-950"
                 isDark={true}
                 size="sm"
+                isLoading={effectiveLoading}
               />
             </div>
           </div>
@@ -369,8 +391,9 @@ export function StepLogoPreview() {
                   brandName={brand.brandName}
                   primaryColor={primaryColor}
                   size="lg"
-                  className="bg-white/95 shadow-xs"
+                  className="bg-primary-50/95 shadow-xs"
                   isSecondary
+                  isLoading={effectiveLoading}
                 />
                 <span className={theme.badgeText}>
                   Horizontal / Wordmark Variant
@@ -383,7 +406,7 @@ export function StepLogoPreview() {
               {/* Top: Light Canvas */}
               <div
                 className={cn(
-                  "preview-card-anim flex min-h-26 flex-1 items-center justify-center bg-white/90 p-4 dark:bg-card/90",
+                  "preview-card-anim flex min-h-26 flex-1 items-center justify-center bg-primary-50/90 p-4 dark:bg-card/90",
                   theme.tileCard
                 )}
               >
@@ -393,14 +416,15 @@ export function StepLogoPreview() {
                   primaryColor={primaryColor}
                   size="sm"
                   isSecondary
-                  className="bg-white"
+                  className="bg-primary-50"
+                  isLoading={effectiveLoading}
                 />
               </div>
 
               {/* Bottom: Dark Canvas */}
               <div
                 className={cn(
-                  "preview-card-anim flex min-h-26 flex-1 items-center justify-center border-zinc-800 bg-zinc-950 p-4",
+                  "preview-card-anim flex min-h-26 flex-1 items-center justify-center border-primary-800 bg-primary-950 p-4",
                   theme.tileCard
                 )}
               >
@@ -410,7 +434,9 @@ export function StepLogoPreview() {
                   primaryColor={primaryColor}
                   isDark={true}
                   size="sm"
+                  className="bg-primary-950"
                   isSecondary
+                  isLoading={effectiveLoading}
                 />
               </div>
             </div>
@@ -430,38 +456,63 @@ export function StepLogoPreview() {
             Logo Usage Constraints &amp; Guardrails
           </span>
           <Badge className={theme.badge}>
-            {(brand.dosAndDonts.length > 0 ? brand.dosAndDonts : LOGO_DONTS).length} Rules
+            {
+              (brand.dosAndDonts.length > 0 ? brand.dosAndDonts : LOGO_DONTS)
+                .length
+            }{" "}
+            Rules
           </Badge>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {(brand.dosAndDonts.length > 0 ? brand.dosAndDonts : LOGO_DONTS).map((item, idx) => {
-            const isDo = item.type === "do"
-            return (
-              <div
-                key={item.id || idx}
-                className={cn(
-                  "flex items-start gap-2.5 rounded-xl border border-border/40 bg-background/50 p-3 text-left transition-all",
-                  theme.tileCard
-                )}
-              >
+        <div className="grid grid-cols-1 gap-3">
+          {(brand.dosAndDonts.length > 0 ? brand.dosAndDonts : LOGO_DONTS).map(
+            (item, idx) => {
+              return (
+                // <div
+                //   key={item.id || idx}
+                //   className={cn(
+                //     "flex w-full flex-row! items-start justify-start! gap-2.5 rounded-xl border border-border/40 bg-background/50 p-3 text-left transition-all",
+                //     theme.tileCard
+                //   )}
+                // >
+                //   <div
+                //     className={cn(
+                //       "mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full",
+                //       isDo
+                //         ? "bg-emerald-500/20 text-emerald-500"
+                //         : "bg-rose-500/20 text-rose-500"
+                //     )}
+                //   >
+                //     {isDo ? <IconCheck size={10} /> : <IconX size={10} />}
+                //   </div>
+                //   <div className="space-y-0.5">
+                //     <h5 className="text-base font-semibold">{item.rule}</h5>
+                //     {item.detail ? (
+                //       <p className="text-sm text-muted-foreground">
+                //         {item.detail}
+                //       </p>
+                //     ) : null}
+                //   </div>
+                // </div>
                 <div
+                  key={idx}
                   className={cn(
-                    "mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full",
-                    isDo
-                      ? "bg-emerald-500/20 text-emerald-500"
-                      : "bg-rose-500/20 text-rose-500"
+                    "mt-2 flex w-full flex-row! items-start justify-start! gap-2.5 p-0! text-left transition-all",
+                    theme.tileCard
                   )}
                 >
-                  {isDo ? <IconCheck size={10} /> : <IconX size={10} />}
+                  <Item variant="outline" key={item.id} className="border-0">
+                    <ItemContent>
+                      <ItemTitle>{item.rule}</ItemTitle>
+                      {item.detail ? (
+                        <ItemDescription>{item.detail}</ItemDescription>
+                      ) : null}
+                    </ItemContent>
+                  </Item>
                 </div>
-                <div className="space-y-0.5">
-                  <h5 className="text-base font-semibold">{item.rule}</h5>
-                  <p className="text-sm text-muted-foreground">{item.detail}</p>
-                </div>
-              </div>
-            )
-          })}
+              )
+            }
+          )}
         </div>
       </GlassPanel>
     </div>

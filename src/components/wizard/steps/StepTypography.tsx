@@ -61,6 +61,8 @@ function FontCombobox({
     if (selected) {
       loadGoogleFont(selected)
       onSelect(selected)
+    } else {
+      onSelect("Inter")
     }
   }
 
@@ -79,6 +81,7 @@ function FontCombobox({
           placeholder={value || "Search font..."}
           className="px-4"
           style={{ fontFamily: value ? `"${value}", sans-serif` : undefined }}
+          showClear
         />
         <ComboboxContent className="z-50 w-full">
           <ComboboxList className="max-h-60 overflow-y-auto p-1">
@@ -140,8 +143,10 @@ export function StepTypography() {
       monoFont: state.monoFont,
       typeScaleRatio: state.typeScaleRatio,
       stagedFontFiles: state.stagedFontFiles,
+      customFonts: state.customFonts,
       stageFontFile: state.stageFontFile,
-      removeStagedFontFile: state.removeStagedFontFile,
+      removeCustomFont: state.removeCustomFont,
+      uploadCustomFont: state.uploadCustomFont,
       setTypography: state.setTypography,
     }))
   )
@@ -199,12 +204,7 @@ export function StepTypography() {
       const success = await registerCustomFontFace(cleanFamily, blobUrl)
 
       if (success) {
-        // Stage font file in store so it persists to Supabase on Continue
-        brand.stageFontFile({
-          file,
-          family: cleanFamily,
-          target: uploadTarget,
-        })
+        await brand.uploadCustomFont(file, cleanFamily, uploadTarget)
 
         toast.success(
           `Custom font "${cleanFamily}" loaded and applied to ${uploadTarget === "display" ? "Display" : "Body"}!`
@@ -225,9 +225,7 @@ export function StepTypography() {
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <h4 className="mb-2">
-          Hierarchy &amp; Type Scale
-        </h4>
+        <h4 className="mb-2">Hierarchy &amp; Type Scale</h4>
         <p className="mb-2">
           Select cohesive Google Font pairings, search the live catalog, or
           upload custom brand typefaces (.woff2, .woff, .ttf, .otf).
@@ -308,30 +306,41 @@ export function StepTypography() {
             />
           </div>
 
-          {brand.stagedFontFiles && brand.stagedFontFiles.length > 0 && (
-            <div className="space-y-1">
-              <div className="flex flex-wrap gap-1.5">
-                {brand.stagedFontFiles.map((staged) => (
-                  <Badge
-                    key={staged.family}
-                    variant={"outline"}
-                    icon={
-                      <X className="cursor-pointer transition hover:text-destructive" />
-                    }
-                    onClick={() => {
-                      brand.removeStagedFontFile(staged.family)
-                      toast.info(
-                        `Removed custom font "${staged.family}" (reset to Inter)`
-                      )
-                    }}
-                    className="cursor-pointer transition hover:border-destructive/50 hover:bg-destructive/10"
-                  >
-                    {staged.family} ({staged.target})
-                  </Badge>
-                ))}
+          {(() => {
+            const activeCustomFonts = [
+              ...(brand.customFonts || []),
+              ...(brand.stagedFontFiles || []).filter(
+                (s) => !brand.customFonts?.some((c) => c.family === s.family)
+              ),
+            ]
+
+            if (activeCustomFonts.length === 0) return null
+
+            return (
+              <div className="space-y-1">
+                <div className="flex flex-wrap gap-1.5">
+                  {activeCustomFonts.map((font) => (
+                    <Badge
+                      key={`${font.family}-${font.target}`}
+                      variant="outline"
+                      icon={
+                        <X className="cursor-pointer transition hover:text-destructive" />
+                      }
+                      onClick={async () => {
+                        await brand.removeCustomFont(font.family)
+                        toast.info(
+                          `Removed custom font "${font.family}" (reset to Inter)`
+                        )
+                      }}
+                      className="cursor-pointer transition hover:border-destructive/50 hover:bg-destructive/10"
+                    >
+                      {font.family} ({font.target})
+                    </Badge>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )
+          })()}
         </div>
 
         {/* Type Scale Ratio Slider */}

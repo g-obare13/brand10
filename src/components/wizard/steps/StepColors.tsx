@@ -2,12 +2,27 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DESIGN_MOVEMENTS } from "@/data/wizard"
 import { generateTonalShades } from "@/lib/colorUtils"
+import { cn } from "@/lib/utils"
 import { useBrandStore } from "@/store/brandStore"
 import chroma from "chroma-js"
+
+function getSwatchMeta(role: string, index: number) {
+  switch (role) {
+    case "primary":
+      return { label: "Primary Color", tag: "Base Dominant" }
+    case "secondary":
+      return { label: "Secondary Color", tag: "Alternate Dominant" }
+    case "accent":
+      return { label: "Accent Color", tag: "Vibrant Accent" }
+    default:
+      return { label: `Color ${index + 1}`, tag: "Extended Hue" }
+  }
+}
+
 /**
  * Step 3 Wizard form component for configuring brand color palette and harmonic relationships.
  * Features:
- * - Color pickers and hex inputs for primary, secondary, and accent roles.
+ * - Dynamic color pickers and hex inputs reflecting the exact number of extracted dominant colors.
  * - Preset palette suggestions based on the active design movement.
  * - Instant tonal scale generation across 11 lightness values (50 to 950).
  * - Real-time contrast checks and WCAG accessibility ratings.
@@ -18,12 +33,11 @@ import chroma from "chroma-js"
 export function StepColors() {
   const brand = useBrandStore()
 
-  const primarySwatch =
-    brand.colorPalette.find((c) => c.role === "primary") ||
-    brand.colorPalette[0]
-  const secondarySwatch =
-    brand.colorPalette.find((c) => c.role === "secondary") ||
-    brand.colorPalette[1]
+  const brandSwatches = brand.colorPalette.filter(
+    (c) => c.role !== "neutral" && c.role !== "background"
+  )
+  const displaySwatches =
+    brandSwatches.length > 0 ? brandSwatches : brand.colorPalette.slice(0, 2)
 
   const activeMovement =
     (brand.designMovement
@@ -46,89 +60,62 @@ export function StepColors() {
     <div className="space-y-6">
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <h4 className="mb-2">
-            Palette &amp; Accessibility Scale
-          </h4>
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-            <span className="size-1.5 animate-pulse rounded-full bg-primary" />
-            <span>{activeMovement.label}</span>
-          </div>
+          <h4 className="mb-2">Palette &amp; Accessibility Scale</h4>
         </div>
         <p className="mb-2">
-          Fine-tune the 2 dominant brand colors extracted from your mark. Tonal
-          scales and accessibility ratios adapt in real time.
+          Fine-tune the {displaySwatches.length} dominant brand{" "}
+          {displaySwatches.length === 1 ? "color" : "colors"} extracted from
+          your mark. Tonal scales and accessibility ratios adapt in real time.
         </p>
       </div>
 
       <div className="space-y-5">
-        {/* Custom Color Inputs for 2 Dominant Colors */}
+        {/* Custom Color Inputs for Dominant Colors */}
         <div className="colors-item-anim space-y-3 pt-2">
           <Label>Fine-tune Dominant Brand Colors</Label>
 
-          <div className="grid grid-cols-2 gap-3 pt-2">
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-foreground">
-                  Primary Color
-                </span>
-                <span className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
-                  Base Dominant
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={
-                    chroma.valid(primarySwatch.hex)
-                      ? chroma(primarySwatch.hex).hex()
-                      : "#6366f1"
-                  }
-                  onChange={(e) =>
-                    handleColorChange(primarySwatch.id, e.target.value)
-                  }
-                  className="size-8 cursor-pointer rounded-lg border-0 bg-transparent"
-                />
-                <Input
-                  value={primarySwatch.hex}
-                  onChange={(e) =>
-                    handleColorChange(primarySwatch.id, e.target.value)
-                  }
-                  className="h-8 rounded-lg font-mono text-xs uppercase"
-                />
-              </div>
-            </div>
+          <div
+            className={cn(
+              "grid gap-3 pt-2",
+              displaySwatches.length === 1 && "grid-cols-1",
+              displaySwatches.length === 2 && "grid-cols-1 sm:grid-cols-2",
+              displaySwatches.length === 3 && "grid-cols-1 sm:grid-cols-3",
+              displaySwatches.length >= 4 && "grid-cols-2 sm:grid-cols-4"
+            )}
+          >
+            {displaySwatches.map((swatch, idx) => {
+              const meta = getSwatchMeta(swatch.role, idx)
+              const isValid = chroma.valid(swatch.hex)
+              const hexVal = isValid ? chroma(swatch.hex).hex() : "#6366f1"
 
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-foreground">
-                  Secondary Color
-                </span>
-                <span className="rounded-md bg-secondary/10 px-1.5 py-0.5 text-[10px] font-medium text-foreground">
-                  Alternate Dominant
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={
-                    chroma.valid(secondarySwatch.hex)
-                      ? chroma(secondarySwatch.hex).hex()
-                      : "#06b6d4"
-                  }
-                  onChange={(e) =>
-                    handleColorChange(secondarySwatch.id, e.target.value)
-                  }
-                  className="size-8 cursor-pointer rounded-lg border-0 bg-transparent"
-                />
-                <Input
-                  value={secondarySwatch.hex}
-                  onChange={(e) =>
-                    handleColorChange(secondarySwatch.id, e.target.value)
-                  }
-                  className="h-8 rounded-lg font-mono text-xs uppercase"
-                />
-              </div>
-            </div>
+              return (
+                <div key={swatch.id || idx} className="space-y-1.5">
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="text-[11px] font-semibold text-foreground">
+                      {meta.label}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      aria-label={`${meta.label} picker`}
+                      value={hexVal}
+                      onChange={(e) =>
+                        handleColorChange(swatch.id, e.target.value)
+                      }
+                      className="size-8 cursor-pointer rounded-lg border-0 bg-transparent"
+                    />
+                    <Input
+                      value={swatch.hex}
+                      onChange={(e) =>
+                        handleColorChange(swatch.id, e.target.value)
+                      }
+                      className="h-8 rounded-lg font-mono text-xs uppercase"
+                    />
+                  </div>
+                </div>
+              )
+            })}
           </div>
 
           {/* Style Guidance Micro-Tip */}

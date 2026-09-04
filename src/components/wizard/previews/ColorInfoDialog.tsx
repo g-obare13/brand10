@@ -51,7 +51,7 @@ const SHADE_KEYS = [
 
 interface ColorInfoDialogProps {
   label: string
-  role: "primary" | "secondary"
+  role: string
   hex: string
   shades: Record<string, string>
   children?: ReactNode

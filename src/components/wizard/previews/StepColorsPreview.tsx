@@ -91,7 +91,7 @@ function getApproximateColorName(hex: string, defaultName?: string): string {
 
 interface ColorShadeScaleRowProps {
   label: string
-  role: "primary" | "secondary"
+  role: string
   hex: string
   shades: Record<string, string>
 }
@@ -245,23 +245,30 @@ function ColorShadeScaleRow({
 export function StepColorsPreview() {
   const brand = useBrandStore()
 
-  const primary = brand.colorPalette.find((c) => c.role === "primary") ||
-    brand.colorPalette[0] || {
-      id: "primary",
-      role: "primary",
-      name: "Primary Brand",
-      hex: "#6366f1",
-      shades: generateTonalShades("#6366f1"),
-    }
-
-  const secondary = brand.colorPalette.find((c) => c.role === "secondary") ||
-    brand.colorPalette[1] || {
-      id: "secondary",
-      role: "secondary",
-      name: "Secondary Accent",
-      hex: "#06b6d4",
-      shades: generateTonalShades("#06b6d4"),
-    }
+  const brandSwatches = brand.colorPalette.filter(
+    (c) => c.role !== "neutral" && c.role !== "background"
+  )
+  const displaySwatches =
+    brandSwatches.length > 0
+      ? brandSwatches
+      : brand.colorPalette.slice(0, 2).length > 0
+        ? brand.colorPalette.slice(0, 2)
+        : [
+            {
+              id: "primary",
+              role: "primary" as const,
+              name: "Primary Brand",
+              hex: "#6366f1",
+              shades: generateTonalShades("#6366f1"),
+            },
+            {
+              id: "secondary",
+              role: "secondary" as const,
+              name: "Secondary Accent",
+              hex: "#06b6d4",
+              shades: generateTonalShades("#06b6d4"),
+            },
+          ]
 
   const activeMovement =
     (brand.designMovement
@@ -275,9 +282,7 @@ export function StepColorsPreview() {
     DESIGN_MOVEMENTS[0]
 
   const theme = getPreviewTheme(activeMovement.id)
-
-  const primaryName = getApproximateColorName(primary.hex, primary.name)
-  const secondaryName = getApproximateColorName(secondary.hex, secondary.name)
+  const primaryHex = displaySwatches[0]?.hex || "#6366f1"
 
   return (
     <div className={theme.container}>
@@ -295,28 +300,26 @@ export function StepColorsPreview() {
           <div
             className={theme.heroGlow}
             style={{
-              backgroundColor: primary.hex,
+              backgroundColor: primaryHex,
             }}
           />
         )}
 
-        {/* Dominant Color 1 (Primary) Monochrome Scale */}
-        <ColorShadeScaleRow
-          label={primaryName}
-          role="primary"
-          hex={primary.hex}
-          shades={primary.shades}
-        />
+        {displaySwatches.map((swatch, idx) => {
+          const name = getApproximateColorName(swatch.hex, swatch.name)
 
-        <div className="h-12" />
-
-        {/* Dominant Color 2 (Secondary) Monochrome Scale */}
-        <ColorShadeScaleRow
-          label={secondaryName}
-          role="secondary"
-          hex={secondary.hex}
-          shades={secondary.shades}
-        />
+          return (
+            <div key={swatch.id || idx}>
+              {idx > 0 && <div className="h-8" />}
+              <ColorShadeScaleRow
+                label={name}
+                role={swatch.role}
+                hex={swatch.hex}
+                shades={swatch.shades}
+              />
+            </div>
+          )
+        })}
       </GlassPanel>
     </div>
   )

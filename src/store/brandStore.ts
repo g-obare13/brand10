@@ -116,10 +116,12 @@ export interface BrandState {
     baseFontSize?: number
     typeScaleRatio?: number
     customFonts?: { family: string; url: string; target: 'display' | 'body' }[]
-  }) => void
+  }) => void | Promise<void>
   addCustomFont: (font: { family: string; url: string; target: 'display' | 'body' }) => void
   stageFontFile: (staged: { file: File; family: string; target: 'display' | 'body' }) => void
-  removeStagedFontFile: (family: string) => void
+  removeStagedFontFile: (family: string) => void | Promise<void>
+  removeCustomFont: (family: string) => Promise<void>
+  uploadCustomFont: (file: File, family: string, target: 'display' | 'body') => Promise<void>
   uploadStagedFonts: () => Promise<void>
 
   // Imagery actions
@@ -258,6 +260,68 @@ export async function uploadLogoToSupabase(
 }
 
 /**
+ * Helper to delete SVG/raster logo from Supabase Storage bucket 'brand-logos'
+ */
+export async function deleteLogoFromSupabase(
+  projectId: string,
+  slot: 'primary' | 'secondary' = 'primary',
+  currentLogoUrl?: string
+): Promise<void> {
+  if (!supabase || !projectId || projectId.startsWith('demo-') || projectId === 'current') {
+    return
+  }
+
+  try {
+    const bucket = 'brand-logos'
+    const pathsToDelete = new Set<string>()
+
+    // 1. If a public URL is provided, extract the direct storage path
+    if (currentLogoUrl && currentLogoUrl.includes(`/${bucket}/`)) {
+      const parts = currentLogoUrl.split(`/${bucket}/`)
+      if (parts[1]) {
+        const rawPath = decodeURIComponent(parts[1].split('?')[0])
+        if (rawPath) {
+          pathsToDelete.add(rawPath)
+        }
+      }
+    }
+
+    // 2. Query bucket for any existing files for this project & slot (cleaning up any orphaned versions)
+    const { data: authData } = await supabase.auth.getUser()
+    const userId = authData.user?.id
+
+    const searchLocations = [
+      ...(userId ? [{ path: userId, prefix: `${projectId}_${slot}_` }] : []),
+      { path: projectId, prefix: `${slot}_logo_` },
+      { path: projectId, prefix: `${projectId}_${slot}_` },
+    ]
+
+    for (const loc of searchLocations) {
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .list(loc.path, { limit: 100, search: loc.prefix })
+
+      if (!error && data) {
+        data
+          .filter((f) => f.name.startsWith(loc.prefix))
+          .forEach((f) => pathsToDelete.add(`${loc.path}/${f.name}`))
+      }
+    }
+
+    if (pathsToDelete.size > 0) {
+      const { error: removeError } = await supabase.storage
+        .from(bucket)
+        .remove(Array.from(pathsToDelete))
+      if (removeError) {
+        console.warn('Failed to remove logo from Supabase storage:', removeError.message)
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to delete logo from Supabase storage:', err)
+  }
+}
+
+/**
  * Helper to upload custom font files (woff2, woff, ttf, otf) directly to Supabase Storage bucket 'brand-fonts'
  */
 export async function uploadCustomFontToSupabase(
@@ -298,6 +362,74 @@ export async function uploadCustomFontToSupabase(
   } catch (err) {
     console.warn('Failed to upload custom font to Supabase storage:', err)
     return null
+  }
+}
+
+/**
+ * Helper to delete custom font files directly from Supabase Storage bucket 'brand-fonts'
+ */
+export async function deleteCustomFontFromSupabase(
+  projectId: string,
+  fontFamily: string,
+  fontUrl?: string
+): Promise<void> {
+  if (!supabase || !projectId || projectId.startsWith('demo-') || projectId === 'current') {
+    return
+  }
+
+  try {
+    const bucket = 'brand-fonts'
+    const pathsToDelete = new Set<string>()
+
+    // 1. If explicit fontUrl provided, extract storage relative path
+    if (fontUrl) {
+      try {
+        const marker = `/${bucket}/`
+        const idx = fontUrl.indexOf(marker)
+        if (idx !== -1) {
+          const rawPath = fontUrl.substring(idx + marker.length).split('?')[0]
+          if (rawPath) {
+            pathsToDelete.add(decodeURIComponent(rawPath))
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to parse fontUrl path:', e)
+      }
+    }
+
+    // 2. Search by prefix in user & project storage locations
+    const { data: authData } = await supabase.auth.getUser()
+    const userId = authData.user?.id
+    const cleanFamily = fontFamily.toLowerCase().replace(/[^a-z0-9]/g, '_')
+
+    const searchLocations = [
+      ...(userId ? [{ path: userId, prefix: `${projectId}_font_${cleanFamily}_` }] : []),
+      { path: projectId, prefix: `font_${cleanFamily}_` },
+      { path: projectId, prefix: `${projectId}_font_${cleanFamily}_` },
+    ]
+
+    for (const loc of searchLocations) {
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .list(loc.path, { limit: 100, search: loc.prefix })
+
+      if (!error && data) {
+        data
+          .filter((f) => f.name.startsWith(loc.prefix))
+          .forEach((f) => pathsToDelete.add(`${loc.path}/${f.name}`))
+      }
+    }
+
+    if (pathsToDelete.size > 0) {
+      const { error: removeError } = await supabase.storage
+        .from(bucket)
+        .remove(Array.from(pathsToDelete))
+      if (removeError) {
+        console.warn('Failed to remove custom font from Supabase storage:', removeError.message)
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to delete custom font from Supabase storage:', err)
   }
 }
 
@@ -417,6 +549,7 @@ export const useBrandStore = create<BrandState>()(
 
       setLogoData: async ({ svgContent, rasterDataUri, isVector, aspectRatio, logoUrl }) => {
         const id = get().projectId || 'current'
+
         if (svgContent) {
           await idbSet(`brand_svg_${id}`, svgContent)
         }
@@ -449,6 +582,7 @@ export const useBrandStore = create<BrandState>()(
 
       setSecondaryLogoData: async ({ svgContent, logoUrl }) => {
         const id = get().projectId || 'current'
+
         if (svgContent) {
           await idbSet(`brand_secondary_svg_${id}`, svgContent)
         }
@@ -474,19 +608,33 @@ export const useBrandStore = create<BrandState>()(
 
       removeLogo: async () => {
         const id = get().projectId || 'current'
+        const currentUrl = get().logoUrl
         try {
           await idbDel(`brand_svg_${id}`)
           await idbDel(`brand_raster_${id}`)
         } catch {}
+
+        if (id && id !== 'current') {
+          await deleteLogoFromSupabase(id, 'primary', currentUrl)
+        }
+
         set({ svgContent: undefined, rasterDataUri: undefined, logoUrl: undefined })
+        await get().saveToSupabase()
       },
 
       removeSecondaryLogo: async () => {
         const id = get().projectId || 'current'
+        const currentUrl = get().secondaryLogoUrl
         try {
           await idbDel(`brand_secondary_svg_${id}`)
         } catch {}
+
+        if (id && id !== 'current') {
+          await deleteLogoFromSupabase(id, 'secondary', currentUrl)
+        }
+
         set({ secondarySvgContent: undefined, secondaryLogoUrl: undefined })
+        await get().saveToSupabase()
       },
 
       setClearspaceMultiplier: (multiplier) => set({ clearspaceMultiplier: multiplier }),
@@ -519,21 +667,59 @@ export const useBrandStore = create<BrandState>()(
         })
       },
 
-      setTypography: (updates) => {
-        set((state) => ({
+      setTypography: async (updates) => {
+        const state = get()
+        const id = state.projectId || 'current'
+
+        // Detect if a custom font is being replaced on display or body
+        const fontsToCleanUp: { family: string; url?: string }[] = []
+
+        if (updates.displayFont && updates.displayFont !== state.displayFont) {
+          const oldDisplayCustom = (state.customFonts || []).find((cf) => cf.family === state.displayFont)
+          const oldDisplayStaged = (state.stagedFontFiles || []).find((sf) => sf.family === state.displayFont)
+          const oldFamily = oldDisplayCustom?.family || oldDisplayStaged?.family
+          if (oldFamily && updates.bodyFont !== oldFamily && state.bodyFont !== oldFamily) {
+            fontsToCleanUp.push({ family: oldFamily, url: oldDisplayCustom?.url })
+          }
+        }
+
+        if (updates.bodyFont && updates.bodyFont !== state.bodyFont) {
+          const oldBodyCustom = (state.customFonts || []).find((cf) => cf.family === state.bodyFont)
+          const oldBodyStaged = (state.stagedFontFiles || []).find((sf) => sf.family === state.bodyFont)
+          const oldFamily = oldBodyCustom?.family || oldBodyStaged?.family
+          if (oldFamily && updates.displayFont !== oldFamily && state.displayFont !== oldFamily) {
+            if (!fontsToCleanUp.some((f) => f.family === oldFamily)) {
+              fontsToCleanUp.push({ family: oldFamily, url: oldBodyCustom?.url })
+            }
+          }
+        }
+
+        const familiesToPurge = new Set(fontsToCleanUp.map((f) => f.family))
+        const remainingCustom = (state.customFonts || []).filter((f) => !familiesToPurge.has(f.family))
+        const remainingStaged = (state.stagedFontFiles || []).filter((f) => !familiesToPurge.has(f.family))
+
+        set({
           displayFont: updates.displayFont || state.displayFont,
           bodyFont: updates.bodyFont || state.bodyFont,
           monoFont: updates.monoFont || state.monoFont,
           baseFontSize: updates.baseFontSize || state.baseFontSize,
           typeScaleRatio: updates.typeScaleRatio || state.typeScaleRatio,
-          customFonts: updates.customFonts || state.customFonts,
-        }))
+          customFonts: familiesToPurge.size > 0 ? remainingCustom : (updates.customFonts || state.customFonts),
+          stagedFontFiles: familiesToPurge.size > 0 ? remainingStaged : state.stagedFontFiles,
+        })
+
+        if (familiesToPurge.size > 0 && id && id !== 'current' && !id.startsWith('demo-')) {
+          for (const item of fontsToCleanUp) {
+            await deleteCustomFontFromSupabase(id, item.family, item.url)
+          }
+          await get().saveToSupabase()
+        }
       },
 
       addCustomFont: (font) => {
         set((state) => {
           const current = state.customFonts || []
-          const filtered = current.filter((f) => f.family !== font.family)
+          const filtered = current.filter((f) => f.family !== font.family && f.target !== font.target)
           return {
             customFonts: [...filtered, font],
             ...(font.target === 'display' ? { displayFont: font.family } : { bodyFont: font.family }),
@@ -544,7 +730,7 @@ export const useBrandStore = create<BrandState>()(
       stageFontFile: (staged) => {
         set((state) => {
           const current = state.stagedFontFiles || []
-          const filtered = current.filter((f) => f.family !== staged.family)
+          const filtered = current.filter((f) => f.family !== staged.family && f.target !== staged.target)
           return {
             stagedFontFiles: [...filtered, staged],
             ...(staged.target === 'display' ? { displayFont: staged.family } : { bodyFont: staged.family }),
@@ -552,26 +738,88 @@ export const useBrandStore = create<BrandState>()(
         })
       },
 
-      removeStagedFontFile: (family) => {
-        set((state) => {
-          const current = state.stagedFontFiles || []
-          const removedItem = current.find((f) => f.family === family)
-          const filtered = current.filter((f) => f.family !== family)
-          const updates: Partial<BrandState> = { stagedFontFiles: filtered }
+      removeCustomFont: async (family) => {
+        const state = get()
+        const id = state.projectId || 'current'
 
-          if (removedItem) {
-            if (removedItem.target === 'display' && state.displayFont === family) {
-              updates.displayFont = 'Inter'
-            } else if (removedItem.target === 'body' && state.bodyFont === family) {
-              updates.bodyFont = 'Inter'
-            }
-          } else {
-            if (state.displayFont === family) updates.displayFont = 'Inter'
-            if (state.bodyFont === family) updates.bodyFont = 'Inter'
+        const targetCustomFonts = (state.customFonts || []).filter((f) => f.family === family)
+        const remainingCustomFonts = (state.customFonts || []).filter((f) => f.family !== family)
+        const remainingStaged = (state.stagedFontFiles || []).filter((f) => f.family !== family)
+
+        const updates: Partial<BrandState> = {
+          customFonts: remainingCustomFonts,
+          stagedFontFiles: remainingStaged,
+        }
+
+        if (state.displayFont === family) {
+          updates.displayFont = 'Inter'
+        }
+        if (state.bodyFont === family) {
+          updates.bodyFont = 'Inter'
+        }
+
+        set(updates)
+
+        if (id && id !== 'current' && !id.startsWith('demo-')) {
+          for (const cf of targetCustomFonts) {
+            await deleteCustomFontFromSupabase(id, family, cf.url)
           }
+          if (targetCustomFonts.length === 0) {
+            await deleteCustomFontFromSupabase(id, family)
+          }
+        }
 
-          return updates
+        await get().saveToSupabase()
+      },
+
+      removeStagedFontFile: async (family) => {
+        await get().removeCustomFont(family)
+      },
+
+      uploadCustomFont: async (file, family, target) => {
+        const state = get()
+        const id = state.projectId || 'current'
+
+        // Check if there was an existing custom font for this target slot
+        const oldCustom = (state.customFonts || []).find((cf) => cf.target === target && cf.family !== family)
+        const oldStaged = (state.stagedFontFiles || []).find((sf) => sf.target === target && sf.family !== family)
+        const oldFamily = oldCustom?.family || oldStaged?.family
+
+        let publicUrl: string | null = null
+        if (id && id !== 'current' && !id.startsWith('demo-')) {
+          publicUrl = await uploadCustomFontToSupabase(file, id, family)
+        }
+
+        set((prev) => {
+          const currentCustom = prev.customFonts || []
+          const filteredCustom = currentCustom.filter((cf) => cf.family !== family && cf.target !== target)
+          const currentStaged = prev.stagedFontFiles || []
+          const filteredStaged = currentStaged.filter((sf) => sf.family !== family && sf.target !== target)
+
+          const nextCustomFonts = publicUrl
+            ? [...filteredCustom, { family, url: publicUrl, target }]
+            : filteredCustom
+
+          const nextStagedFiles = publicUrl
+            ? filteredStaged
+            : [...filteredStaged, { file, family, target }]
+
+          return {
+            customFonts: nextCustomFonts,
+            stagedFontFiles: nextStagedFiles,
+            ...(target === 'display' ? { displayFont: family } : { bodyFont: family }),
+          }
         })
+
+        // Clean up old family from Supabase if no longer in use
+        if (oldFamily && id && id !== 'current' && !id.startsWith('demo-')) {
+          const otherFont = target === 'display' ? get().bodyFont : get().displayFont
+          if (otherFont !== oldFamily) {
+            await deleteCustomFontFromSupabase(id, oldFamily, oldCustom?.url)
+          }
+        }
+
+        await get().saveToSupabase()
       },
 
       uploadStagedFonts: async () => {
@@ -590,6 +838,7 @@ export const useBrandStore = create<BrandState>()(
           }
         }
         set({ stagedFontFiles: [] })
+        await get().saveToSupabase()
       },
 
       setImagery: (updates) => {
@@ -916,7 +1165,7 @@ export const useBrandStore = create<BrandState>()(
                   p.id === state.projectId
                     ? {
                         ...p,
-                        logo_url: primaryLogo || p.logo_url,
+                        logo_url: primaryLogo || undefined,
                         brand_name: state.brandName || p.brand_name,
                         name: state.brandName || p.name,
                         primary_color:

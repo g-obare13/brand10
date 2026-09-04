@@ -1,7 +1,15 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemTitle,
+} from "@/components/ui/item"
 import { Label } from "@/components/ui/label"
+import { Loader } from "@/components/ui/loader"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   extractColorsFromSvg,
@@ -11,7 +19,6 @@ import { cn } from "@/lib/utils"
 import { useBrandStore } from "@/store/brandStore"
 import {
   IconAlertCircle,
-  IconCheck,
   IconPlus,
   IconRefresh,
   IconTrash,
@@ -22,26 +29,38 @@ import { useEffect, useRef, useState } from "react"
 
 const MAX_SVG_BYTES = 1 * 1024 * 1024 // 1MB
 
+export interface StepLogoProps {
+  isLoading?: boolean
+}
+
 /**
  * Step 2 Wizard form component for configuring primary and secondary brand logo marks.
  * Features:
  * - Drag-and-drop SVG file uploads with validation and size limit enforcement.
  * - In-browser vector color extraction with clustering into brand color swatches.
+ * - Real-time Loader indicators during mark processing and palette extraction.
  * - Logo clearspace multiplier adjustments and lockup previews.
  * - Brand guidelines Do's and Don'ts manager for logo usage rules.
  *
  * @component
+ * @param {StepLogoProps} [props] - The component props.
+ * @param {boolean} [props.isLoading] - Optional manual override for loading state.
  * @returns {React.ReactElement} The rendered logo configuration form.
  */
-export function StepLogo() {
+export function StepLogo({ isLoading }: StepLogoProps = {}) {
   const brand = useBrandStore()
+  const effectiveLoading = isLoading ?? (brand.isLoading || !brand.projectId)
 
   const [activeSlot, setActiveSlot] = useState<"primary" | "secondary">(
     "primary"
   )
   const [extractedColors, setExtractedColors] = useState<string[]>([])
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [, setIsProcessing] = useState(false)
+  const [processingSlot, setProcessingSlot] = useState<
+    "primary" | "secondary" | null
+  >(null)
+  const isProcessing = processingSlot !== null
+  const [isExtractingColors, setIsExtractingColors] = useState(false)
   const [dragOverSlot, setDragOverSlot] = useState<
     "primary" | "secondary" | null
   >(null)
@@ -51,22 +70,18 @@ export function StepLogo() {
   const lastExtractedPrimarySvg = useRef<string | null>(null)
 
   const [isAddingRule, setIsAddingRule] = useState(false)
-  const [newRuleType, setNewRuleType] = useState<"do" | "dont">("dont")
   const [newRuleTitle, setNewRuleTitle] = useState("")
   const [newRuleDetail, setNewRuleDetail] = useState("")
 
   const handleAddRule = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!newRuleTitle.trim()) return
+    const trimmedTitle = newRuleTitle.trim()
+    if (!trimmedTitle) return
 
     brand.addDoDont({
-      type: newRuleType,
-      rule: newRuleTitle.trim(),
-      detail:
-        newRuleDetail.trim() ||
-        (newRuleType === "dont"
-          ? "Prohibited logo treatment."
-          : "Recommended logo treatment."),
+      type: "dont",
+      rule: trimmedTitle,
+      detail: newRuleDetail.trim(),
     })
 
     setNewRuleTitle("")
@@ -74,13 +89,37 @@ export function StepLogo() {
     setIsAddingRule(false)
   }
 
-  const extractPrimaryColors = async (svg: string, syncPalette: boolean) => {
-    const colors = await extractColorsFromSvg(svg, 4)
-    setExtractedColors(colors)
+  const handleDeleteLogo = async (slot: "primary" | "secondary") => {
+    setProcessingSlot(slot)
+    try {
+      if (slot === "primary") {
+        await brand.removeLogo()
+        lastExtractedPrimarySvg.current = null
+        setExtractedColors([])
+      } else {
+        await brand.removeSecondaryLogo()
+      }
+    } catch (err) {
+      console.error(`Failed to remove ${slot} logo:`, err)
+    } finally {
+      setProcessingSlot(null)
+    }
+  }
 
-    if (syncPalette && colors.length > 0) {
-      const updated = syncExtractedColorsToPalette(colors, brand.colorPalette)
-      brand.setColorPalette(updated)
+  const extractPrimaryColors = async (svg: string, syncPalette: boolean) => {
+    setIsExtractingColors(true)
+    try {
+      const colors = await extractColorsFromSvg(svg, 4)
+      setExtractedColors(colors)
+
+      if (syncPalette && colors.length > 0) {
+        const updated = syncExtractedColorsToPalette(colors, brand.colorPalette)
+        brand.setColorPalette(updated)
+      }
+    } catch (err) {
+      console.error("Color extraction error:", err)
+    } finally {
+      setIsExtractingColors(false)
     }
   }
 
@@ -118,7 +157,7 @@ export function StepLogo() {
       return
     }
 
-    setIsProcessing(true)
+    setProcessingSlot(slot)
 
     try {
       const text = await file.text()
@@ -129,7 +168,7 @@ export function StepLogo() {
       const parserError = doc.querySelector("parsererror")
       if (parserError) {
         setErrorMsg("Corrupt SVG file: Unable to parse XML structure.")
-        setIsProcessing(false)
+        setProcessingSlot(null)
         return
       }
 
@@ -170,7 +209,7 @@ export function StepLogo() {
       console.error("SVG Processing Error:", err)
       setErrorMsg("An unexpected error occurred while reading the SVG file.")
     } finally {
-      setIsProcessing(false)
+      setProcessingSlot(null)
     }
   }
 
@@ -181,6 +220,22 @@ export function StepLogo() {
   const secondarySvgUri = brand.secondarySvgContent
     ? `data:image/svg+xml;utf8,${encodeURIComponent(brand.secondarySvgContent)}`
     : null
+
+  if (effectiveLoading) {
+    return (
+      <div className="flex h-full min-h-96 flex-col items-center justify-center space-y-4 rounded-2xl p-8 text-center">
+        <Loader size="lg" />
+        <div className="space-y-1">
+          <p className="text-sm font-semibold text-foreground">
+            Loading Logo Configuration...
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Retrieving vector marks, clearspace settings, and brand guidelines
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="relative flex h-full flex-col space-y-6">
@@ -230,8 +285,16 @@ export function StepLogo() {
             }}
           />
 
-          {brand.svgContent && primarySvgUri ? (
+          {primarySvgUri ? (
             <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-card/80 p-4 transition-all">
+              {processingSlot === "primary" && (
+                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-background/85 backdrop-blur-xs">
+                  <Loader size="sm" />
+                  <span className="text-xs font-semibold text-foreground">
+                    Deleting logo...
+                  </span>
+                </div>
+              )}
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="flex size-16 items-center justify-center rounded-xl border border-border/60 bg-muted/30 p-2">
@@ -253,28 +316,20 @@ export function StepLogo() {
                 <div className="flex items-center gap-1.5">
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="destructive_outline"
                     size="sm"
-                    onClick={() => primaryInputRef.current?.click()}
-                    className="cursor-pointer rounded-full text-xs"
-                    icon={<IconRefresh size={13} />}
-                    iconPlacement="left"
-                  >
-                    Replace
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      brand.removeLogo()
-                      lastExtractedPrimarySvg.current = null
-                      setExtractedColors([])
-                    }}
+                    disabled={isProcessing}
+                    onClick={() => handleDeleteLogo("primary")}
                     className="cursor-pointer rounded-full text-xs text-destructive hover:bg-destructive/10"
-                  >
-                    <IconTrash size={13} />
-                  </Button>
+                    icon={
+                      processingSlot === "primary" ? (
+                        <Loader size="sm" className="size-3.5" />
+                      ) : (
+                        <IconTrash size={13} />
+                      )
+                    }
+                    iconPlacement="left"
+                  ></Button>
                 </div>
               </div>
             </div>
@@ -291,23 +346,40 @@ export function StepLogo() {
                 const file = e.dataTransfer.files.item(0)
                 if (file) handleSvgFile(file, "primary")
               }}
-              onClick={() => primaryInputRef.current?.click()}
+              onClick={() => {
+                if (!isProcessing) primaryInputRef.current?.click()
+              }}
               className={cn(
                 "flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed p-6 text-center transition-all",
                 dragOverSlot === "primary"
                   ? "scale-[1.01] border-primary bg-primary/10"
-                  : "border-border/80 bg-card/40 hover:border-primary/50 hover:bg-card/70"
+                  : "border-border/80 bg-card/40 hover:border-primary/50 hover:bg-card/70",
+                isProcessing && "pointer-events-none opacity-80"
               )}
             >
-              <div className="mb-2 flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <IconUpload size={20} />
-              </div>
-              <span className="text-xs font-bold text-foreground">
-                Upload Primary Logo
-              </span>
-              <span className="mt-1 text-xs text-foreground">
-                Drag &amp; drop or click to browse • Max 1MB (.svg only)
-              </span>
+              {processingSlot === "primary" ? (
+                <div className="flex flex-col items-center justify-center space-y-2 py-2">
+                  <Loader size="md" />
+                  <span className="text-xs font-bold text-foreground">
+                    Processing Primary Logo...
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    Analyzing vector geometry &amp; extracting colors
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-2 flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                    <IconUpload size={20} />
+                  </div>
+                  <span className="text-xs font-bold text-foreground">
+                    Upload Primary Logo
+                  </span>
+                  <span className="mt-1 text-xs text-foreground">
+                    Drag &amp; drop or click to browse • Max 1MB (.svg only)
+                  </span>
+                </>
+              )}
             </div>
           )}
         </TabsContent>
@@ -325,8 +397,16 @@ export function StepLogo() {
             }}
           />
 
-          {brand.secondarySvgContent && secondarySvgUri ? (
+          {secondarySvgUri ? (
             <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-card/80 p-4 transition-all">
+              {processingSlot === "secondary" && (
+                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-background/85 backdrop-blur-xs">
+                  <Loader size="sm" />
+                  <span className="text-xs font-semibold text-foreground">
+                    Deleting secondary logo...
+                  </span>
+                </div>
+              )}
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="flex size-16 items-center justify-center rounded-xl border border-border/60 bg-muted/30 p-2">
@@ -341,13 +421,7 @@ export function StepLogo() {
                       <span className="text-xs font-bold text-foreground">
                         Secondary Logo
                       </span>
-                      <Badge className="border-primary/20 bg-primary/10 py-0 text-[10px] text-primary">
-                        Alternate Lockup
-                      </Badge>
                     </div>
-                    <p className="text-[11px] text-muted-foreground">
-                      Vector mark active • Wordmark / Horizontal
-                    </p>
                   </div>
                 </div>
 
@@ -356,24 +430,18 @@ export function StepLogo() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => secondaryInputRef.current?.click()}
-                    className="cursor-pointer rounded-full text-xs"
-                    icon={<IconRefresh size={13} />}
-                    iconPlacement="left"
-                  >
-                    Replace
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      brand.removeSecondaryLogo()
-                    }}
+                    disabled={isProcessing}
+                    onClick={() => handleDeleteLogo("secondary")}
                     className="cursor-pointer rounded-full text-xs text-destructive hover:bg-destructive/10"
-                  >
-                    <IconTrash size={13} />
-                  </Button>
+                    icon={
+                      processingSlot === "secondary" ? (
+                        <Loader size="sm" className="size-3.5" />
+                      ) : (
+                        <IconTrash size={13} />
+                      )
+                    }
+                    iconPlacement="left"
+                  ></Button>
                 </div>
               </div>
             </div>
@@ -390,40 +458,99 @@ export function StepLogo() {
                 const file = e.dataTransfer.files.item(0)
                 if (file) handleSvgFile(file, "secondary")
               }}
-              onClick={() => secondaryInputRef.current?.click()}
+              onClick={() => {
+                if (!isProcessing) secondaryInputRef.current?.click()
+              }}
               className={cn(
                 "flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed p-6 text-center transition-all",
                 dragOverSlot === "secondary"
                   ? "scale-[1.01] border-primary bg-primary/10"
-                  : "border-border/80 bg-card/40 hover:border-primary/50 hover:bg-card/70"
+                  : "border-border/80 bg-card/40 hover:border-primary/50 hover:bg-card/70",
+                isProcessing && "pointer-events-none opacity-80"
               )}
             >
-              <div className="mb-2 flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <IconUpload size={20} />
-              </div>
-              <span className="text-xs font-bold text-foreground">
-                Upload Secondary Logo
-              </span>
-              <span className="mt-1 text-xs text-foreground">
-                Alternate mark, wordmark, or badge • Max 1MB (.svg only)
-              </span>
+              {processingSlot === "secondary" ? (
+                <div className="flex flex-col items-center justify-center space-y-2 py-2">
+                  <Loader size="md" />
+                  <span className="text-xs font-bold text-foreground">
+                    Processing Secondary Logo...
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    Parsing vector mark &amp; dimensions
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-2 flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                    <IconUpload size={20} />
+                  </div>
+                  <span className="text-xs font-bold text-foreground">
+                    Upload Secondary Logo
+                  </span>
+                  <span className="mt-1 text-xs text-foreground">
+                    Alternate mark, wordmark, or badge • Max 1MB (.svg only)
+                  </span>
+                </>
+              )}
             </div>
           )}
         </TabsContent>
       </Tabs>
 
       {/* 3. EXTRACTED COLORS PREVIEW */}
-      {extractedColors.length > 0 &&
-        Boolean(brand.svgContent || brand.secondarySvgContent) && (
-          <div className="logo-item-anim space-y-3 rounded-2xl">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-foreground">
-                  Extracted Colors from Primary Logo
-                </span>
-              </div>
+      {(Boolean(brand.svgContent) || isExtractingColors) && (
+        <div className="logo-item-anim space-y-3 rounded-2xl border border-border/80 bg-card/60 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-foreground">
+                Extracted Colors from Primary Logo
+              </span>
+              {isExtractingColors ? (
+                <Badge
+                  variant="outline"
+                  className="flex items-center gap-1.5 border-primary/30 bg-primary/10 text-[10px] text-primary"
+                >
+                  <Loader size="sm" className="size-3" />
+                  Extracting...
+                </Badge>
+              ) : extractedColors.length > 0 ? (
+                <Badge variant="ghost" className="text-[10px]">
+                  {extractedColors.length} Swatches
+                </Badge>
+              ) : null}
             </div>
 
+            {brand.svgContent && !isExtractingColors && (
+              <Button
+                type="button"
+                variant="outline"
+                className={"rounded-full"}
+                size="sm"
+                onClick={() => {
+                  if (brand.svgContent) {
+                    void extractPrimaryColors(brand.svgContent, true)
+                  }
+                }}
+                icon={<IconRefresh size={12} />}
+                iconPlacement="left"
+              >
+                Re-extract
+              </Button>
+            )}
+          </div>
+
+          {isExtractingColors ? (
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <Loader size="sm" className="mb-2" />
+              <span className="text-xs font-medium text-foreground">
+                Analyzing vector paths &amp; clustering colors...
+              </span>
+              <span className="mt-1 text-[11px] text-muted-foreground">
+                Auto-syncing extracted hues with your primary &amp; secondary
+                brand swatches
+              </span>
+            </div>
+          ) : extractedColors.length > 0 ? (
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {extractedColors.map((hex, idx) => {
                 return (
@@ -442,8 +569,13 @@ export function StepLogo() {
                 )
               })}
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="py-2 text-center text-xs text-muted-foreground">
+              No distinct accent colors detected in vector mark geometry.
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 4. LOGO USAGE CONSTRAINTS / DO'S & DON'TS */}
       <div className="space-y-4 pt-2">
@@ -463,59 +595,29 @@ export function StepLogo() {
         {/* Existing Rules List */}
         <div className="space-y-2.5">
           {brand.dosAndDonts.map((item) => {
-            const isDo = item.type === "do"
             return (
               <div
                 key={item.id}
-                className={cn(
-                  "flex items-start justify-between gap-3 rounded-2xl border p-3.5 transition-colors",
-                  isDo
-                    ? "border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/40"
-                    : "border-border/80 bg-card/60 hover:border-rose-500/40"
-                )}
+                className="flex items-start justify-between gap-3 transition-colors"
               >
-                <div className="flex items-start gap-3">
-                  <div
-                    className={cn(
-                      "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full text-xs",
-                      isDo
-                        ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                        : "bg-rose-500/20 text-rose-600 dark:text-rose-400"
-                    )}
-                  >
-                    {isDo ? <IconCheck size={12} /> : <IconX size={12} />}
-                  </div>
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-foreground">
-                        {item.rule}
-                      </span>
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          "rounded-full px-1.5 py-0 text-[10px] font-bold uppercase",
-                          isDo
-                            ? "border-emerald-500/40 text-emerald-600 dark:text-emerald-400"
-                            : "border-rose-500/40 text-rose-600 dark:text-rose-400"
-                        )}
-                      >
-                        {isDo ? "Do" : "Don't"}
-                      </Badge>
-                    </div>
-                    <p className="text-xs leading-relaxed text-muted-foreground">
-                      {item.detail}
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => brand.removeDoDont(item.id)}
-                  className="cursor-pointer rounded-lg p-1 text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
-                  title="Remove rule"
-                >
-                  <IconTrash size={14} />
-                </button>
+                <Item variant="outline" key={item.id}>
+                  <ItemContent>
+                    <ItemTitle>{item.rule}</ItemTitle>
+                    {item.detail ? (
+                      <ItemDescription>{item.detail}</ItemDescription>
+                    ) : null}
+                  </ItemContent>
+                  <ItemActions>
+                    <Button
+                      size="sm"
+                      variant={"destructive_outline"}
+                      onClick={() => brand.removeDoDont(item.id)}
+                      className={"size-8 rounded-full"}
+                    >
+                      <IconTrash size={14} />
+                    </Button>
+                  </ItemActions>
+                </Item>
               </div>
             )
           })}
@@ -525,56 +627,32 @@ export function StepLogo() {
         {isAddingRule ? (
           <form
             onSubmit={handleAddRule}
-            className="space-y-3 rounded-2xl border border-primary/30 bg-card/80 p-4 shadow-sm"
+            className="space-y-3 rounded-2xl border border-primary/30 bg-card/80 p-4"
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-foreground">
                 Add New Constraint Rule
               </span>
-              <button
+              <Button
                 type="button"
+                size="icon-sm"
+                variant="outline"
                 onClick={() => setIsAddingRule(false)}
-                className="cursor-pointer text-muted-foreground hover:text-foreground"
               >
                 <IconX size={14} />
-              </button>
+              </Button>
             </div>
 
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <div className="space-y-1">
-                <Label className="text-[11px]">Rule Type</Label>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant={newRuleType === "dont" ? "default" : "outline"}
-                    className="flex-1 text-xs"
-                    onClick={() => setNewRuleType("dont")}
-                  >
-                    Don&apos;t (Prohibited)
-                  </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant={newRuleType === "do" ? "default" : "outline"}
-                    className="flex-1 text-xs"
-                    onClick={() => setNewRuleType("do")}
-                  >
-                    Do (Approved)
-                  </Button>
-                </div>
-              </div>
-
-              <div className="space-y-1 sm:col-span-2">
-                <Label className="text-[11px]">Rule Title</Label>
-                <Input
-                  value={newRuleTitle}
-                  onChange={(e) => setNewRuleTitle(e.target.value)}
-                  placeholder="e.g. Don't invert trademark emblem"
-                  className="text-xs"
-                  required
-                />
-              </div>
+            <div className="space-y-1">
+              <Label className="text-[11px]">Rule Title</Label>
+              <Input
+                value={newRuleTitle}
+                onChange={(e) => setNewRuleTitle(e.target.value)}
+                placeholder="e.g. Don't invert trademark emblem, or Keep clearspace intact"
+                className="text-xs"
+                required
+                autoFocus
+              />
             </div>
 
             <div className="space-y-1">

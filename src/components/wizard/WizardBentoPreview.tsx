@@ -32,7 +32,7 @@ export function WizardBentoPreview({
       {/* Dynamic Step Preview Content */}
       <div className="transition-all duration-300">
         {currentStep === 1 && <StepFoundationPreview isLoading={isLoading} />}
-        {currentStep === 2 && <StepLogoPreview />}
+        {currentStep === 2 && <StepLogoPreview isLoading={isLoading} />}
         {currentStep === 3 && <StepColorsPreview />}
         {currentStep === 4 && <StepTypographyPreview />}
         {currentStep === 5 && <StepImageryPreview />}

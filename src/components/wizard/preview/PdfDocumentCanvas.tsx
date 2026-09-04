@@ -63,7 +63,24 @@ export function PdfDocumentCanvas({
         } catch {}
       })
     }
-  }, [brand.displayFont, brand.bodyFont, brand.monoFont, brand.stagedFontFiles])
+
+    if (brand.customFonts && brand.customFonts.length > 0) {
+      brand.customFonts.forEach((cf) => {
+        try {
+          const weights = ["400", "500", "600", "700"]
+          weights.forEach((w) => {
+            try {
+              const face = new FontFace(cf.family, `url(${cf.url})`, {
+                weight: w,
+                style: "normal",
+              })
+              face.load().then((loaded) => document.fonts.add(loaded)).catch(() => {})
+            } catch {}
+          })
+        } catch {}
+      })
+    }
+  }, [brand.displayFont, brand.bodyFont, brand.monoFont, brand.stagedFontFiles, brand.customFonts])
 
   // Track page scroll to sync active page index
   useEffect(() => {

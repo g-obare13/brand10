@@ -178,9 +178,12 @@ export function syncExtractedColorsToPalette(
 ): ColorSwatch[] {
   if (!extractedColors.length) return existingPalette
 
-  const roles: Array<
-    "primary" | "secondary" | "accent" | "neutral" | "background"
-  > = ["primary", "secondary", "accent", "neutral", "background"]
+  const roles: ColorSwatch["role"][] = [
+    "primary",
+    "secondary",
+    "accent",
+    "custom",
+  ]
 
   const updatedPalette = extractedColors.map((hex, index) => {
     const role = roles[index] || "custom"
@@ -349,22 +352,19 @@ export async function ingestBrandFile(file: File): Promise<ExtractedBrandData> {
     "primary",
     "secondary",
     "accent",
-    "neutral",
-    "background",
+    "custom",
   ]
   const colors: ColorSwatch[] = rawHexColors.map((hex, index) => {
     const role = roles[index] || "custom"
     return createColorSwatch(hex, role)
   })
 
-  // Ensure we have at least 4 core roles
-  if (colors.length < 4) {
-    if (!colors.some((c) => c.role === "neutral")) {
-      colors.push(createColorSwatch("#64748b", "neutral", "Slate Neutral"))
-    }
-    if (!colors.some((c) => c.role === "background")) {
-      colors.push(createColorSwatch("#f8fafc", "background", "Clean Canvas"))
-    }
+  // Ensure neutral and background exist
+  if (!colors.some((c) => c.role === "neutral")) {
+    colors.push(createColorSwatch("#64748b", "neutral", "Slate Neutral"))
+  }
+  if (!colors.some((c) => c.role === "background")) {
+    colors.push(createColorSwatch("#f8fafc", "background", "Clean Canvas"))
   }
 
   return {

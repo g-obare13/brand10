@@ -169,7 +169,9 @@ function StudioPage() {
                     {currentStep === 1 && (
                       <StepFoundation isLoading={isProjectLoading} />
                     )}
-                    {currentStep === 2 && <StepLogo />}
+                    {currentStep === 2 && (
+                      <StepLogo isLoading={isProjectLoading} />
+                    )}
                     {currentStep === 3 && <StepColors />}
                     {currentStep === 4 && <StepTypography />}
                     {currentStep === 5 && <StepImagery />}
