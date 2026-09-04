@@ -10,6 +10,7 @@ import {
 } from "@tabler/icons-react"
 import { useEffect, useRef, useState } from "react"
 import type { PreviewStyleId } from "./pages/A4PageFrame"
+import { PageColorInfo } from "./pages/PageColorInfo"
 import { PageColors } from "./pages/PageColors"
 import { PageCover } from "./pages/PageCover"
 import { PageFoundation } from "./pages/PageFoundation"
@@ -140,7 +141,7 @@ export function PdfDocumentCanvas({
   const hasSecondaryLogo = Boolean(
     brand.secondarySvgContent?.trim() || brand.secondaryLogoUrl?.trim()
   )
-  const totalPages = hasSecondaryLogo ? 9 : 8
+  const totalPages = hasSecondaryLogo ? 10 : 9
 
   const primaryColor =
     brand.colorPalette.find((c) => c.role === "primary")?.hex || "#6366f1"
@@ -355,7 +356,19 @@ export function PdfDocumentCanvas({
               totalPages={totalPages}
             />
 
-            {/* Page 6 or 7: Typography Hierarchy */}
+            {/* Page 6 or 7: Color Information & Metrics */}
+            <PageColorInfo
+              brandName={brand.brandName}
+              colors={brand.colorPalette}
+              styleTheme={styleTheme}
+              displayFont={brand.displayFont}
+              bodyFont={brand.bodyFont}
+              monoFont={brand.monoFont}
+              pageNumber={hasSecondaryLogo ? 7 : 6}
+              totalPages={totalPages}
+            />
+
+            {/* Page 7 or 8: Typography Hierarchy */}
             <PageTypography
               brandName={brand.brandName}
               displayFont={brand.displayFont}
@@ -364,11 +377,11 @@ export function PdfDocumentCanvas({
               typeScaleRatio={brand.typeScaleRatio}
               baseFontSize={brand.baseFontSize}
               styleTheme={styleTheme}
-              pageNumber={hasSecondaryLogo ? 7 : 6}
+              pageNumber={hasSecondaryLogo ? 8 : 7}
               totalPages={totalPages}
             />
 
-            {/* Page 7 or 8: Imagery & Mood Direction */}
+            {/* Page 8 or 9: Imagery & Mood Direction */}
             <PageImagery
               brandName={brand.brandName}
               imageryMood={brand.imageryMood}
@@ -378,11 +391,11 @@ export function PdfDocumentCanvas({
               displayFont={brand.displayFont}
               bodyFont={brand.bodyFont}
               monoFont={brand.monoFont}
-              pageNumber={hasSecondaryLogo ? 8 : 7}
+              pageNumber={hasSecondaryLogo ? 9 : 8}
               totalPages={totalPages}
             />
 
-            {/* Page 8 or 9: Touchpoint Specs & Governance */}
+            {/* Page 9 or 10: Touchpoint Specs & Governance */}
             <PageTouchpoints
               brandName={brand.brandName}
               iconStyle={brand.iconStyle}
@@ -393,7 +406,7 @@ export function PdfDocumentCanvas({
               displayFont={brand.displayFont}
               bodyFont={brand.bodyFont}
               monoFont={brand.monoFont}
-              pageNumber={hasSecondaryLogo ? 9 : 8}
+              pageNumber={hasSecondaryLogo ? 10 : 9}
               totalPages={totalPages}
             />
           </div>

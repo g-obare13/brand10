@@ -1,10 +1,9 @@
 import { Badge } from "@/components/ui/badge"
-import { A4PageFrame  } from "./A4PageFrame"
-import type {PreviewStyleId} from "./A4PageFrame";
+import type { PreviewStyleId } from "./A4PageFrame"
+import { A4PageFrame } from "./A4PageFrame"
 import type { ColorSwatch } from "@/lib/colorUtils"
-import { getReadableTextColor, getWcagContrast } from "@/lib/colorUtils"
+import { generateTonalShades } from "@/lib/colorUtils"
 import chroma from "chroma-js"
-import { cn } from "@/lib/utils"
 
 interface PageColorsProps {
   brandName: string
@@ -17,6 +16,66 @@ interface PageColorsProps {
   totalPages?: number
 }
 
+const SHADE_KEYS = [
+  "50",
+  "100",
+  "200",
+  "300",
+  "400",
+  "500",
+  "600",
+  "700",
+  "800",
+  "900",
+  "950",
+] as const
+
+function findClosestShade(
+  baseHex: string,
+  shades: Record<string, string>
+): string {
+  try {
+    let closestKey = "500"
+    let minDelta = Infinity
+    for (const [key, hex] of Object.entries(shades)) {
+      const d = chroma.deltaE(baseHex, hex)
+      if (d < minDelta) {
+        minDelta = d
+        closestKey = key
+      }
+    }
+    return closestKey
+  } catch {
+    return "500"
+  }
+}
+
+function getCardTextColor(shadeHex: string, darkestShadeHex: string): string {
+  try {
+    const lum = chroma(shadeHex).luminance()
+    if (lum > 0.42) {
+      return chroma(darkestShadeHex).darken(0.3).hex()
+    }
+    return "#ffffff"
+  } catch {
+    return "#ffffff"
+  }
+}
+
+function getSwatchDisplayName(role: string, name?: string): string {
+  if (name && name !== "Color" && !name.startsWith("Token")) return name
+  switch (role) {
+    case "primary":
+      return "Primary Brand Color"
+    case "secondary":
+      return "Secondary Accent Color"
+    case "accent":
+      return "Accent Color"
+    default:
+      return "Brand Color"
+  }
+}
+
 export function PageColors({
   brandName,
   colors,
@@ -27,161 +86,187 @@ export function PageColors({
   pageNumber = 5,
   totalPages = 8,
 }: PageColorsProps) {
-  // Safe default colors if empty
-  const activeColors = colors.length > 0 ? colors.slice(0, 5) : [
-    { id: "1", hex: "#6366f1", role: "primary" as const, name: "Indigo Primary" },
-    { id: "2", hex: "#0ea5e9", role: "secondary" as const, name: "Sky Secondary" },
-    { id: "3", hex: "#f59e0b", role: "accent" as const, name: "Amber Accent" },
-    { id: "4", hex: "#18181b", role: "neutral" as const, name: "Zinc Dark" },
-    { id: "5", hex: "#fafafa", role: "surface" as const, name: "Pure White" },
-  ]
+  // Use exact dominant brand colors from step colors (filtering out neutral and background)
+  const dominantSwatches = colors.filter(
+    (c) => c.role !== "neutral" && c.role !== "background"
+  )
+  const displaySwatches =
+    dominantSwatches.length > 0
+      ? dominantSwatches
+      : colors.length > 0
+        ? colors.slice(0, 2)
+        : [
+            {
+              id: "primary",
+              role: "primary" as const,
+              name: "Primary Brand Color",
+              hex: "#6366f1",
+              rgb: { r: 99, g: 102, b: 241 },
+              cmyk: { c: 59, m: 58, y: 0, k: 5 },
+              hsl: { h: 239, s: 84, l: 67 },
+              shades: generateTonalShades("#6366f1"),
+            },
+            {
+              id: "secondary",
+              role: "secondary" as const,
+              name: "Secondary Accent Color",
+              hex: "#06b6d4",
+              rgb: { r: 6, g: 182, b: 212 },
+              cmyk: { c: 97, m: 14, y: 0, k: 17 },
+              hsl: { h: 189, s: 94, l: 43 },
+              shades: generateTonalShades("#06b6d4"),
+            },
+          ]
 
   return (
     <A4PageFrame
-      id="page-03"
+      id="page-colors"
       pageNumber={pageNumber}
       totalPages={totalPages}
       sectionNumber="03"
-      sectionTitle="Color Matrix & Palette"
+      sectionTitle="Color Palette & Harmony"
       brandName={brandName}
       styleTheme={styleTheme}
       displayFont={displayFont}
       bodyFont={bodyFont}
       monoFont={monoFont}
+      className="overflow-hidden border border-zinc-200 bg-white p-12 text-black shadow-2xl"
     >
-      <div className="flex h-full flex-col justify-between space-y-6">
-        {/* Intro */}
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-[10px] font-mono uppercase">
-              Chroma Tokens
-            </Badge>
-            <Badge variant="default" className="text-[10px]">
-              WCAG 2.1 AA Compliant
-            </Badge>
+      <div className="flex h-full flex-col justify-between py-6">
+        {/* Title & Introduction */}
+        <div className="space-y-3 pt-2">
+          <div className="space-y-2">
+            <h2 className="text-4xl font-bold text-black uppercase sm:text-5xl">
+              COLOR PALETTE
+            </h2>
+            <div className="h-0.5 w-16 bg-black" />
           </div>
-          <h2>Harmonized Chromatic System</h2>
-          <p className="text-xs opacity-75">
-            Engineered for high-contrast accessibility, dark-mode adaptability, and digital surface consistency across all brand applications.
+
+          <p className="max-w-xl text-zinc-600">
+            The core chromatic system extracted from the brandmark geometry.
+            Each dominant color is expanded into an 11-step mathematical tonal scale
+            to ensure contrast accessibility and consistent visual hierarchy.
           </p>
         </div>
 
-        {/* Primary Color Hero Swatch */}
-        {activeColors[0] && (
-          <div
-            className="flex items-center justify-between rounded-2xl p-6 shadow-sm border border-black/10"
-            style={{ backgroundColor: activeColors[0].hex }}
-          >
-            <div
-              className={cn(
-                "space-y-1",
-                getReadableTextColor(activeColors[0].hex) === "#ffffff" ? "text-white" : "text-black"
-              )}
-            >
-              <Badge variant="outline" className="text-[10px] uppercase font-mono bg-white/20 border-white/30 text-inherit">
-                Core Hero Color
-              </Badge>
-              <h3 className="text-2xl font-bold tracking-tight text-inherit">
-                {activeColors[0].name || "Primary Brand"}
-              </h3>
-              <div className="font-mono text-xs opacity-80">
-                HEX {activeColors[0].hex.toUpperCase()} • RGB {chroma.valid(activeColors[0].hex) ? chroma(activeColors[0].hex).rgb().join(", ") : "99, 102, 241"}
-              </div>
-            </div>
-
-            <div
-              className={cn(
-                "rounded-xl border p-3 font-mono text-right text-xs backdrop-blur-xs",
-                getReadableTextColor(activeColors[0].hex) === "#ffffff"
-                  ? "border-white/20 bg-white/10 text-white"
-                  : "border-black/20 bg-black/10 text-black"
-              )}
-            >
-              <div className="text-[10px] opacity-70">Contrast vs White</div>
-              <div className="text-base font-bold">
-                {getWcagContrast(activeColors[0].hex, "#ffffff").ratio.toFixed(1)}:1
-              </div>
-              <div className="text-[10px] opacity-70">WCAG AA Certified</div>
-            </div>
-          </div>
-        )}
-
-        {/* Color Palette Grid */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {activeColors.slice(1).map((swatch, idx) => {
-            const rgb = chroma.valid(swatch.hex) ? chroma(swatch.hex).rgb() : [0, 0, 0]
-            const contrast = getWcagContrast(swatch.hex, "#ffffff").ratio.toFixed(1)
+        {/* Dominant Color Tonal Scales (Mirroring StepColorsPreview) */}
+        <div className="my-auto space-y-7 py-2">
+          {displaySwatches.map((swatch) => {
+            const safeShades =
+              Object.keys(swatch.shades).length === 11
+                ? swatch.shades
+                : generateTonalShades(swatch.hex)
+            const closestShade = findClosestShade(swatch.hex, safeShades)
+            const darkestShade =
+              safeShades["950"] || safeShades["900"] || "#000000"
+            const label = getSwatchDisplayName(swatch.role, swatch.name)
 
             return (
-              <div
-                key={idx}
-                className={cn(
-                  "overflow-hidden rounded-2xl border transition-all",
-                  styleTheme === "cinematic"
-                    ? "border-zinc-800 bg-zinc-900/60"
-                    : "border-zinc-200 bg-white"
-                )}
-              >
-                {/* Color Visual Block */}
-                <div
-                  className="h-20 w-full border-b border-black/5"
-                  style={{ backgroundColor: swatch.hex }}
-                />
-
-                {/* Color Data Metrics */}
-                <div className="space-y-1.5 p-3.5">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-[10px] font-semibold uppercase tracking-wider opacity-60">
-                      {swatch.role}
+              <div key={swatch.id} className="space-y-3">
+                {/* Header: Label, Role Badge & Hex */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-base font-semibold text-black">
+                      {label}
                     </span>
-                    <Badge variant="outline" className="text-[9px] font-mono px-1.5 py-0 h-4">
-                      {contrast}:1
+                    <Badge variant="outline" className="rounded-full">
+                      {swatch.role}
                     </Badge>
                   </div>
-
-                  <span className="block truncate text-xs font-bold">
-                    {swatch.name || `Token ${idx + 1}`}
+                  <span className="font-mono text-xs font-bold text-zinc-500 uppercase">
+                    Base: {swatch.hex}
                   </span>
+                </div>
 
-                  <div className="space-y-0.5 font-mono text-[10px] opacity-70">
-                    <div>{swatch.hex.toUpperCase()}</div>
-                    <div>RGB {rgb[0]}, {rgb[1]}, {rgb[2]}</div>
-                  </div>
+                {/* 11-Step Tonal Cards Row */}
+                <div className="grid grid-cols-11 gap-1.5">
+                  {SHADE_KEYS.map((step) => {
+                    const shadeHex = safeShades[step] || swatch.hex
+                    const isBase = step === closestShade
+                    const textColor = getCardTextColor(shadeHex, darkestShade)
+                    const cleanHex = shadeHex.replace("#", "").toUpperCase()
+
+                    return (
+                      <div
+                        key={step}
+                        className="relative flex min-h-24 flex-col justify-between rounded-xl p-2 text-left"
+                        style={{ backgroundColor: shadeHex }}
+                      >
+                        {/* Active Base Indicator Dot */}
+                        <div className="flex h-3 items-center">
+                          {isBase ? (
+                            <div
+                              className="size-1.5 rounded-full"
+                              style={{ backgroundColor: textColor }}
+                            />
+                          ) : null}
+                        </div>
+
+                        {/* Step Number & Hex */}
+                        <div className="space-y-0.5">
+                          <span
+                            className="block font-mono text-xs font-bold"
+                            style={{ color: textColor }}
+                          >
+                            {step}
+                          </span>
+                          <span
+                            className="block font-mono text-[9px] font-medium uppercase"
+                            style={{ color: textColor }}
+                          >
+                            {cleanHex}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )
           })}
         </div>
 
-        {/* System Tonal Scale Ramp */}
-        <div
-          className={cn(
-            "rounded-2xl border p-5",
-            styleTheme === "cinematic"
-              ? "border-zinc-800 bg-zinc-900/40"
-              : "border-zinc-200 bg-zinc-50/70"
-          )}
-        >
-          <div className="mb-3 flex items-center justify-between">
-            <h4 className="text-sm font-semibold">Tonal Shade Distribution</h4>
-            <span className="font-mono text-[10px] opacity-60">50 - 950 Step Ladder</span>
+        {/* Chromatic Specifications */}
+        <div className="space-y-3 pt-5">
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-bold text-zinc-500 uppercase">
+              Chromatic Specifications
+            </div>
+            <span className="text-[11px] font-medium text-zinc-400">
+              Scale Distribution
+            </span>
           </div>
 
-          <div className="flex h-10 w-full overflow-hidden rounded-xl border border-black/10 shadow-xs">
-            {["#f8fafc", "#f1f5f9", "#e2e8f0", "#cbd5e1", "#94a3b8", "#64748b", "#475569", "#334155", "#1e293b", "#0f172a"].map((shade, i) => (
-              <div
-                key={i}
-                className="flex-1 transition-transform hover:scale-105"
-                style={{ backgroundColor: shade }}
-                title={`Shade Step ${i + 1}`}
-              />
-            ))}
-          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-1">
+              <div className="text-xs font-bold text-black">
+                Contrast Compliance
+              </div>
+              <p className="text-[11px] text-zinc-600">
+                Ensure minimum 4.5:1 contrast against background values for all
+                body copy and text elements.
+              </p>
+            </div>
 
-          <div className="mt-2 flex justify-between font-mono text-[9px] opacity-50">
-            <span>50 Light Surface</span>
-            <span>500 Middle Ground</span>
-            <span>950 Deep Canvas</span>
+            <div className="space-y-1">
+              <div className="text-xs font-bold text-black">
+                Tonal Interpolation
+              </div>
+              <p className="text-[11px] text-zinc-600">
+                Step values from 50 (light surface tint) to 950 (deep shadow tone)
+                provide seamless dark and light modes.
+              </p>
+            </div>
+
+            <div className="space-y-1">
+              <div className="text-xs font-bold text-black">
+                Dominant Hierarchy
+              </div>
+              <p className="text-[11px] text-zinc-600">
+                Primary hue anchors brand awareness across main interactive
+                touchpoints and primary surfaces.
+              </p>
+            </div>
           </div>
         </div>
       </div>
