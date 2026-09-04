@@ -1,8 +1,10 @@
 import { LoginModal } from "@/components/shared/LoginModal"
-import { SignOutModal } from "@/components/shared/SignOutModal"
 import { Logo } from "@/components/shared/Logo"
+import { SignOutModal } from "@/components/shared/SignOutModal"
 import { ThemeToggler } from "@/components/shared/theme-toggler"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import Container from "@/components/ui/container"
 import { headerData } from "@/data/menu"
 import { animateFadeUp } from "@/lib/gsap-animations"
 import { useAuthStore } from "@/store/authStore"
@@ -14,11 +16,9 @@ import {
   IconMenu,
   IconX,
 } from "@tabler/icons-react"
-import { Link, useLocation, useNavigate } from "@tanstack/react-router"
+import { Link, useLocation } from "@tanstack/react-router"
 import gsap from "gsap"
 import { useEffect, useRef, useState } from "react"
-import { Badge } from "@/components/ui/badge"
-import Container from "@/components/ui/container"
 import GlassPanel from "./GlassPanel"
 import ImageComponentOptimized from "./ImageComponentOptimized"
 

@@ -193,7 +193,6 @@ function ProjectCardLogo({
 export function ProjectsTab({ onOpenCreateModal }: ProjectsTabProps) {
   const auth = useAuthStore()
   const projectsStore = useProjectsStore()
-  const isLimitReached = projectsStore.isLimitReached()
   const hasProjects = projectsStore.projects.length > 0
   const isLoading = projectsStore.loading
   const containerRef = useRef<HTMLDivElement>(null)
