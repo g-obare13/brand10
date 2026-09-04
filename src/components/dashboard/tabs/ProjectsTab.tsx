@@ -60,13 +60,15 @@ function ProjectCardLogo({
   primaryColor,
   brandInitial,
 }: ProjectCardLogoProps) {
-  const brand = useBrandStore()
+  const currentProjectId = useBrandStore((state) => state.projectId)
+  const currentLogoUrl = useBrandStore((state) => state.logoUrl)
+  const currentSvgContent = useBrandStore((state) => state.svgContent)
   const [logoSrc, setLogoSrc] = useState<string | null>(() => {
     if (project.logo_url) return project.logo_url
-    if (brand.projectId === project.id) {
-      if (brand.logoUrl) return brand.logoUrl
-      if (brand.svgContent) {
-        return `data:image/svg+xml;utf8,${encodeURIComponent(brand.svgContent)}`
+    if (currentProjectId === project.id) {
+      if (currentLogoUrl) return currentLogoUrl
+      if (currentSvgContent) {
+        return `data:image/svg+xml;utf8,${encodeURIComponent(currentSvgContent)}`
       }
     }
     return null
@@ -83,15 +85,15 @@ function ProjectCardLogo({
       return
     }
 
-    if (brand.projectId === project.id) {
-      if (brand.logoUrl) {
-        setLogoSrc(brand.logoUrl)
+    if (currentProjectId === project.id) {
+      if (currentLogoUrl) {
+        setLogoSrc(currentLogoUrl)
         setHasError(false)
         return
       }
-      if (brand.svgContent) {
+      if (currentSvgContent) {
         setLogoSrc(
-          `data:image/svg+xml;utf8,${encodeURIComponent(brand.svgContent)}`
+          `data:image/svg+xml;utf8,${encodeURIComponent(currentSvgContent)}`
         )
         setHasError(false)
         return
@@ -143,9 +145,9 @@ function ProjectCardLogo({
   }, [
     project.id,
     project.logo_url,
-    brand.projectId,
-    brand.logoUrl,
-    brand.svgContent,
+    currentProjectId,
+    currentLogoUrl,
+    currentSvgContent,
   ])
 
   if (logoSrc && !hasError) {
@@ -191,20 +193,17 @@ function ProjectCardLogo({
  * @returns {React.ReactElement} The rendered projects management tab.
  */
 export function ProjectsTab({ onOpenCreateModal }: ProjectsTabProps) {
-  const auth = useAuthStore()
-  const projectsStore = useProjectsStore()
-  const hasProjects = projectsStore.projects.length > 0
-  const isLoading = projectsStore.loading
+  const userId = useAuthStore((state) => state.user?.id)
+  const projects = useProjectsStore((state) => state.projects)
+  const isLoading = useProjectsStore((state) => state.loading)
+  const deleteProject = useProjectsStore((state) => state.deleteProject)
+  const hasProjects = projects.length > 0
   const containerRef = useRef<HTMLDivElement>(null)
 
   // State for delete confirmation modal
   const [projectToDelete, setProjectToDelete] =
     useState<BrandProjectItem | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
-
-  useEffect(() => {
-    projectsStore.fetchProjects(auth.user?.id)
-  }, [auth.user?.id])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -232,13 +231,13 @@ export function ProjectsTab({ onOpenCreateModal }: ProjectsTabProps) {
     }, containerRef)
 
     return () => ctx.revert()
-  }, [hasProjects, isLoading, projectsStore.projects.length])
+  }, [hasProjects, isLoading, projects.length])
 
   const handleConfirmDelete = async () => {
     if (!projectToDelete) return
     setIsDeleting(true)
     try {
-      await projectsStore.deleteProject(projectToDelete.id, auth.user?.id)
+      await deleteProject(projectToDelete.id, userId)
       setProjectToDelete(null)
     } finally {
       setIsDeleting(false)
@@ -259,7 +258,7 @@ export function ProjectsTab({ onOpenCreateModal }: ProjectsTabProps) {
               <WordReveal as="p" stagger={0.02} duration={1.2} start="top 90%">
                 {isLoading
                   ? "Loading projects..."
-                  : `${projectsStore.projects.length} of 2 slots used`}
+                  : `${projects.length} of 2 slots used`}
               </WordReveal>
             </div>
           </div>
@@ -295,7 +294,7 @@ export function ProjectsTab({ onOpenCreateModal }: ProjectsTabProps) {
           </div>
         ) : hasProjects ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {projectsStore.projects.map((project: BrandProjectItem) => {
+            {projects.map((project: BrandProjectItem) => {
               const primaryColor = project.primary_color || "#624b59"
               const brandInitial = (project.brand_name || project.name || "B")
                 .charAt(0)

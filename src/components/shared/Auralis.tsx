@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { cn } from "@/lib/utils"
 
 const vertexShaderGLSL = `
@@ -121,6 +121,12 @@ const Auralis = ({
     ]
   }
 
+  const colorKey = colors.join("|")
+  const colorUniforms = useMemo(
+    () => new Float32Array(colors.slice(0, 3).flatMap(hexToRgb)),
+    [colorKey]
+  )
+
   useEffect(() => {
     const canvas = canvasRef.current
     const container = containerRef.current
@@ -185,8 +191,7 @@ const Auralis = ({
       gl.uniform1f(locs.time, t * 0.001 * speed)
       gl.uniform1f(locs.grain, grain)
 
-      const flat = new Float32Array(colors.slice(0, 3).flatMap(hexToRgb))
-      gl.uniform3fv(locs.colors, flat)
+      gl.uniform3fv(locs.colors, colorUniforms)
 
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
       raf = requestAnimationFrame(render)
@@ -198,7 +203,7 @@ const Auralis = ({
       cancelAnimationFrame(raf)
       gl.deleteProgram(program)
     }
-  }, [colors, speed, grain])
+  }, [colorKey, colorUniforms, speed, grain])
 
   return (
     <div

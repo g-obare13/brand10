@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
+import { useShallow } from "zustand/react/shallow"
 import { useBrandStore } from "@/store/brandStore"
 import { Header } from "@/components/shared/Header"
 import { DashboardBackground } from "@/components/dashboard/DashboardBackground"
@@ -67,7 +68,20 @@ function StudioPage() {
   const { projectId } = Route.useParams()
   const search = Route.useSearch()
   const currentStep = search.step ?? 1
-  const brand = useBrandStore()
+  const brand = useBrandStore(
+    useShallow((state) => ({
+      isLoading: state.isLoading,
+      projectId: state.projectId,
+      loadFromProject: state.loadFromProject,
+      svgContent: state.svgContent,
+      secondarySvgContent: state.secondarySvgContent,
+      colorPalette: state.colorPalette,
+      setColorPalette: state.setColorPalette,
+      stagedFontFiles: state.stagedFontFiles,
+      uploadStagedFonts: state.uploadStagedFonts,
+      saveToSupabase: state.saveToSupabase,
+    }))
+  )
   const navigate = useNavigate()
   const [isSaving, setIsSaving] = useState(false)
 

@@ -39,16 +39,29 @@ export const Route = createFileRoute("/dashboard")({
  * @returns {React.ReactElement} The dashboard layout shell.
  */
 function DashboardLayout() {
-  const auth = useAuthStore()
-  const projectsStore = useProjectsStore()
+  const authUserId = useAuthStore((state) => state.user?.id)
+  const authUserEmail = useAuthStore((state) => state.user?.email)
+  const authLoading = useAuthStore((state) => state.loading)
+  const initializeAuth = useAuthStore((state) => state.initialize)
+  const projectCount = useProjectsStore((state) => state.projects.length)
+  const isCreateModalOpen = useProjectsStore(
+    (state) => state.isCreateModalOpen
+  )
+  const openCreateModal = useProjectsStore((state) => state.openCreateModal)
+  const closeCreateModal = useProjectsStore((state) => state.closeCreateModal)
+  const fetchProjects = useProjectsStore((state) => state.fetchProjects)
 
   useEffect(() => {
-    auth.initialize().then(() => {
-      projectsStore.fetchProjects(auth.user?.id)
-    })
-  }, [auth.user?.id])
+    initializeAuth()
+  }, [initializeAuth])
 
-  const isLimitReached = projectsStore.isLimitReached()
+  useEffect(() => {
+    if (!authLoading) {
+      fetchProjects(authUserId)
+    }
+  }, [authLoading, authUserId, fetchProjects])
+
+  const isLimitReached = projectCount >= 2
 
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-background text-foreground transition-colors duration-200 selection:bg-primary/20 selection:text-primary">
@@ -62,10 +75,10 @@ function DashboardLayout() {
       <main className="relative z-10 flex-1 pt-8 pb-32 md:pt-12">
         <Container className="space-y-12">
           <DashboardHero
-            userEmail={auth.user?.email}
-            projectCount={projectsStore.projects.length}
+            userEmail={authUserEmail}
+            projectCount={projectCount}
             isLimitReached={isLimitReached}
-            onOpenCreateModal={projectsStore.openCreateModal}
+            onOpenCreateModal={openCreateModal}
           />
 
           {/* Child Route Content */}
@@ -78,8 +91,8 @@ function DashboardLayout() {
 
       {/* Create Project Modal */}
       <CreateProjectModal
-        isOpen={projectsStore.isCreateModalOpen}
-        onClose={projectsStore.closeCreateModal}
+        isOpen={isCreateModalOpen}
+        onClose={closeCreateModal}
       />
     </div>
   )

@@ -7,6 +7,7 @@ import { useBrandStore } from "@/store/brandStore"
 import { IconFileText, IconUpload } from "@tabler/icons-react"
 import React, { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
+import { useShallow } from "zustand/react/shallow"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -134,7 +135,18 @@ function FontCombobox({
  * @returns {React.ReactElement} The rendered typography configuration form.
  */
 export function StepTypography() {
-  const brand = useBrandStore()
+  const brand = useBrandStore(
+    useShallow((state) => ({
+      displayFont: state.displayFont,
+      bodyFont: state.bodyFont,
+      monoFont: state.monoFont,
+      typeScaleRatio: state.typeScaleRatio,
+      stagedFontFiles: state.stagedFontFiles,
+      stageFontFile: state.stageFontFile,
+      removeStagedFontFile: state.removeStagedFontFile,
+      setTypography: state.setTypography,
+    }))
+  )
   const [googleFonts, setGoogleFonts] = useState<GoogleFontItem[]>([])
   const [isLoadingFonts, setIsLoadingFonts] = useState(true)
   const [uploadTarget, setUploadTarget] = useState<"display" | "body">(

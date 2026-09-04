@@ -7,6 +7,35 @@ import { getPreviewTheme } from "./previewTheme"
 import { cn } from "@/lib/utils"
 import { loadGoogleFont } from "@/lib/fontLoader"
 import { gsap } from "gsap"
+import { useShallow } from "zustand/react/shallow"
+
+const registeredFontKeys = new Set<string>()
+const stagedFontUrls = new WeakMap<File, string>()
+
+function registerPreviewFont(
+  family: string,
+  source: string,
+  registrationKey: string
+) {
+  if (registeredFontKeys.has(registrationKey)) return
+  registeredFontKeys.add(registrationKey)
+
+  const weights = ["400", "500", "600", "700", "800"]
+  weights.forEach((weight) => {
+    try {
+      const face = new FontFace(family, `url(${source})`, {
+        weight,
+        style: "normal",
+      })
+      face.load().then((loaded) => document.fonts.add(loaded)).catch(() => {})
+    } catch {}
+  })
+
+  try {
+    const baseFace = new FontFace(family, `url(${source})`)
+    baseFace.load().then((loaded) => document.fonts.add(loaded)).catch(() => {})
+  } catch {}
+}
 /**
  * A live interactive preview demonstrating typography hierarchy and font pairings.
  * Features:
@@ -19,7 +48,20 @@ import { gsap } from "gsap"
  * @returns {React.ReactElement} The rendered typography preview panel.
  */
 export function StepTypographyPreview() {
-  const brand = useBrandStore()
+  const brand = useBrandStore(
+    useShallow((state) => ({
+      designMovement: state.designMovement,
+      toneRatings: state.toneRatings,
+      brandName: state.brandName,
+      displayFont: state.displayFont,
+      bodyFont: state.bodyFont,
+      monoFont: state.monoFont,
+      stagedFontFiles: state.stagedFontFiles,
+      customFonts: state.customFonts,
+      typeScaleRatio: state.typeScaleRatio,
+      baseFontSize: state.baseFontSize,
+    }))
+  )
   const containerRef = useRef<HTMLDivElement>(null)
 
   const activeMovement =
@@ -45,16 +87,16 @@ export function StepTypographyPreview() {
     if (brand.stagedFontFiles && brand.stagedFontFiles.length > 0) {
       brand.stagedFontFiles.forEach((staged) => {
         try {
-          const blobUrl = URL.createObjectURL(staged.file)
-          const weights = ["400", "500", "600", "700", "800"]
-          weights.forEach((w) => {
-            try {
-              const face = new FontFace(staged.family, `url(${blobUrl})`, { weight: w, style: "normal" })
-              face.load().then((loaded) => document.fonts.add(loaded)).catch(() => {})
-            } catch {}
-          })
-          const baseFace = new FontFace(staged.family, `url(${blobUrl})`)
-          baseFace.load().then((loaded) => document.fonts.add(loaded)).catch(() => {})
+          let blobUrl = stagedFontUrls.get(staged.file)
+          if (!blobUrl) {
+            blobUrl = URL.createObjectURL(staged.file)
+            stagedFontUrls.set(staged.file, blobUrl)
+          }
+          registerPreviewFont(
+            staged.family,
+            blobUrl,
+            `staged:${staged.family}:${staged.file.name}:${staged.file.size}:${staged.file.lastModified}`
+          )
         } catch {}
       })
     }
@@ -62,15 +104,7 @@ export function StepTypographyPreview() {
     if (brand.customFonts && brand.customFonts.length > 0) {
       brand.customFonts.forEach((cf) => {
         try {
-          const weights = ["400", "500", "600", "700", "800"]
-          weights.forEach((w) => {
-            try {
-              const face = new FontFace(cf.family, `url(${cf.url})`, { weight: w, style: "normal" })
-              face.load().then((loaded) => document.fonts.add(loaded)).catch(() => {})
-            } catch {}
-          })
-          const baseFace = new FontFace(cf.family, `url(${cf.url})`)
-          baseFace.load().then((loaded) => document.fonts.add(loaded)).catch(() => {})
+          registerPreviewFont(cf.family, cf.url, `custom:${cf.family}:${cf.url}`)
         } catch {}
       })
     }

@@ -39,9 +39,11 @@ export function CreateProjectModal({
   onClose,
 }: CreateProjectModalProps) {
   const navigate = useNavigate()
-  const auth = useAuthStore()
-  const projectsStore = useProjectsStore()
-  const brand = useBrandStore()
+  const userId = useAuthStore((state) => state.user?.id)
+  const isLimitReached = useProjectsStore((state) => state.isLimitReached)
+  const createProject = useProjectsStore((state) => state.createProject)
+  const setProjectId = useBrandStore((state) => state.setProjectId)
+  const setBrandName = useBrandStore((state) => state.setBrandName)
 
   const [projectName, setProjectName] = useState("")
   const [createError, setCreateError] = useState<string | null>(null)
@@ -169,7 +171,7 @@ export function CreateProjectModal({
     e.preventDefault()
     setCreateError(null)
 
-    if (projectsStore.isLimitReached()) {
+    if (isLimitReached()) {
       const msg = "You have reached the maximum limit of 2 brand projects."
       setCreateError(msg)
       toast.error(msg)
@@ -178,16 +180,16 @@ export function CreateProjectModal({
 
     setIsSubmitting(true)
     try {
-      const { project, error } = await projectsStore.createProject(
+      const { project, error } = await createProject(
         projectName,
-        auth.user?.id
+        userId
       )
       if (error) {
         setCreateError(error)
         toast.error(error)
       } else if (project) {
-        brand.setProjectId(project.id)
-        brand.setBrandName(project.name || projectName)
+        setProjectId(project.id)
+        setBrandName(project.name || projectName)
         onClose()
         toast.success(`Created project "${project.name || projectName}"`)
         try {

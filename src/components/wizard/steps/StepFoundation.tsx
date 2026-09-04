@@ -11,6 +11,7 @@ import { useBrandStore } from "@/store/brandStore"
 import { XCircle } from "@boxicons/react"
 import { gsap } from "gsap"
 import { useEffect, useRef, useState } from "react"
+import { useShallow } from "zustand/react/shallow"
 /**
  * Skeleton loading state for StepFoundation form fields and interactive badges.
  *
@@ -75,7 +76,22 @@ export interface StepFoundationProps {
  * @returns {React.ReactElement} The rendered foundation configuration form.
  */
 export function StepFoundation({ isLoading }: StepFoundationProps = {}) {
-  const brand = useBrandStore()
+  const brand = useBrandStore(
+    useShallow((state) => ({
+      isLoading: state.isLoading,
+      projectId: state.projectId,
+      brandName: state.brandName,
+      mission: state.mission,
+      vision: state.vision,
+      designMovement: state.designMovement,
+      toneRatings: state.toneRatings,
+      setBrandName: state.setBrandName,
+      setMission: state.setMission,
+      setVision: state.setVision,
+      setDesignMovement: state.setDesignMovement,
+      setToneRating: state.setToneRating,
+    }))
+  )
   const effectiveLoading = isLoading ?? (brand.isLoading || !brand.projectId)
   const containerRef = useRef<HTMLDivElement>(null)
   const floatingRef = useRef<HTMLDivElement>(null)

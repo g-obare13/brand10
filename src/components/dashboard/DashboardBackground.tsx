@@ -1,6 +1,8 @@
 import Auralis from "@/components/shared/Auralis"
 import { cn } from "@/lib/utils"
 
+const DASHBOARD_BACKGROUND_COLORS = ["#6366f1", "#a855f7", "#38bdf8"]
+
 /**
  * Ambient visual background canvas for the main dashboard views.
  * Features:
@@ -37,7 +39,7 @@ export function DashboardBackground({
     >
       <Auralis
         className={`absolute inset-0 h-full w-full ${opacity}`}
-        colors={["#6366f1", "#a855f7", "#38bdf8"]}
+        colors={DASHBOARD_BACKGROUND_COLORS}
         speed={speed}
         grain={grain}
       />
