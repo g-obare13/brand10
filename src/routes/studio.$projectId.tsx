@@ -18,15 +18,7 @@ import { Button } from "@/components/ui/button"
 import { Loader } from "@/components/ui/loader"
 import GlassPanel from "@/components/shared/GlassPanel"
 import { cn } from "@/lib/utils"
-import {
-  extractColorsFromSvg,
-  clusterDistinctColors,
-  syncExtractedColorsToPalette,
-} from "@/lib/extractor"
-import {
-  IconArrowLeft,
-  IconArrowRight,
-} from "@tabler/icons-react"
+import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react"
 
 interface StudioSearchParams {
   step?: number
@@ -109,30 +101,6 @@ function StudioPage() {
     if (currentStep < 6) {
       try {
         setIsSaving(true)
-        // Automatically sync logo colors to color matrix when leaving Step 2 (Logo step)
-        if (
-          currentStep === 2 &&
-          (brand.svgContent || brand.secondarySvgContent)
-        ) {
-          const primaryColors = brand.svgContent
-            ? await extractColorsFromSvg(brand.svgContent, 4)
-            : []
-          const secondaryColors = brand.secondarySvgContent
-            ? await extractColorsFromSvg(brand.secondarySvgContent, 4)
-            : []
-          const combined = clusterDistinctColors(
-            [...primaryColors, ...secondaryColors],
-            5
-          )
-          if (combined.length > 0) {
-            const updatedPalette = syncExtractedColorsToPalette(
-              combined,
-              brand.colorPalette
-            )
-            brand.setColorPalette(updatedPalette)
-          }
-        }
-
         // Upload any staged custom fonts to Supabase when leaving Step 4 (Typography step)
         if (
           currentStep === 4 &&
@@ -157,13 +125,6 @@ function StudioPage() {
     if (isProjectLoading || isSaving) return
     if (currentStep > 1) {
       goToStep(currentStep - 1)
-    }
-  }
-
-  const handleSkipStep = () => {
-    if (isProjectLoading || isSaving) return
-    if (currentStep < 6) {
-      goToStep(currentStep + 1)
     }
   }
 
@@ -232,7 +193,7 @@ function StudioPage() {
                     </Button>
 
                     <div className="flex items-center gap-2">
-                      <Button
+                      {/* <Button
                         variant="outline"
                         size="pill"
                         gsapFill
@@ -241,7 +202,7 @@ function StudioPage() {
                         className="cursor-pointer rounded-full px-4 text-xs font-semibold text-muted-foreground hover:text-foreground disabled:opacity-30"
                       >
                         Skip Step
-                      </Button>
+                      </Button> */}
 
                       <Button
                         variant="shiny"

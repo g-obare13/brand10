@@ -1,4 +1,3 @@
-import WordReveal from "@/components/shared/WordReveal"
 import { cn } from "@/lib/utils"
 import { useBrandStore } from "@/store/brandStore"
 import { IconCheck } from "@tabler/icons-react"
@@ -32,24 +31,12 @@ export function StepImagery() {
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <WordReveal
-          as="h4"
-          stagger={0.03}
-          duration={1.2}
-          disableScrollTrigger={true}
-          className="mb-2"
-        >
+        <h4 className="mb-2">
           Visual Mood &amp; Treatment
-        </WordReveal>
-        <WordReveal
-          as="p"
-          stagger={0.03}
-          duration={1.2}
-          disableScrollTrigger={true}
-          className="mb-2"
-        >
+        </h4>
+        <p className="mb-2">
           Establish photography guidelines and ambient lighting direction.
-        </WordReveal>
+        </p>
       </div>
 
       <div className="space-y-5">

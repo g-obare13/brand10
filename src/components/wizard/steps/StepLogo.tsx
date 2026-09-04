@@ -1,9 +1,9 @@
-import WordReveal from "@/components/shared/WordReveal"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
-  clusterDistinctColors,
   extractColorsFromSvg,
   syncExtractedColorsToPalette,
 } from "@/lib/extractor"
@@ -11,11 +11,13 @@ import { cn } from "@/lib/utils"
 import { useBrandStore } from "@/store/brandStore"
 import {
   IconAlertCircle,
+  IconCheck,
+  IconPlus,
   IconRefresh,
   IconTrash,
   IconUpload,
+  IconX,
 } from "@tabler/icons-react"
-import { gsap } from "gsap"
 import { useEffect, useRef, useState } from "react"
 
 const MAX_SVG_BYTES = 1 * 1024 * 1024 // 1MB
@@ -33,7 +35,6 @@ const MAX_SVG_BYTES = 1 * 1024 * 1024 // 1MB
  */
 export function StepLogo() {
   const brand = useBrandStore()
-  const containerRef = useRef<HTMLDivElement>(null)
 
   const [activeSlot, setActiveSlot] = useState<"primary" | "secondary">(
     "primary"
@@ -47,62 +48,53 @@ export function StepLogo() {
 
   const primaryInputRef = useRef<HTMLInputElement>(null)
   const secondaryInputRef = useRef<HTMLInputElement>(null)
+  const lastExtractedPrimarySvg = useRef<string | null>(null)
 
-  useEffect(() => {
-    if (!containerRef.current) return
-    const ctx = gsap.context(() => {
-      const items = containerRef.current?.querySelectorAll(".logo-item-anim")
-      if (items && items.length > 0) {
-        gsap.fromTo(
-          items,
-          { y: 24, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.7,
-            stagger: 0.08,
-            delay: 0.1,
-            ease: "power3.out",
-          }
-        )
-      }
-    }, containerRef)
+  const [isAddingRule, setIsAddingRule] = useState(false)
+  const [newRuleType, setNewRuleType] = useState<"do" | "dont">("dont")
+  const [newRuleTitle, setNewRuleTitle] = useState("")
+  const [newRuleDetail, setNewRuleDetail] = useState("")
 
-    return () => ctx.revert()
-  }, [])
+  const handleAddRule = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newRuleTitle.trim()) return
 
-  // Extract dominant distinct colors from primary and secondary SVGs
-  const refreshExtractedColors = async (
-    primarySvg?: string | null,
-    secondarySvg?: string | null,
-    autoSync = false
-  ) => {
-    const primaryColors = primarySvg
-      ? await extractColorsFromSvg(primarySvg, 4)
-      : []
-    const secondaryColors = secondarySvg
-      ? await extractColorsFromSvg(secondarySvg, 4)
-      : []
+    brand.addDoDont({
+      type: newRuleType,
+      rule: newRuleTitle.trim(),
+      detail:
+        newRuleDetail.trim() ||
+        (newRuleType === "dont"
+          ? "Prohibited logo treatment."
+          : "Recommended logo treatment."),
+    })
 
-    const combined = clusterDistinctColors(
-      [...primaryColors, ...secondaryColors],
-      5
-    )
-    setExtractedColors(combined)
+    setNewRuleTitle("")
+    setNewRuleDetail("")
+    setIsAddingRule(false)
+  }
 
-    if (autoSync && combined.length > 0) {
-      const updated = syncExtractedColorsToPalette(combined, brand.colorPalette)
+  const extractPrimaryColors = async (svg: string, syncPalette: boolean) => {
+    const colors = await extractColorsFromSvg(svg, 4)
+    setExtractedColors(colors)
+
+    if (syncPalette && colors.length > 0) {
+      const updated = syncExtractedColorsToPalette(colors, brand.colorPalette)
       brand.setColorPalette(updated)
     }
   }
 
   useEffect(() => {
-    if (brand.svgContent || brand.secondarySvgContent) {
-      refreshExtractedColors(brand.svgContent, brand.secondarySvgContent, false)
-    } else {
+    if (!brand.svgContent) {
+      lastExtractedPrimarySvg.current = null
       setExtractedColors([])
+      return
     }
-  }, [brand.svgContent, brand.secondarySvgContent])
+
+    if (lastExtractedPrimarySvg.current === brand.svgContent) return
+    lastExtractedPrimarySvg.current = brand.svgContent
+    void extractPrimaryColors(brand.svgContent, false)
+  }, [brand.svgContent])
 
   const handleSvgFile = async (file: File, slot: "primary" | "secondary") => {
     setErrorMsg(null)
@@ -160,19 +152,19 @@ export function StepLogo() {
         }
       }
 
-      // Save to store and refresh dominant colors (auto-sync to palette)
+      // The primary mark is the single source of truth for the brand palette.
       if (slot === "primary") {
+        lastExtractedPrimarySvg.current = text
+        await extractPrimaryColors(text, true)
         await brand.setLogoData({
           svgContent: text,
           isVector: true,
           aspectRatio,
         })
-        await refreshExtractedColors(text, brand.secondarySvgContent, true)
       } else {
         await brand.setSecondaryLogoData({
           svgContent: text,
         })
-        await refreshExtractedColors(brand.svgContent, text, true)
       }
     } catch (err) {
       console.error("SVG Processing Error:", err)
@@ -191,28 +183,14 @@ export function StepLogo() {
     : null
 
   return (
-    <div ref={containerRef} className="relative flex h-full flex-col space-y-6">
+    <div className="relative flex h-full flex-col space-y-6">
       {/* Step Header */}
       <div className="space-y-1">
-        <WordReveal
-          as="h4"
-          stagger={0.03}
-          duration={1.2}
-          disableScrollTrigger={true}
-          className="mb-2"
-        >
-          Logo Assets &amp; Color Extraction
-        </WordReveal>
-        <WordReveal
-          as="p"
-          stagger={0.03}
-          duration={1.2}
-          disableScrollTrigger={true}
-          className="mb-2"
-        >
+        <h4 className="mb-2">Logo Assets &amp; Color Extraction</h4>
+        <p className="mb-2">
           Upload vector marks (SVG only, max 1MB) for primary and secondary
           brand lockups. Colors are auto-extracted from mark geometry.
-        </WordReveal>
+        </p>
       </div>
 
       {/* Error Alert */}
@@ -290,7 +268,8 @@ export function StepLogo() {
                     size="sm"
                     onClick={() => {
                       brand.removeLogo()
-                      refreshExtractedColors(null, brand.secondarySvgContent)
+                      lastExtractedPrimarySvg.current = null
+                      setExtractedColors([])
                     }}
                     className="cursor-pointer rounded-full text-xs text-destructive hover:bg-destructive/10"
                   >
@@ -390,7 +369,6 @@ export function StepLogo() {
                     size="sm"
                     onClick={() => {
                       brand.removeSecondaryLogo()
-                      refreshExtractedColors(brand.svgContent, null)
                     }}
                     className="cursor-pointer rounded-full text-xs text-destructive hover:bg-destructive/10"
                   >
@@ -441,12 +419,12 @@ export function StepLogo() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-medium text-foreground">
-                  Extracted Colors from SVG
+                  Extracted Colors from Primary Logo
                 </span>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {extractedColors.map((hex, idx) => {
                 return (
                   <div
@@ -466,6 +444,175 @@ export function StepLogo() {
             </div>
           </div>
         )}
+
+      {/* 4. LOGO USAGE CONSTRAINTS / DO'S & DON'TS */}
+      <div className="space-y-4 pt-2">
+        <div className="flex items-center justify-between">
+          <div>
+            <Label>Logo Usage Guardrails &amp; Constraints</Label>
+            <p className="text-xs text-muted-foreground">
+              Define reproduction rules, safe alignments, and prohibited
+              treatments.
+            </p>
+          </div>
+          <Badge variant="outline" className="rounded-full">
+            {brand.dosAndDonts.length} Rules
+          </Badge>
+        </div>
+
+        {/* Existing Rules List */}
+        <div className="space-y-2.5">
+          {brand.dosAndDonts.map((item) => {
+            const isDo = item.type === "do"
+            return (
+              <div
+                key={item.id}
+                className={cn(
+                  "flex items-start justify-between gap-3 rounded-2xl border p-3.5 transition-colors",
+                  isDo
+                    ? "border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/40"
+                    : "border-border/80 bg-card/60 hover:border-rose-500/40"
+                )}
+              >
+                <div className="flex items-start gap-3">
+                  <div
+                    className={cn(
+                      "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full text-xs",
+                      isDo
+                        ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                        : "bg-rose-500/20 text-rose-600 dark:text-rose-400"
+                    )}
+                  >
+                    {isDo ? <IconCheck size={12} /> : <IconX size={12} />}
+                  </div>
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-foreground">
+                        {item.rule}
+                      </span>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "rounded-full px-1.5 py-0 text-[10px] font-bold uppercase",
+                          isDo
+                            ? "border-emerald-500/40 text-emerald-600 dark:text-emerald-400"
+                            : "border-rose-500/40 text-rose-600 dark:text-rose-400"
+                        )}
+                      >
+                        {isDo ? "Do" : "Don't"}
+                      </Badge>
+                    </div>
+                    <p className="text-xs leading-relaxed text-muted-foreground">
+                      {item.detail}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => brand.removeDoDont(item.id)}
+                  className="cursor-pointer rounded-lg p-1 text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
+                  title="Remove rule"
+                >
+                  <IconTrash size={14} />
+                </button>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Add New Rule Form / Toggle */}
+        {isAddingRule ? (
+          <form
+            onSubmit={handleAddRule}
+            className="space-y-3 rounded-2xl border border-primary/30 bg-card/80 p-4 shadow-sm"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-foreground">
+                Add New Constraint Rule
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsAddingRule(false)}
+                className="cursor-pointer text-muted-foreground hover:text-foreground"
+              >
+                <IconX size={14} />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div className="space-y-1">
+                <Label className="text-[11px]">Rule Type</Label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={newRuleType === "dont" ? "default" : "outline"}
+                    className="flex-1 text-xs"
+                    onClick={() => setNewRuleType("dont")}
+                  >
+                    Don&apos;t (Prohibited)
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={newRuleType === "do" ? "default" : "outline"}
+                    className="flex-1 text-xs"
+                    onClick={() => setNewRuleType("do")}
+                  >
+                    Do (Approved)
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-1 sm:col-span-2">
+                <Label className="text-[11px]">Rule Title</Label>
+                <Input
+                  value={newRuleTitle}
+                  onChange={(e) => setNewRuleTitle(e.target.value)}
+                  placeholder="e.g. Don't invert trademark emblem"
+                  className="text-xs"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-[11px]">Guideline Detail</Label>
+              <Input
+                value={newRuleDetail}
+                onChange={(e) => setNewRuleDetail(e.target.value)}
+                placeholder="e.g. The trademark mark must never be inverted or mirrored horizontally."
+                className="text-xs"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsAddingRule(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" size="sm">
+                Add Rule
+              </Button>
+            </div>
+          </form>
+        ) : (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setIsAddingRule(true)}
+            className="w-full cursor-pointer gap-1.5 rounded-xl border-dashed py-2.5 text-xs font-semibold"
+            icon={<IconPlus size={14} />}
+          >
+            Add Constraint Rule
+          </Button>
+        )}
+      </div>
     </div>
   )
 }

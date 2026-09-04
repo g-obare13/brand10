@@ -1,35 +1,44 @@
-import { useEffect, useRef } from "react"
+import type { BrandDoDontItem } from "@/store/brandStore"
 import { useBrandStore } from "@/store/brandStore"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import GlassPanel from "@/components/shared/GlassPanel"
-import { IconX } from "@tabler/icons-react"
+import { IconCheck, IconX } from "@tabler/icons-react"
 import { DESIGN_MOVEMENTS } from "@/data/wizard"
 import { getPreviewTheme } from "./previewTheme"
 import { Circle } from "@boxicons/react"
-import { gsap } from "gsap"
 
-const LOGO_DONTS = [
+const LOGO_DONTS: BrandDoDontItem[] = [
   {
+    id: "1",
+    type: "dont",
     rule: "Don't use outdated versions",
     detail:
       "If the brand has had past logo iterations, only the current approved version should appear.",
   },
   {
+    id: "2",
+    type: "dont",
     rule: "Don't add effects",
     detail:
       "No drop shadows, gradients, outlines, bevels, or glows unless that's part of the actual logo design.",
   },
   {
+    id: "3",
+    type: "dont",
     rule: "Don't recolor outside the approved palette",
     detail: "No random or off-brand colors applied to the mark.",
   },
   {
+    id: "4",
+    type: "dont",
     rule: "Don't rotate",
     detail:
       "Keep the logo at its intended orientation unless a rotated lockup is explicitly part of the system.",
   },
   {
+    id: "5",
+    type: "dont",
     rule: "Don't stretch or distort",
     detail:
       "Never scale non-proportionally (squishing horizontally or vertically).",
@@ -220,7 +229,6 @@ function BlueprintFrame({
  */
 export function StepLogoPreview() {
   const brand = useBrandStore()
-  const containerRef = useRef<HTMLDivElement>(null)
   const primaryColor =
     brand.colorPalette.find((c) => c.role === "primary")?.hex || "#6366f1"
 
@@ -246,31 +254,8 @@ export function StepLogoPreview() {
 
   const theme = getPreviewTheme(activeMovement.id)
 
-  useEffect(() => {
-    if (!containerRef.current) return
-    const ctx = gsap.context(() => {
-      const cards = containerRef.current?.querySelectorAll(".preview-card-anim")
-      if (cards && cards.length > 0) {
-        gsap.fromTo(
-          cards,
-          { y: 24, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.7,
-            stagger: 0.08,
-            delay: 0.1,
-            ease: "power3.out",
-          }
-        )
-      }
-    }, containerRef)
-
-    return () => ctx.revert()
-  }, [])
-
   return (
-    <div ref={containerRef} className={theme.container}>
+    <div className={theme.container}>
       {/* 1. PRIMARY LOGO SYSTEM (TOP) */}
       <div className="space-y-3">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
@@ -442,29 +427,41 @@ export function StepLogoPreview() {
       >
         <div className="mb-2 flex items-center justify-between">
           <span className="text-sm font-semibold">
-            Logo Usage Constraints (Don&apos;ts)
+            Logo Usage Constraints &amp; Guardrails
           </span>
-          <Badge className={theme.badge}>Rules &amp; Guardrails</Badge>
+          <Badge className={theme.badge}>
+            {(brand.dosAndDonts.length > 0 ? brand.dosAndDonts : LOGO_DONTS).length} Rules
+          </Badge>
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {LOGO_DONTS.map((item, idx) => (
-            <div
-              key={idx}
-              className={cn(
-                "flex items-start gap-2.5 rounded-xl border border-border/40 bg-background/50 p-3 text-left transition-all",
-                theme.tileCard
-              )}
-            >
-              <div className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-rose-500/20 text-rose-500">
-                <IconX size={10} />
+          {(brand.dosAndDonts.length > 0 ? brand.dosAndDonts : LOGO_DONTS).map((item, idx) => {
+            const isDo = item.type === "do"
+            return (
+              <div
+                key={item.id || idx}
+                className={cn(
+                  "flex items-start gap-2.5 rounded-xl border border-border/40 bg-background/50 p-3 text-left transition-all",
+                  theme.tileCard
+                )}
+              >
+                <div
+                  className={cn(
+                    "mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full",
+                    isDo
+                      ? "bg-emerald-500/20 text-emerald-500"
+                      : "bg-rose-500/20 text-rose-500"
+                  )}
+                >
+                  {isDo ? <IconCheck size={10} /> : <IconX size={10} />}
+                </div>
+                <div className="space-y-0.5">
+                  <h5 className="text-base font-semibold">{item.rule}</h5>
+                  <p className="text-sm text-muted-foreground">{item.detail}</p>
+                </div>
               </div>
-              <div className="space-y-0.5">
-                <h5 className="text-base font-semibold">{item.rule}</h5>
-                <p className="text-sm text-muted-foreground">{item.detail}</p>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </GlassPanel>
     </div>

@@ -1,12 +1,9 @@
-import WordReveal from "@/components/shared/WordReveal"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DESIGN_MOVEMENTS } from "@/data/wizard"
 import { generateTonalShades } from "@/lib/colorUtils"
 import { useBrandStore } from "@/store/brandStore"
 import chroma from "chroma-js"
-import { gsap } from "gsap"
-import { useEffect, useRef } from "react"
 /**
  * Step 3 Wizard form component for configuring brand color palette and harmonic relationships.
  * Features:
@@ -20,7 +17,6 @@ import { useEffect, useRef } from "react"
  */
 export function StepColors() {
   const brand = useBrandStore()
-  const containerRef = useRef<HTMLDivElement>(null)
 
   const primarySwatch =
     brand.colorPalette.find((c) => c.role === "primary") ||
@@ -40,29 +36,6 @@ export function StepColors() {
     ) ||
     DESIGN_MOVEMENTS[0]
 
-  useEffect(() => {
-    if (!containerRef.current) return
-    const ctx = gsap.context(() => {
-      const items = containerRef.current?.querySelectorAll(".colors-item-anim")
-      if (items && items.length > 0) {
-        gsap.fromTo(
-          items,
-          { y: 24, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.7,
-            stagger: 0.08,
-            delay: 0.1,
-            ease: "power3.out",
-          }
-        )
-      }
-    }, containerRef)
-
-    return () => ctx.revert()
-  }, [])
-
   const handleColorChange = (id: string, hex: string) => {
     const valid = chroma.valid(hex)
     const shades = valid ? generateTonalShades(hex) : undefined
@@ -70,33 +43,21 @@ export function StepColors() {
   }
 
   return (
-    <div ref={containerRef} className="space-y-6">
+    <div className="space-y-6">
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <WordReveal
-            as="h4"
-            stagger={0.03}
-            duration={1.2}
-            disableScrollTrigger={true}
-            className="mb-2"
-          >
+          <h4 className="mb-2">
             Palette &amp; Accessibility Scale
-          </WordReveal>
+          </h4>
           <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
             <span className="size-1.5 animate-pulse rounded-full bg-primary" />
             <span>{activeMovement.label}</span>
           </div>
         </div>
-        <WordReveal
-          as="p"
-          stagger={0.03}
-          duration={1.2}
-          disableScrollTrigger={true}
-          className="mb-2"
-        >
+        <p className="mb-2">
           Fine-tune the 2 dominant brand colors extracted from your mark. Tonal
           scales and accessibility ratios adapt in real time.
-        </WordReveal>
+        </p>
       </div>
 
       <div className="space-y-5">

@@ -92,7 +92,7 @@ export function GeneralErrorComponent({ reset }: ErrorComponentProps) {
               size={"pill"}
               gsapFill
               style={{ opacity: 0 }}
-              className={"hero-cta-btn rounded-full px-12! py-8!"}
+              className={"hero-cta-btn rounded-full"}
             >
               Try Again
             </Button>
@@ -102,10 +102,10 @@ export function GeneralErrorComponent({ reset }: ErrorComponentProps) {
               size={"pill"}
               gsapFill
               style={{ opacity: 0 }}
-              className={"hero-cta-btn rounded-full px-12! py-8!"}
+              className={"hero-cta-btn rounded-full"}
               href="/"
             >
-              Return Home
+              Return to Home
             </Button>
           </div>
         </div>

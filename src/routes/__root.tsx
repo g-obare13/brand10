@@ -14,7 +14,6 @@ import { useAuthStore } from "@/store/authStore"
 import { Toaster } from "sonner"
 import "sonner/dist/styles.css"
 import "@/styles.css"
-import { ScrollManager } from "@/components/shared/ScrollManager"
 import { ProgressiveBlur } from "@/components/shared/ProgressiveBlur"
 
 initConsole()
@@ -233,19 +232,19 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           position="fixed"
           size="7rem"
         />
-        <ScrollManager>
-          <ThemeProvider>
-            {children}
-            <Toaster
-              position="bottom-right"
-              closeButton
-              richColors
-              toastOptions={{
-                className: "font-sans",
-              }}
-            />
-          </ThemeProvider>
-        </ScrollManager>
+        {/* <ScrollManager> */}
+        <ThemeProvider>
+          {children}
+          <Toaster
+            position="bottom-right"
+            closeButton
+            richColors
+            toastOptions={{
+              className: "font-sans",
+            }}
+          />
+        </ThemeProvider>
+        {/* </ScrollManager> */}
 
         <ProgressiveBlur
           className="z-40"

@@ -1,10 +1,9 @@
-import { useRef, useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useBrandStore } from "@/store/brandStore"
 import { generateTonalShades } from "@/lib/colorUtils"
 import GlassPanel from "@/components/shared/GlassPanel"
 import { DESIGN_MOVEMENTS } from "@/data/wizard"
 import { getPreviewTheme } from "./previewTheme"
-import { gsap } from "gsap"
 import chroma from "chroma-js"
 import { Badge } from "@/components/ui/badge"
 import { Shield } from "@boxicons/react"
@@ -245,7 +244,6 @@ function ColorShadeScaleRow({
  */
 export function StepColorsPreview() {
   const brand = useBrandStore()
-  const containerRef = useRef<HTMLDivElement>(null)
 
   const primary = brand.colorPalette.find((c) => c.role === "primary") ||
     brand.colorPalette[0] || {
@@ -278,34 +276,11 @@ export function StepColorsPreview() {
 
   const theme = getPreviewTheme(activeMovement.id)
 
-  useEffect(() => {
-    if (!containerRef.current) return
-    const ctx = gsap.context(() => {
-      const cards = containerRef.current?.querySelectorAll(".preview-card-anim")
-      if (cards && cards.length > 0) {
-        gsap.fromTo(
-          cards,
-          { y: 24, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.7,
-            stagger: 0.08,
-            delay: 0.1,
-            ease: "power3.out",
-          }
-        )
-      }
-    }, containerRef)
-
-    return () => ctx.revert()
-  }, [])
-
   const primaryName = getApproximateColorName(primary.hex, primary.name)
   const secondaryName = getApproximateColorName(secondary.hex, secondary.name)
 
   return (
-    <div ref={containerRef} className={theme.container}>
+    <div className={theme.container}>
       <GlassPanel
         blur="none"
         noise

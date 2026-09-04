@@ -1,4 +1,3 @@
-import WordReveal from "@/components/shared/WordReveal"
 import { Label } from "@/components/ui/label"
 import { loadGoogleFont } from "@/lib/fontLoader"
 import type { GoogleFontItem } from "@/lib/googleFonts"
@@ -21,7 +20,6 @@ import {
 } from "@/components/ui/combobox"
 import { Slider } from "@/components/ui/slider"
 import { X } from "@boxicons/react"
-import { gsap } from "gsap"
 
 interface FontComboboxProps {
   label: string
@@ -153,30 +151,6 @@ export function StepTypography() {
     "display"
   )
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const stepContainerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!stepContainerRef.current) return
-    const ctx = gsap.context(() => {
-      const cards =
-        stepContainerRef.current?.querySelectorAll(".step-typo-anim")
-      if (cards && cards.length > 0) {
-        gsap.fromTo(
-          cards,
-          { y: 16, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.5,
-            stagger: 0.08,
-            ease: "power2.out",
-          }
-        )
-      }
-    }, stepContainerRef)
-
-    return () => ctx.revert()
-  }, [])
 
   useEffect(() => {
     let isMounted = true
@@ -249,27 +223,15 @@ export function StepTypography() {
   }
 
   return (
-    <div ref={stepContainerRef} className="space-y-6">
+    <div className="space-y-6">
       <div className="space-y-1">
-        <WordReveal
-          as="h4"
-          stagger={0.03}
-          duration={1.2}
-          disableScrollTrigger={true}
-          className="mb-2"
-        >
+        <h4 className="mb-2">
           Hierarchy &amp; Type Scale
-        </WordReveal>
-        <WordReveal
-          as="p"
-          stagger={0.03}
-          duration={1.2}
-          disableScrollTrigger={true}
-          className="mb-2"
-        >
+        </h4>
+        <p className="mb-2">
           Select cohesive Google Font pairings, search the live catalog, or
           upload custom brand typefaces (.woff2, .woff, .ttf, .otf).
-        </WordReveal>
+        </p>
       </div>
 
       <div className="space-y-5">

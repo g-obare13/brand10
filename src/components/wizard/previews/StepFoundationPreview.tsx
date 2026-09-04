@@ -1,5 +1,3 @@
-import { useEffect, useRef } from "react"
-import { gsap } from "gsap"
 import { DESIGN_MOVEMENTS } from "@/data/wizard"
 import { useBrandStore } from "@/store/brandStore"
 import { getPreviewTheme } from "./previewTheme"
@@ -12,7 +10,6 @@ import {
 import GlassPanel from "@/components/shared/GlassPanel"
 import { Badge } from "@/components/ui/badge"
 import { Circle } from "@boxicons/react"
-import WordReveal from "@/components/shared/WordReveal"
 
 /**
  * Loading skeleton component for the StepFoundationPreview panel.
@@ -137,8 +134,6 @@ export function StepFoundationPreview({
 }: StepFoundationPreviewProps = {}) {
   const brand = useBrandStore()
   const effectiveLoading = isLoading ?? (brand.isLoading || !brand.projectId)
-  const containerRef = useRef<HTMLDivElement>(null)
-
   const primaryColor =
     brand.colorPalette.find((c) => c.role === "primary")?.hex || "#6366f1"
 
@@ -156,35 +151,12 @@ export function StepFoundationPreview({
 
   const theme = getPreviewTheme(activeMovement.id)
 
-  useEffect(() => {
-    if (!containerRef.current || effectiveLoading) return
-    const ctx = gsap.context(() => {
-      const cards = containerRef.current?.querySelectorAll(".preview-card-anim")
-      if (cards && cards.length > 0) {
-        gsap.fromTo(
-          cards,
-          { y: 24, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.7,
-            stagger: 0.08,
-            delay: 0.1,
-            ease: "power3.out",
-          }
-        )
-      }
-    }, containerRef)
-
-    return () => ctx.revert()
-  }, [effectiveLoading])
-
   if (effectiveLoading) {
     return <StepFoundationPreviewSkeleton theme={theme} />
   }
 
   return (
-    <div ref={containerRef} className={theme.container}>
+    <div className={theme.container}>
       {/* 1. Brand Workspace Hero Identity Tile */}
       <GlassPanel
         blur="none"
@@ -209,14 +181,7 @@ export function StepFoundationPreview({
           </div>
 
           <div className="space-y-1.5">
-            <WordReveal
-              as="h2"
-              stagger={0.03}
-              duration={1.0}
-              disableScrollTrigger={true}
-            >
-              {brand.brandName || "Your Brand Workspace"}
-            </WordReveal>
+            <h2>{brand.brandName || "Your Brand Workspace"}</h2>
             <p className="max-w-xl">
               {activeMovement.vibe ||
                 "Configure your core brand essence, mission, and calibrated tones."}
@@ -255,6 +220,8 @@ export function StepFoundationPreview({
           </p>
         </div>
       </div>
+
+      <h6>Example Card</h6>
 
       {/* 3. Live UI Component Theme Simulation */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react"
+import { useEffect } from "react"
 import { useBrandStore } from "@/store/brandStore"
 import GlassPanel from "@/components/shared/GlassPanel"
 import { IconTypography } from "@tabler/icons-react"
@@ -6,7 +6,6 @@ import { DESIGN_MOVEMENTS } from "@/data/wizard"
 import { getPreviewTheme } from "./previewTheme"
 import { cn } from "@/lib/utils"
 import { loadGoogleFont } from "@/lib/fontLoader"
-import { gsap } from "gsap"
 import { useShallow } from "zustand/react/shallow"
 
 const registeredFontKeys = new Set<string>()
@@ -62,7 +61,6 @@ export function StepTypographyPreview() {
       baseFontSize: state.baseFontSize,
     }))
   )
-  const containerRef = useRef<HTMLDivElement>(null)
 
   const activeMovement =
     (brand.designMovement
@@ -110,45 +108,6 @@ export function StepTypographyPreview() {
     }
   }, [brand.displayFont, brand.bodyFont, brand.monoFont, brand.stagedFontFiles, brand.customFonts])
 
-  // Entrance and reactive font-switch animation for specimen typography elements
-  useEffect(() => {
-    if (!containerRef.current) return
-    const ctx = gsap.context(() => {
-      const cards = containerRef.current?.querySelectorAll(".preview-card-anim")
-      if (cards && cards.length > 0) {
-        gsap.fromTo(
-          cards,
-          { y: 20, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.6,
-            stagger: 0.08,
-            ease: "power3.out",
-          }
-        )
-      }
-
-      // Smooth subtle pop/fade when font family or scale updates
-      const typeElements = containerRef.current?.querySelectorAll(".typo-specimen-item")
-      if (typeElements && typeElements.length > 0) {
-        gsap.fromTo(
-          typeElements,
-          { opacity: 0.4, y: 6 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.45,
-            stagger: 0.03,
-            ease: "power2.out",
-          }
-        )
-      }
-    }, containerRef)
-
-    return () => ctx.revert()
-  }, [brand.displayFont, brand.bodyFont, brand.monoFont, brand.typeScaleRatio])
-
   // Calculate proportional steps based on the modular ratio
   const ratio = brand.typeScaleRatio || 1.25
   const baseSize = brand.baseFontSize || 16
@@ -166,7 +125,7 @@ export function StepTypographyPreview() {
   const captionSize = Math.round(baseSize * 0.75)
 
   return (
-    <div ref={containerRef} className={theme.container}>
+    <div className={theme.container}>
       {/* 1. Main Typography Specimen Card styled with Movement Theme */}
       <GlassPanel
         blur="none"

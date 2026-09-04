@@ -83,7 +83,7 @@ export function NotFoundComponent() {
               size={"pill"}
               gsapFill
               style={{ opacity: 0 }}
-              className={"hero-cta-btn rounded-full px-12! py-8!"}
+              className={"hero-cta-btn rounded-full"}
             >
               Return to Home
             </Button>
@@ -93,7 +93,7 @@ export function NotFoundComponent() {
               size={"pill"}
               gsapFill
               style={{ opacity: 0 }}
-              className={"hero-cta-btn rounded-full px-12! py-8!"}
+              className={"hero-cta-btn rounded-full"}
               href="/dashboard/projects"
             >
               Open Projects

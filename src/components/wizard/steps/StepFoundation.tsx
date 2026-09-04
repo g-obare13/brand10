@@ -1,4 +1,3 @@
-import WordReveal from "@/components/shared/WordReveal"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -36,7 +35,7 @@ export function StepFoundationSkeleton() {
         <div className="space-y-2.5 pt-1">
           <Skeleton className="h-4 w-36 rounded-md" />
           <div className="flex flex-wrap gap-2">
-            {[1, 2, 3, 4, 5].map((i) => (
+            {[1, 2, 3, 4].map((i) => (
               <Skeleton key={i} className="h-9 w-28 rounded-full" />
             ))}
           </div>
@@ -132,29 +131,6 @@ export function StepFoundation({ isLoading }: StepFoundationProps = {}) {
     yTo.current(y)
   }
 
-  useEffect(() => {
-    if (!containerRef.current || effectiveLoading) return
-    const ctx = gsap.context(() => {
-      const items = containerRef.current?.querySelectorAll(".foundation-item")
-      if (items && items.length > 0) {
-        gsap.fromTo(
-          items,
-          { y: 24, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.7,
-            stagger: 0.08,
-            delay: 0.1,
-            ease: "power3.out",
-          }
-        )
-      }
-    }, containerRef)
-
-    return () => ctx.revert()
-  }, [effectiveLoading])
-
   const handleToggleMovement = (movement: DesignMovement) => {
     if (selectedMovementId === movement.id) {
       brand.setDesignMovement(null)
@@ -177,15 +153,9 @@ export function StepFoundation({ isLoading }: StepFoundationProps = {}) {
       className="relative flex h-full flex-col space-y-6"
     >
       {/* Title Header */}
-      <WordReveal
-        as="h2"
-        stagger={0.03}
-        duration={1.2}
-        disableScrollTrigger={true}
-        className="mb-2"
-      >
+      <h2 className="mb-2">
         {brand.brandName || "Strategic Foundation"}
-      </WordReveal>
+      </h2>
 
       <div className="space-y-6">
         {/* Brand Name Input */}
