@@ -60,7 +60,10 @@ export function Footer() {
   ]
 
   return (
-    <footer ref={containerRef} className="overflow-hidden bg-card pt-24 pb-8">
+    <footer
+      ref={containerRef}
+      className="overflow-hidden bg-background pt-24 pb-8"
+    >
       <Container className="space-y-20">
         {/* Top Content: CTA Left, Links Right */}
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-3 lg:gap-8">

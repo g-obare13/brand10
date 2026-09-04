@@ -1,7 +1,7 @@
 import WordReveal from "@/components/shared/WordReveal"
 import { cn } from "@/lib/utils"
 import { useBrandStore } from "@/store/brandStore"
-import { IconCheck, IconPhoto } from "@tabler/icons-react"
+import { IconCheck } from "@tabler/icons-react"
 import { Badge } from "@/components/ui/badge"
 import { IMAGERY_MOOD_OPTIONS, IMAGERY_MOOD_IMAGE_ARRAYS } from "@/data/wizard"
 import ImageComponentOptimized from "@/components/shared/ImageComponentOptimized"

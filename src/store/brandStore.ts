@@ -876,7 +876,7 @@ export const useBrandStore = create<BrandState>()(
             logo_variants: {
               secondary_url: secondaryLogo,
               custom_fonts: state.customFonts || [],
-              imagery_links: state.imageryLinks || [],
+              imagery_links: state.imageryLinks,
             },
             clearspace_multiplier: state.clearspaceMultiplier,
             color_palette: state.colorPalette,

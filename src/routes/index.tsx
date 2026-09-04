@@ -1,13 +1,12 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { useEffect } from "react"
-import { Header } from "@/components/shared/Header"
 import { Hero } from "@/components/hero"
+import FAQSection from "@/components/hero/FAQSection"
 import HowItWorks from "@/components/hero/HowItWorks"
 import InsightsSection from "@/components/hero/InsightsSection"
 import Footer from "@/components/shared/Footer"
-import FAQSection from "@/components/hero/FAQSection"
-import { ProgressiveBlur } from "@/components/shared/ProgressiveBlur"
+import { Header } from "@/components/shared/Header"
 import { useAuthStore } from "@/store/authStore"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { useEffect } from "react"
 
 export const Route = createFileRoute("/")({
   head: () => ({

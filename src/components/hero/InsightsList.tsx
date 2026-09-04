@@ -1,13 +1,13 @@
+import WordReveal from "@/components/shared/WordReveal"
+import Container from "@/components/ui/container"
+import { mediaData } from "@/data/insights"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import * as React from "react"
 import { InsightCard } from "./InsightCard"
-import { mediaData } from "@/data/insights"
-import WordReveal from "@/components/shared/WordReveal"
-import Container from "@/components/ui/container"
 
-import { animateFadeUp, animateParallax } from "@/lib/gsap-animations"
 import ImageComponentOptimized from "@/components/shared/ImageComponentOptimized"
+import { animateParallax } from "@/lib/gsap-animations"
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger)

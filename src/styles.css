@@ -308,16 +308,51 @@
 }
 
 @layer utilities {
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.2);
+  }
   .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
+    height: 8px;
   }
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 9999px;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-muted-foreground/20;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid transparent;
+    background-clip: content-box;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/30;
+    background: rgba(255, 255, 255, 0.5);
+    border: 2px solid transparent;
+    background-clip: content-box;
   }
 }
+
+@media print {
+  body {
+    background: transparent !important;
+    color: #000 !important;
+  }
+  header, footer, nav, aside, .no-print, button, [role="toolbar"] {
+    display: none !important;
+  }
+  .preview-a4-page {
+    box-shadow: none !important;
+    margin: 0 !important;
+    border: none !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    width: 210mm !important;
+    height: 297mm !important;
+  }
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+}
+

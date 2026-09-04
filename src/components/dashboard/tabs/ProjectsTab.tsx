@@ -1,28 +1,6 @@
-import type { BrandProjectItem } from "@/store/projectsStore"
-import { useProjectsStore } from "@/store/projectsStore"
-import { useAuthStore } from "@/store/authStore"
-import { useBrandStore } from "@/store/brandStore"
-import { get as idbGet } from "idb-keyval"
-import {
-  IconAlertTriangle,
-  IconArrowRight,
-  IconPlus,
-  IconTrash,
-} from "@tabler/icons-react"
-import { Link } from "@tanstack/react-router"
-import { useEffect, useRef, useState } from "react"
+import ImageComponentOptimized from "@/components/shared/ImageComponentOptimized"
 import { SpotlightCard } from "@/components/shared/SpotlightCard"
-import { Button } from "@/components/ui/button"
 import WordReveal from "@/components/shared/WordReveal"
-import { animateFadeUp } from "@/lib/gsap-animations"
-import { gsap } from "gsap"
-import { cn } from "@/lib/utils"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -32,8 +10,29 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
 import { Loader } from "@/components/ui/loader"
-import ImageComponentOptimized from "@/components/shared/ImageComponentOptimized"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { animateFadeUp } from "@/lib/gsap-animations"
+import { useAuthStore } from "@/store/authStore"
+import { useBrandStore } from "@/store/brandStore"
+import type { BrandProjectItem } from "@/store/projectsStore"
+import { useProjectsStore } from "@/store/projectsStore"
+import {
+  IconAlertTriangle,
+  IconArrowRight,
+  IconPlus,
+  IconTrash,
+} from "@tabler/icons-react"
+import { Link } from "@tanstack/react-router"
+import { gsap } from "gsap"
+import { get as idbGet } from "idb-keyval"
+import { useEffect, useRef, useState } from "react"
 
 interface ProjectsTabProps {
   onOpenCreateModal: () => void

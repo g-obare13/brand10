@@ -1,11 +1,11 @@
+import ImageComponentOptimized from "@/components/shared/ImageComponentOptimized"
+import WordReveal from "@/components/shared/WordReveal"
+import type { InsightPost } from "@/data/insights"
+import { animateParallax } from "@/lib/gsap-animations"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import * as React from "react"
 import { InsightCard } from "./InsightCard"
-import type { InsightPost } from "@/data/insights"
-import { animateFadeUp, animateParallax } from "@/lib/gsap-animations"
-import WordReveal from "@/components/shared/WordReveal"
-import ImageComponentOptimized from "@/components/shared/ImageComponentOptimized"
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger)

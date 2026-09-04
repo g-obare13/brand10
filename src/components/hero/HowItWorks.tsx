@@ -321,12 +321,12 @@ export default function HowItWorks({
           </div>
 
           <div className="project-names absolute right-8 bottom-8 flex translate-y-4 flex-col gap-2 text-2xl whitespace-nowrap text-zinc-400 max-lg:hidden">
-            {projects.map(({ title }, i) => (
+            {projects.map(({ title: projectTitle }, i) => (
               <p
                 key={i}
                 className="font-medium text-zinc-300 transition-colors duration-300 data-[active=true]:text-zinc-900 dark:text-zinc-700 dark:data-[active=true]:text-zinc-100"
               >
-                {title}
+                {projectTitle}
               </p>
             ))}
           </div>

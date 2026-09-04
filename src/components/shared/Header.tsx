@@ -42,8 +42,7 @@ export interface HeaderProps {
 export function Header({ action }: HeaderProps = {}) {
   const [isOpen, setIsOpen] = useState(false)
   const [copiedField, setCopiedField] = useState<string | null>(null)
-  const { user, initialize, loginModalOpen, setLoginModalOpen } =
-    useAuthStore()
+  const { user, initialize, loginModalOpen, setLoginModalOpen } = useAuthStore()
   const [signOutModalOpen, setSignOutModalOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const menuBtnRef = useRef<HTMLButtonElement>(null)
@@ -59,7 +58,6 @@ export function Header({ action }: HeaderProps = {}) {
   }
 
   const location = useLocation()
-  const navigate = useNavigate()
   const currentPath = location.pathname
   const isDashboard =
     action === "logout" || currentPath === "/dashboard/projects"

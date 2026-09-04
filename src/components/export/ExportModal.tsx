@@ -83,6 +83,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ open, onOpenChange }) 
         imageryOverlay: brand.imageryOverlay,
         imageryLinks: brand.imageryLinks,
         iconStyle: brand.iconStyle,
+        styleTheme: brand.imageryMood === "editorial" ? "candid" : brand.imageryMood,
       })
       toast.success('Brand guidelines PDF generated.')
     } catch (err) {

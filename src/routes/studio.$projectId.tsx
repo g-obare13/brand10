@@ -12,10 +12,11 @@ import { StepLogo } from "@/components/wizard/steps/StepLogo"
 import { StepColors } from "@/components/wizard/steps/StepColors"
 import { StepTypography } from "@/components/wizard/steps/StepTypography"
 import { StepImagery } from "@/components/wizard/steps/StepImagery"
-import { StepSummary } from "@/components/wizard/steps/StepSummary"
+import { PdfPreviewStudio } from "@/components/wizard/preview/PdfPreviewStudio"
 import { Button } from "@/components/ui/button"
 import { Loader } from "@/components/ui/loader"
 import GlassPanel from "@/components/shared/GlassPanel"
+import { cn } from "@/lib/utils"
 import {
   extractColorsFromSvg,
   clusterDistinctColors,
@@ -24,7 +25,6 @@ import {
 import {
   IconArrowLeft,
   IconArrowRight,
-  IconSparkles,
 } from "@tabler/icons-react"
 
 interface StudioSearchParams {
@@ -163,7 +163,12 @@ function StudioPage() {
 
       {/* Main Content Area */}
       <main className="relative z-10 flex-1 pt-20 pb-32 md:pt-24">
-        <Container className="space-y-8">
+        <Container
+          className={cn(
+            "space-y-8",
+            currentStep === 6 && "max-w-[1680px] px-4 sm:px-6"
+          )}
+        >
           {/* Sub-Header Control & Step Indicator Strip */}
           <WizardHeader
             currentStep={currentStep}
@@ -171,29 +176,31 @@ function StudioPage() {
             projectId={projectId}
           />
 
-          {/* Main Wizard Split Layout */}
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-            {/* Left Column: Step Configuration Form (5 cols) */}
-            <div className="flex flex-col lg:col-span-5">
-              <GlassPanel
-                blur="none"
-                noise
-                noiseOpacity={0.02}
-                className="flex h-full flex-col justify-between rounded-3xl border border-border/80 bg-card/85 p-6 shadow-sm backdrop-blur-xl sm:p-8"
-              >
-                <div className="flex-1">
-                  {currentStep === 1 && (
-                    <StepFoundation isLoading={isProjectLoading} />
-                  )}
-                  {currentStep === 2 && <StepLogo />}
-                  {currentStep === 3 && <StepColors />}
-                  {currentStep === 4 && <StepTypography />}
-                  {currentStep === 5 && <StepImagery />}
-                  {currentStep === 6 && <StepSummary projectId={projectId} />}
-                </div>
+          {/* Step 6: 3-Column Interactive Brand PDF Preview Studio */}
+          {currentStep === 6 ? (
+            <PdfPreviewStudio projectId={projectId} />
+          ) : (
+            /* Main Wizard Split Layout for Steps 1-5 */
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+              {/* Left Column: Step Configuration Form (5 cols) */}
+              <div className="flex flex-col lg:col-span-5">
+                <GlassPanel
+                  blur="none"
+                  noise
+                  noiseOpacity={0.02}
+                  className="flex h-full flex-col justify-between rounded-3xl border border-border/80 bg-card/85 p-6 shadow-sm backdrop-blur-xl sm:p-8"
+                >
+                  <div className="flex-1">
+                    {currentStep === 1 && (
+                      <StepFoundation isLoading={isProjectLoading} />
+                    )}
+                    {currentStep === 2 && <StepLogo />}
+                    {currentStep === 3 && <StepColors />}
+                    {currentStep === 4 && <StepTypography />}
+                    {currentStep === 5 && <StepImagery />}
+                  </div>
 
-                {/* Bottom Step Actions - Pinned to bottom of the card */}
-                {currentStep < 6 && (
+                  {/* Bottom Step Actions - Pinned to bottom of the card */}
                   <div className="mt-auto flex items-center justify-between pt-6">
                     <Button
                       variant="outline"
@@ -246,18 +253,18 @@ function StudioPage() {
                       </Button>
                     </div>
                   </div>
-                )}
-              </GlassPanel>
-            </div>
+                </GlassPanel>
+              </div>
 
-            {/* Right Column: Sticky Live Step Preview (7 cols) */}
-            <div className="lg:col-span-7">
-              <WizardBentoPreview
-                currentStep={currentStep}
-                isLoading={isProjectLoading}
-              />
+              {/* Right Column: Sticky Live Step Preview (7 cols) */}
+              <div className="lg:col-span-7">
+                <WizardBentoPreview
+                  currentStep={currentStep}
+                  isLoading={isProjectLoading}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </Container>
       </main>
     </div>
