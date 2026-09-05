@@ -10,7 +10,6 @@ import {
   IconDownload,
   IconPackage,
   IconPrinter,
-  IconArrowRight,
   IconDeviceFloppy,
 } from "@tabler/icons-react"
 
@@ -95,9 +94,6 @@ export function PdfPreviewRightSidebar({
   const [isZipping, setIsZipping] = useState(false)
   const [isFinishing, setIsFinishing] = useState(false)
 
-  const activeSection =
-    OUTLINE_SECTIONS.find((s) => s.page === activePage) || OUTLINE_SECTIONS[0]
-
   const handleZipExport = async () => {
     try {
       setIsZipping(true)
@@ -144,14 +140,6 @@ export function PdfPreviewRightSidebar({
     }
   }
 
-  const handleJumpToStep = (stepNumber: number) => {
-    navigate({
-      to: "/studio/$projectId",
-      params: { projectId },
-      search: { step: stepNumber },
-    })
-  }
-
   return (
     <aside className="flex flex-col gap-5 rounded-3xl bg-card/85 p-5 backdrop-blur-xl">
       {/* 1. Document Outline / Table of Contents (Matching PDFCN screenshot) */}
@@ -183,20 +171,6 @@ export function PdfPreviewRightSidebar({
             )
           })}
         </div>
-      </div>
-
-      {/* 2. Active Section Inspector & Quick Jump */}
-      <div className="space-y-2.5">
-        <Button
-          variant="default"
-          size="default"
-          gsapFill
-          onClick={() => handleJumpToStep(activeSection.stepNumber)}
-          className="w-fit cursor-pointer rounded-full"
-          icon={<IconArrowRight size={13} />}
-        >
-          <span>Edit in Step {activeSection.stepNumber}</span>
-        </Button>
       </div>
 
       {/* 3. Production Export Hub */}

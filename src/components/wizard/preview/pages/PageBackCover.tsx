@@ -50,21 +50,21 @@ export function PageBackCover({
       className="overflow-hidden border border-zinc-200 bg-white p-0 shadow-2xl"
     >
       <div className="relative flex h-full w-full flex-col justify-between overflow-hidden bg-white p-12 text-black select-none lg:p-16">
-        {/* Subtle Decorative Logo Watermark Shape (Centered Watermark) */}
-        <div className="pointer-events-none absolute top-1/2 left-1/2 flex size-[840px] -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden select-none">
+        {/* Subtle Decorative Logo Watermark Shape (3% opacity, grayscale) */}
+        <div className="pointer-events-none absolute top-1/2 left-1/2 flex size-[680px] -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden select-none opacity-[0.03] grayscale contrast-50">
           {svgContent ? (
             <div
-              className="flex size-full items-center justify-center text-zinc-100 opacity-60 [&_*]:!fill-current [&_*]:!stroke-current [&_svg]:size-full [&_svg]:max-h-full [&_svg]:max-w-full"
+              className="flex size-full items-center justify-center [&_*]:!fill-black [&_*]:!stroke-transparent [&_svg]:size-full [&_svg]:max-h-full [&_svg]:max-w-full"
               dangerouslySetInnerHTML={{ __html: svgContent }}
             />
           ) : rasterDataUri ? (
             <img
               src={rasterDataUri}
               alt=""
-              className="size-full object-contain opacity-10 grayscale"
+              className="size-full object-contain"
             />
           ) : (
-            <div className="text-[600px] leading-none font-bold text-zinc-100 select-none">
+            <div className="text-[500px] leading-none font-bold text-black select-none">
               {(brandName || "B").charAt(0).toUpperCase()}
             </div>
           )}
