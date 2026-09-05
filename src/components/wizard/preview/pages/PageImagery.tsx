@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge"
 import { IMAGERY_MOOD_IMAGE_ARRAYS } from "@/data/wizard"
 import type { PreviewStyleId } from "./A4PageFrame"
 import { A4PageFrame } from "./A4PageFrame"
@@ -113,7 +112,7 @@ export function PageImagery({
         {/* Content Body */}
         <div className="my-auto space-y-5 py-2">
           {/* Active Mood Specification Bar */}
-          <div className="flex items-baseline justify-between border-b border-zinc-200 pb-3">
+          <div className="flex items-baseline justify-between pb-3">
             <div className="space-y-0.5">
               <span className="font-mono text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
                 Art Direction Aesthetic
@@ -132,19 +131,11 @@ export function PageImagery({
                   {moodInfo.lighting}
                 </span>
               </div>
-              <Badge variant="outline" className="text-xs">
-                {moodInfo.badge}
-              </Badge>
             </div>
           </div>
 
           {/* Editorial Photographic Gallery */}
           <div className="space-y-2.5">
-            <div className="flex items-center justify-between border-b border-zinc-200 pb-1 font-mono text-[10px] text-zinc-400 uppercase">
-              <span>Curated Visual Library</span>
-              <span>Aspect &amp; Framing Specimens</span>
-            </div>
-
             {/* Top Asymmetric Pair (Hero 62% / Detail 38%) */}
             <div className="grid grid-cols-12 gap-3">
               {/* Hero Landscape Shot */}

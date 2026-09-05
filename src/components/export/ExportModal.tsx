@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { toast } from 'sonner'
 import { useBrandStore } from '@/store/brandStore'
 import { buildAndDownloadZip, generateTailwindConfig, generateTokensJson, generateCssTokens } from '@/lib/zipBuilder'
-import { downloadBrandPdf } from './PdfBrandDeck'
+import { exportBrandManualPdf } from "@/lib/pdfExportService"
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { IconPackage, IconFileText, IconCode, IconDownload, IconCheck, IconCopy } from '@tabler/icons-react'
@@ -62,28 +62,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({ open, onOpenChange }) 
   const handlePdfDownload = async () => {
     try {
       setIsPdfing(true)
-      await downloadBrandPdf({
-        brandName: brand.brandName,
-        tagline: brand.tagline,
-        mission: brand.mission,
-        vision: brand.vision,
-        coreValues: brand.coreValues,
-        toneRatings: brand.toneRatings,
-        colors: brand.colorPalette,
-        displayFont: brand.displayFont,
-        bodyFont: brand.bodyFont,
-        monoFont: brand.monoFont,
-        baseFontSize: brand.baseFontSize,
-        typeScaleRatio: brand.typeScaleRatio,
-        logoUrl: brand.logoUrl,
-        rasterDataUri: brand.rasterDataUri,
-        clearspaceMultiplier: brand.clearspaceMultiplier,
-        dosAndDonts: brand.dosAndDonts,
-        imageryMood: brand.imageryMood,
-        imageryOverlay: brand.imageryOverlay,
-        imageryLinks: brand.imageryLinks,
-        iconStyle: brand.iconStyle,
-        styleTheme: brand.imageryMood === "editorial" ? "candid" : brand.imageryMood,
+      await exportBrandManualPdf({
+        brandName: brand.brandName || "Brand",
       })
       toast.success('Brand guidelines PDF generated.')
     } catch (err) {

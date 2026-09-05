@@ -267,7 +267,7 @@ export function ProjectsTab({ onOpenCreateModal }: ProjectsTabProps) {
         {isLoading ? (
           /* Loading Skeletons - Prevents Empty State Flashing */
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[1, 2].map((i) => (
+            {[1, 2, 3].map((i) => (
               <div
                 key={i}
                 className="flex min-h-65 animate-pulse flex-col justify-between rounded-2xl border border-border/40 bg-card/60 p-7"

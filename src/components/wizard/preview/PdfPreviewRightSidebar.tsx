@@ -78,6 +78,7 @@ interface PdfPreviewRightSidebarProps {
   onNavigateToPage: (page: number) => void
   onDownloadPdf: () => void
   isDownloadingPdf?: boolean
+  downloadProgress?: string
   projectId: string
 }
 
@@ -86,6 +87,7 @@ export function PdfPreviewRightSidebar({
   onNavigateToPage,
   onDownloadPdf,
   isDownloadingPdf = false,
+  downloadProgress = "",
   projectId,
 }: PdfPreviewRightSidebarProps) {
   const brand = useBrandStore()
@@ -218,7 +220,9 @@ export function PdfPreviewRightSidebar({
             }
             iconPlacement="right"
           >
-            {isDownloadingPdf ? "Compiling PDF..." : "Download Brand PDF"}
+            {isDownloadingPdf
+              ? downloadProgress || "Compiling PDF..."
+              : "Download Brand PDF"}
           </Button>
 
           {/* Download Assets ZIP Button */}

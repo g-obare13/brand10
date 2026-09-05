@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useBrandStore } from "@/store/brandStore"
 import type { BrandToneRatings } from "@/store/brandStore"
-import { downloadBrandPdf } from "@/components/export/PdfBrandDeck"
+import { exportBrandManualPdf } from "@/lib/pdfExportService"
 import { toast } from "sonner"
 import { DESIGN_MOVEMENTS } from "@/data/wizard"
 import type { PreviewStyleId } from "@/components/wizard/preview/pages/A4PageFrame"
@@ -38,6 +38,7 @@ export function PdfPreviewStudio({ projectId }: PdfPreviewStudioProps) {
   const [activeStyle, setActiveStyle] = useState<PreviewStyleId>(initialStyle)
   const [activePage, setActivePage] = useState<number>(1)
   const [isDownloadingPdf, setIsDownloadingPdf] = useState<boolean>(false)
+  const [downloadProgress, setDownloadProgress] = useState<string>("")
 
   const handleSelectStyle = (style: PreviewStyleId) => {
     setActiveStyle(style)
@@ -63,35 +64,20 @@ export function PdfPreviewStudio({ projectId }: PdfPreviewStudioProps) {
   const handleDownloadPdf = async () => {
     try {
       setIsDownloadingPdf(true)
-      await downloadBrandPdf({
-        brandName: brand.brandName,
-        tagline: brand.tagline,
-        mission: brand.mission,
-        vision: brand.vision,
-        coreValues: brand.coreValues,
-        toneRatings: brand.toneRatings,
-        colors: brand.colorPalette,
-        displayFont: brand.displayFont,
-        bodyFont: brand.bodyFont,
-        monoFont: brand.monoFont,
-        baseFontSize: brand.baseFontSize,
-        typeScaleRatio: brand.typeScaleRatio,
-        logoUrl: brand.logoUrl,
-        rasterDataUri: brand.rasterDataUri,
-        clearspaceMultiplier: brand.clearspaceMultiplier,
-        dosAndDonts: brand.dosAndDonts,
-        imageryMood: brand.imageryMood,
-        imageryOverlay: brand.imageryOverlay,
-        imageryLinks: brand.imageryLinks,
-        iconStyle: brand.iconStyle,
-        styleTheme: activeStyle,
+      setDownloadProgress("Preparing pages...")
+      await exportBrandManualPdf({
+        brandName: brand.brandName || "Brand",
+        onProgress: (_current, _total, message) => {
+          setDownloadProgress(message)
+        },
       })
-      toast.success("Brand Guidelines PDF exported.")
+      toast.success("Brand Manual PDF exported.")
     } catch (err) {
       console.error("PDF generation failed:", err)
-      toast.error("Failed to generate PDF deck. Please try again.")
+      toast.error("Failed to export PDF manual. Please try again.")
     } finally {
       setIsDownloadingPdf(false)
+      setDownloadProgress("")
     }
   }
 
@@ -124,6 +110,7 @@ export function PdfPreviewStudio({ projectId }: PdfPreviewStudioProps) {
             onNavigateToPage={handleNavigateToPage}
             onDownloadPdf={handleDownloadPdf}
             isDownloadingPdf={isDownloadingPdf}
+            downloadProgress={downloadProgress}
             projectId={projectId}
           />
         </div>

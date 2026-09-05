@@ -152,11 +152,6 @@ export function PageBackCover({
                   {brandName || "Brand Identity System"}
                 </div>
               </div>
-
-              <div className="text-xs text-zinc-400">
-                Design System Repository:{" "}
-                <span className="font-mono text-zinc-200">{websiteUrl}</span>
-              </div>
             </div>
 
             {/* Right Column: Governance & Copyright */}
@@ -169,7 +164,8 @@ export function PageBackCover({
               </div>
 
               <div className="font-mono text-[11px] text-zinc-400">
-                &copy; {currentYear} {brandName || "Brand Identity"}. All rights reserved.
+                &copy; {currentYear} {brandName || "Brand Identity"}. All rights
+                reserved.
               </div>
             </div>
           </div>
@@ -178,10 +174,11 @@ export function PageBackCover({
           <div className="border-t border-zinc-800/80 pt-3">
             <p className="text-[10px] leading-relaxed text-zinc-400">
               This document concludes the foundational brand manual for{" "}
-              {brandName || "this organization"}. All design tokens, modular scale
-              hierarchies, colorimetry metrics, and art direction guidelines
-              contained herein represent authoritative standards for digital
-              interfaces, physical collateral, and ecosystem touchpoints.
+              {brandName || "this organization"}. All design tokens, modular
+              scale hierarchies, colorimetry metrics, and art direction
+              guidelines contained herein represent authoritative standards for
+              digital interfaces, physical collateral, and ecosystem
+              touchpoints.
             </p>
           </div>
         </div>
