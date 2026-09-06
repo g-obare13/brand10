@@ -10,6 +10,7 @@ import {
   getReadableTextColor,
   getWcagContrast,
 } from "@/lib/colorUtils"
+import { getPdfTheme } from "./pdfPageTheme"
 import chroma from "chroma-js"
 
 interface PageColorInfoProps {
@@ -81,6 +82,11 @@ export function PageColorInfo({
   pageNumber = 6,
   totalPages = 9,
 }: PageColorInfoProps) {
+  const theme = getPdfTheme(styleTheme)
+  const isExpressive = theme.isExpressive
+  const isSoftTactility = theme.isSoftTactility
+  const isEditorial = theme.isEditorial
+
   // Select the single primary brand color for detailed metrics breakdown
   const dominantSwatches = colors.filter(
     (c) => c.role !== "neutral" && c.role !== "background"
@@ -117,17 +123,17 @@ export function PageColorInfo({
       displayFont={displayFont}
       bodyFont={bodyFont}
       monoFont={monoFont}
-      className="overflow-hidden border border-zinc-200 bg-white p-12 text-primary-900 shadow-2xl"
+      className={theme.pageFrame}
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Title & Introduction */}
         <div className="space-y-3 pt-2">
           <div className="space-y-2">
-            <h2 className="text-primary-900 uppercase"> COLOR METRICS</h2>
-            <div className="h-0.5 w-16 bg-zinc-500" />
+            <h2 className={theme.title}> COLOR METRICS</h2>
+            <div className={theme.accentBar} />
           </div>
 
-          <p className="max-w-xl text-zinc-600">
+          <p className={theme.introText}>
             Comprehensive colorimetry data and perceptual contrast ratings
             across all 11 tonal steps. Computed using modern OKLCH color space
             coordinates and the Advanced Perceptual Contrast Algorithm (APCA
@@ -141,23 +147,81 @@ export function PageColorInfo({
             {/* Header: Label, Role Badge & Hex */}
             <div className="flex items-center justify-between pb-1">
               <div className="flex items-center gap-2.5">
-                <span className="text-base font-bold text-primary-900">
+                <span
+                  className={
+                    isExpressive
+                      ? "text-base font-black uppercase text-black"
+                      : isSoftTactility
+                        ? "text-base font-semibold text-stone-900"
+                        : isEditorial
+                          ? "text-base font-bold text-stone-950"
+                          : "text-base font-bold text-primary-900"
+                  }
+                >
                   {label}
                 </span>
-                <Badge variant="outline" className="rounded-full">
-                  {swatch.role}
-                </Badge>
+                {isExpressive ? (
+                  <Badge className={theme.badgeAmber}>
+                    {swatch.role}
+                  </Badge>
+                ) : isSoftTactility ? (
+                  <Badge className={theme.badgePrimary}>
+                    {swatch.role}
+                  </Badge>
+                ) : isEditorial ? (
+                  <Badge className={theme.badgeOutline}>
+                    {swatch.role}
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="rounded-full">
+                    {swatch.role}
+                  </Badge>
+                )}
               </div>
-              <span className="font-mono text-xs font-semibold text-zinc-500 uppercase">
-                Base Mark Hue: {swatch.hex}
-              </span>
+              {isExpressive ? (
+                <Badge className={theme.badgeLime}>
+                  BASE: {swatch.hex}
+                </Badge>
+              ) : isSoftTactility ? (
+                <Badge className={theme.badgeSecondary}>
+                  BASE: {swatch.hex}
+                </Badge>
+              ) : isEditorial ? (
+                <span className="font-mono text-xs uppercase tracking-widest text-stone-600">
+                  Base Mark Hue: {swatch.hex}
+                </span>
+              ) : (
+                <span className="font-mono text-xs font-semibold text-zinc-500 uppercase">
+                  Base Mark Hue: {swatch.hex}
+                </span>
+              )}
             </div>
 
             {/* Tabular Matrix */}
-            <div className="overflow-hidden border-y border-zinc-200">
+            <div
+              className={
+                isExpressive
+                  ? "overflow-hidden rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_#000]"
+                  : isSoftTactility
+                    ? "overflow-hidden rounded-3xl border border-stone-200/80 bg-white/90 shadow-[6px_6px_16px_rgba(0,0,0,0.05),-4px_-4px_12px_rgba(255,255,255,0.9)]"
+                    : isEditorial
+                      ? "overflow-hidden rounded-none border-t border-b border-stone-300 bg-transparent"
+                      : "overflow-hidden border-y border-zinc-200"
+              }
+            >
               <table className="w-full text-left font-mono">
                 <thead>
-                  <tr className="border-b border-zinc-200 bg-zinc-50 text-[10px] font-semibold text-zinc-600">
+                  <tr
+                    className={
+                      isExpressive
+                        ? "border-b-2 border-black bg-black text-[10px] font-black uppercase text-white"
+                        : isSoftTactility
+                          ? "border-b border-stone-200 bg-stone-100/70 text-[10px] font-semibold text-stone-700"
+                          : isEditorial
+                            ? "border-b border-stone-400 bg-stone-100/40 text-[10px] font-mono uppercase tracking-widest text-stone-800"
+                            : "border-b border-zinc-200 bg-zinc-50 text-[10px] font-semibold text-zinc-600"
+                    }
+                  >
                     <th className="px-3 py-2">#</th>
                     <th className="px-2 py-2">Swatch</th>
                     <th className="px-3 py-2">HEX</th>
@@ -167,7 +231,17 @@ export function PageColorInfo({
                     <th className="px-3 py-2 text-right">WCAG vs White</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-100">
+                <tbody
+                  className={
+                    isExpressive
+                      ? "divide-y divide-black/20"
+                      : isSoftTactility
+                        ? "divide-y divide-stone-100"
+                        : isEditorial
+                          ? "divide-y divide-stone-200"
+                          : "divide-y divide-zinc-100"
+                  }
+                >
                   {SHADE_KEYS.map((step) => {
                     const shadeHex = safeShades[step] || swatch.hex
                     const isBase = step === closestShade
@@ -182,7 +256,15 @@ export function PageColorInfo({
                       <tr
                         key={step}
                         className={`transition-colors ${
-                          isBase ? "bg-zinc-50/80 font-bold" : ""
+                          isBase
+                            ? isExpressive
+                              ? "bg-amber-100/70 font-bold"
+                              : isSoftTactility
+                                ? "bg-stone-100/80 font-bold"
+                                : isEditorial
+                                  ? "bg-stone-200/50 font-bold"
+                                  : "bg-zinc-50/80 font-bold"
+                            : ""
                         }`}
                       >
                         {/* Step Number */}
@@ -190,7 +272,17 @@ export function PageColorInfo({
                           <span className="flex items-center gap-1.5">
                             {step}
                             {isBase ? (
-                              <span className="size-1.5 rounded-full bg-primary-900" />
+                              <span
+                                className={
+                                  isExpressive
+                                    ? "size-2 rounded-full bg-black"
+                                    : isSoftTactility
+                                      ? "size-1.5 rounded-full bg-stone-800"
+                                      : isEditorial
+                                        ? "size-1.5 rounded-none bg-stone-950"
+                                        : "size-1.5 rounded-full bg-primary-900"
+                                }
+                              />
                             ) : null}
                           </span>
                         </td>
@@ -198,7 +290,15 @@ export function PageColorInfo({
                         {/* Color Chip */}
                         <td className="px-2 py-2">
                           <div
-                            className="h-4 w-7 rounded-xs border border-primary-900/10 shadow-2xs"
+                            className={
+                              isExpressive
+                                ? "h-4 w-7 rounded-xs border border-black shadow-[1px_1px_0px_0px_#000]"
+                                : isSoftTactility
+                                  ? "h-4 w-7 rounded-xs border border-stone-300 shadow-2xs"
+                                  : isEditorial
+                                    ? "h-4 w-7 rounded-none border border-stone-400"
+                                    : "h-4 w-7 rounded-xs border border-primary-900/10 shadow-2xs"
+                            }
                             style={{ backgroundColor: shadeHex }}
                           />
                         </td>
@@ -222,7 +322,15 @@ export function PageColorInfo({
                         <td className="px-3 py-2">
                           <div className="flex items-center gap-1.5 text-[10px]">
                             <span
-                              className="inline-block rounded-xs px-1.5 py-0.5 text-center font-bold"
+                              className={
+                                isExpressive
+                                  ? "inline-block rounded-xs border border-black px-1.5 py-0.5 text-center font-black shadow-[1px_1px_0px_0px_#000]"
+                                  : isSoftTactility
+                                    ? "inline-block rounded-xs border border-stone-200/80 px-1.5 py-0.5 text-center font-bold"
+                                    : isEditorial
+                                      ? "inline-block rounded-none border border-stone-400 px-1.5 py-0.5 text-center font-bold"
+                                      : "inline-block rounded-xs px-1.5 py-0.5 text-center font-bold"
+                              }
                               style={{
                                 backgroundColor: shadeHex,
                                 color: pillTextColor,
@@ -244,12 +352,21 @@ export function PageColorInfo({
                           </span>{" "}
                           <Badge
                             variant={
-                              wcagWhite.rating === "AAA" ||
-                              wcagWhite.rating === "AA"
+                              isExpressive
                                 ? "default"
-                                : "outline"
+                                : wcagWhite.rating === "Fail"
+                                  ? "destructive"
+                                  : "default"
                             }
-                            className="h-4 px-1 text-[9px]"
+                            className={
+                              isExpressive
+                                ? theme.badgeLime
+                                : isSoftTactility
+                                  ? "rounded-full border border-stone-200 bg-stone-100 px-2 py-0.5 text-[9px] font-mono font-semibold text-stone-800"
+                                  : isEditorial
+                                    ? "rounded-none border border-stone-400 bg-transparent px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-stone-800"
+                                    : "rounded-full"
+                            }
                           >
                             {wcagWhite.rating}
                           </Badge>
@@ -263,8 +380,28 @@ export function PageColorInfo({
           </div>
 
           {/* Notice to access additional color metrics from export assets */}
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-zinc-600">
+          <div
+            className={
+              isExpressive
+                ? "flex items-center justify-between rounded-lg border-2 border-black bg-amber-50 p-3 shadow-[2px_2px_0px_0px_#000]"
+                : isSoftTactility
+                  ? "flex items-center justify-between rounded-2xl border border-stone-200/80 bg-stone-50/80 p-3"
+                  : isEditorial
+                    ? "flex items-center justify-between border-t border-stone-300 pt-3"
+                    : "flex items-center justify-between"
+            }
+          >
+            <p
+              className={
+                isExpressive
+                  ? "text-xs font-medium text-black"
+                  : isSoftTactility
+                    ? "text-xs text-stone-600 font-normal leading-relaxed"
+                    : isEditorial
+                      ? "text-xs text-stone-600 leading-relaxed"
+                      : "text-sm text-zinc-600"
+              }
+            >
               For complete colorimetry breakdowns, CSS variables, and raw design
               tokens for all secondary and supporting swatches, please access
               them directly via the exported brand asset pack.

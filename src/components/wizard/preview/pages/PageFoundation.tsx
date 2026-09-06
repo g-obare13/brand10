@@ -1,6 +1,8 @@
 import type { BrandPillar } from "@/store/brandStore"
 import type { PreviewStyleId } from "./A4PageFrame"
 import { A4PageFrame } from "./A4PageFrame"
+import { Badge } from "@/components/ui/badge"
+import { getPdfTheme } from "./pdfPageTheme"
 
 interface PageFoundationProps {
   brandName: string
@@ -66,6 +68,11 @@ export function PageFoundation({
   const activeMission = hasMission ? trimmedMission : DEFAULT_MISSION
   const activeVision = hasVision ? trimmedVision : DEFAULT_VISION
 
+  const theme = getPdfTheme(styleTheme)
+  const isExpressive = theme.isExpressive
+  const isSoftTactility = theme.isSoftTactility
+  const isEditorial = theme.isEditorial
+
   // Active pillars list with fallback
   const pillarsList =
     brandPillars &&
@@ -102,23 +109,33 @@ export function PageFoundation({
       bodyFont={bodyFont}
       monoFont={monoFont}
       websiteUrl={websiteUrl}
-      className="overflow-hidden border border-zinc-200 bg-white p-12 text-primary-900 shadow-2xl"
+      className={theme.pageFrame}
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Page Title & Introductory Statement */}
         <div className="space-y-4">
           <div className="space-y-2">
-            <h2 className="text-primary-900 uppercase">FOUNDATION</h2>
-            <div className="h-0.5 w-16 bg-zinc-500" />
+            <h2 className={theme.title}>FOUNDATION</h2>
+            <div className={theme.accentBar} />
           </div>
 
           <div className="space-y-1 pt-1">
             {tagline && (
-              <div className="text-base font-semibold text-primary-900">
+              <div
+                className={
+                  isExpressive
+                    ? "text-base font-black text-black uppercase"
+                    : isSoftTactility
+                      ? "text-base font-semibold text-stone-900 tracking-tight"
+                      : isEditorial
+                        ? "text-base font-semibold text-stone-900 tracking-tight"
+                        : "text-base font-semibold text-primary-900"
+                }
+              >
                 {tagline}
               </div>
             )}
-            <p className="max-w-xl text-zinc-600">
+            <p className={theme.introText}>
               The foundation defines the strategic purpose and ideological north
               star of {brandName || "the brand"}. Every visual asset, tone
               directive, and interactive touchpoint across this system derives
@@ -127,17 +144,51 @@ export function PageFoundation({
           </div>
         </div>
 
-        {/* Mission & Vision Section */}
-        <div className="my-auto space-y-6 py-2">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        {/* Vision & Mission Row */}
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
             {/* Mission Block */}
-            <div className="flex flex-col justify-between border-t-2 border-primary-900 pt-4">
+            <div
+              className={
+                isExpressive
+                  ? "flex flex-col justify-between rounded-xl border-2 border-black bg-white p-5 shadow-[4px_4px_0px_0px_#000]"
+                  : isSoftTactility
+                    ? "flex flex-col justify-between rounded-3xl border border-stone-200/70 bg-white/90 p-5 shadow-[6px_6px_16px_rgba(0,0,0,0.05),-4px_-4px_12px_rgba(255,255,255,0.9)]"
+                    : isEditorial
+                      ? "flex flex-col justify-between border-t border-stone-900 bg-transparent pt-4"
+                      : "flex flex-col justify-between border-t-2 border-primary-900 pt-4"
+              }
+            >
               <div className="space-y-3">
-                <div className="text-xs font-bold text-zinc-500 uppercase">
-                  01 / Mission Statement
-                </div>
-                <div className="text-lg font-bold text-primary-900 sm:text-xl">
-                  {activeMission}
+                {isExpressive ? (
+                  <Badge className={theme.badgeAmber}>
+                    01 / Core Mission
+                  </Badge>
+                ) : isSoftTactility ? (
+                  <Badge className={theme.badgePrimary}>
+                    01 / Core Mission
+                  </Badge>
+                ) : isEditorial ? (
+                  <Badge className={theme.badgeAmber}>
+                    01 / Core Mission
+                  </Badge>
+                ) : (
+                  <div className="text-xs font-bold text-zinc-500 uppercase">
+                    01 / Core Mission
+                  </div>
+                )}
+                <div
+                  className={
+                    isExpressive
+                      ? "text-base font-bold text-black sm:text-lg leading-snug"
+                      : isSoftTactility
+                        ? "text-base font-semibold text-stone-900 sm:text-lg leading-snug"
+                        : isEditorial
+                          ? "text-lg font-bold text-stone-950 sm:text-xl"
+                          : "text-lg font-bold text-primary-900 sm:text-xl"
+                  }
+                >
+                  &ldquo;{activeMission}&rdquo;
                 </div>
               </div>
 
@@ -149,13 +200,47 @@ export function PageFoundation({
             </div>
 
             {/* Vision Block */}
-            <div className="flex flex-col justify-between border-t-2 border-primary-900 pt-4">
+            <div
+              className={
+                isExpressive
+                  ? "flex flex-col justify-between rounded-xl border-2 border-black bg-white p-5 shadow-[4px_4px_0px_0px_#000]"
+                  : isSoftTactility
+                    ? "flex flex-col justify-between rounded-3xl border border-stone-200/70 bg-white/90 p-5 shadow-[6px_6px_16px_rgba(0,0,0,0.05),-4px_-4px_12px_rgba(255,255,255,0.9)]"
+                    : isEditorial
+                      ? "flex flex-col justify-between border-t border-stone-900 bg-transparent pt-4"
+                      : "flex flex-col justify-between border-t-2 border-primary-900 pt-4"
+              }
+            >
               <div className="space-y-3">
-                <div className="text-xs font-bold text-zinc-500 uppercase">
-                  02 / Strategic Vision
-                </div>
-                <div className="text-lg font-bold text-primary-900 sm:text-xl">
-                  {activeVision}
+                {isExpressive ? (
+                  <Badge className={theme.badgeLime}>
+                    02 / Strategic Vision
+                  </Badge>
+                ) : isSoftTactility ? (
+                  <Badge className={theme.badgeSecondary}>
+                    02 / Strategic Vision
+                  </Badge>
+                ) : isEditorial ? (
+                  <Badge className={theme.badgeSecondary}>
+                    02 / Strategic Vision
+                  </Badge>
+                ) : (
+                  <div className="text-xs font-bold text-zinc-500 uppercase">
+                    02 / Strategic Vision
+                  </div>
+                )}
+                <div
+                  className={
+                    isExpressive
+                      ? "text-base font-bold text-black sm:text-lg leading-snug"
+                      : isSoftTactility
+                        ? "text-base font-semibold text-stone-900 sm:text-lg leading-snug"
+                        : isEditorial
+                          ? "text-lg font-bold text-stone-950 sm:text-xl"
+                          : "text-lg font-bold text-primary-900 sm:text-xl"
+                  }
+                >
+                  &ldquo;{activeVision}&rdquo;
                 </div>
               </div>
 
@@ -169,7 +254,17 @@ export function PageFoundation({
 
           {/* Combined disclaimer note if both were missing */}
           {isMissingEither && !hasMission && !hasVision && (
-            <div className="rounded border border-dashed border-zinc-200 bg-zinc-50 px-4 py-2 text-xs text-zinc-500">
+            <div
+              className={
+                isExpressive
+                  ? "rounded-lg border-2 border-dashed border-black bg-amber-50 px-4 py-2 text-xs font-medium text-black"
+                  : isSoftTactility
+                    ? "rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-4 py-2 text-xs text-stone-600"
+                    : isEditorial
+                      ? "rounded-none border-b border-dashed border-stone-400 bg-transparent px-2 py-2 font-mono text-[11px] text-stone-600"
+                      : "rounded border border-dashed border-zinc-200 bg-zinc-50 px-4 py-2 text-xs text-zinc-500"
+              }
+            >
               Note: Mission and Vision are currently using default placeholders.
               You can customize them anytime in Step 1 (Foundation).
             </div>
@@ -178,17 +273,93 @@ export function PageFoundation({
 
         {/* Core Values / Brand Pillars */}
         <div className="space-y-3 pt-6">
-          <div className="text-xs font-bold text-zinc-500 uppercase">
-            Core Brand Pillars
+          <div className="flex items-center justify-between">
+            <div
+              className={
+                isExpressive
+                  ? "font-mono text-xs font-black uppercase text-black"
+                  : isSoftTactility
+                    ? "text-xs font-semibold uppercase text-stone-600 tracking-wider"
+                    : isEditorial
+                      ? "font-mono text-[10px] uppercase tracking-widest text-stone-500"
+                      : "text-xs font-bold text-zinc-500 uppercase"
+              }
+            >
+              Core Brand Pillars
+            </div>
+            {isExpressive ? (
+              <Badge className={theme.badgeAmber}>
+                3 Pillars
+              </Badge>
+            ) : isSoftTactility ? (
+              <Badge className={theme.badgePrimary}>
+                3 Pillars
+              </Badge>
+            ) : isEditorial ? (
+              <Badge className={theme.badgePrimary}>
+                3 Pillars
+              </Badge>
+            ) : null}
           </div>
 
           <div className="grid grid-cols-3 gap-6">
             {pillarsList.map((val) => (
-              <div key={val.num} className="space-y-1">
-                <div className="text-sm font-bold text-primary-900">
-                  {val.title}
-                </div>
-                <p className="text-xs text-zinc-600">{val.desc}</p>
+              <div
+                key={val.num}
+                className={
+                  isExpressive
+                    ? "flex flex-col justify-between space-y-2 rounded-xl border-2 border-black bg-white p-4 shadow-[3px_3px_0px_0px_#000]"
+                    : isSoftTactility
+                      ? "flex flex-col justify-between space-y-2 rounded-2xl border border-stone-200/60 bg-white/90 p-4 shadow-[4px_4px_12px_rgba(0,0,0,0.04),-3px_-3px_8px_rgba(255,255,255,0.9)]"
+                      : isEditorial
+                        ? "flex flex-col justify-between space-y-2 border-l-2 border-stone-900 bg-transparent py-2 pl-4 pr-1"
+                        : "space-y-1"
+                }
+              >
+                {isExpressive ? (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-xs font-black text-black">
+                        {val.num}
+                      </span>
+                    </div>
+                    <div className="text-sm font-black uppercase text-black">
+                      {val.title}
+                    </div>
+                    <p className="text-xs font-medium text-zinc-700">{val.desc}</p>
+                  </>
+                ) : isSoftTactility ? (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <Badge className="rounded-full border border-stone-200/80 bg-stone-100 px-2 py-0.5 text-[10px] font-mono font-semibold text-stone-700">
+                        {val.num}
+                      </Badge>
+                    </div>
+                    <div className="text-sm font-semibold text-stone-900">
+                      {val.title}
+                    </div>
+                    <p className="text-xs text-stone-600 font-normal leading-relaxed">{val.desc}</p>
+                  </>
+                ) : isEditorial ? (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-[10px] uppercase tracking-widest text-stone-500">
+                        {val.num}
+                      </span>
+                    </div>
+                    <div className="text-sm font-bold text-stone-950">
+                      {val.title}
+                    </div>
+                    <p className="text-xs text-stone-600 leading-relaxed">{val.desc}</p>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-sm font-bold text-primary-900">
+                      {val.title}
+                    </div>
+                    <p className="text-xs text-zinc-600">{val.desc}</p>
+                  </>
+                )}
               </div>
             ))}
           </div>

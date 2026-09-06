@@ -1,6 +1,8 @@
 import { IMAGERY_MOOD_IMAGE_ARRAYS } from "@/data/wizard"
 import type { PreviewStyleId } from "./A4PageFrame"
 import { A4PageFrame } from "./A4PageFrame"
+import { Badge } from "@/components/ui/badge"
+import { getPdfTheme } from "./pdfPageTheme"
 
 interface PageImageryProps {
   brandName: string
@@ -63,6 +65,11 @@ export function PageImagery({
   pageNumber = 10,
   totalPages = 10,
 }: PageImageryProps) {
+  const theme = getPdfTheme(styleTheme)
+  const isExpressive = theme.isExpressive
+  const isSoftTactility = theme.isSoftTactility
+  const isEditorial = theme.isEditorial
+
   const resolvedMood = imageryMood
 
   const moodInfo = MOOD_DETAILS[resolvedMood]
@@ -89,19 +96,17 @@ export function PageImagery({
       displayFont={displayFont}
       bodyFont={bodyFont}
       monoFont={monoFont}
-      className="overflow-hidden border border-zinc-200 bg-white p-12 text-primary-900 shadow-2xl"
+      className={theme.pageFrame}
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Header Section */}
         <div className="space-y-3 pt-2">
           <div className="space-y-2">
-            <h2 className="text-primary-900 uppercase">
-              IMAGERY &amp; ART DIRECTION
-            </h2>
-            <div className="h-0.5 w-16 bg-zinc-500" />
+            <h2 className={theme.title}>IMAGERY &amp; ART DIRECTION</h2>
+            <div className={theme.accentBar} />
           </div>
 
-          <p className="max-w-xl text-zinc-600">
+          <p className={theme.introText}>
             Visual art direction and photographic treatments establish the
             atmosphere, tonal fidelity, and human resonance of the brand. Visual
             assets strictly adhere to architectural framing, natural
@@ -112,24 +117,74 @@ export function PageImagery({
         {/* Content Body */}
         <div className="my-auto space-y-5 py-2">
           {/* Active Mood Specification Bar */}
-          <div className="flex items-baseline justify-between pb-3">
+          <div
+            className={
+              isExpressive
+                ? "flex items-baseline justify-between rounded-xl border-2 border-black bg-white p-4 shadow-[4px_4px_0px_0px_#000]"
+                : isSoftTactility
+                  ? "flex items-baseline justify-between rounded-2xl border border-stone-200/80 bg-white/90 p-4 shadow-[4px_4px_12px_rgba(0,0,0,0.04)]"
+                  : isEditorial
+                    ? "flex items-baseline justify-between rounded-none border-b border-stone-300 pb-3"
+                    : "flex items-baseline justify-between pb-3"
+            }
+          >
             <div className="space-y-0.5">
-              <span className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
+              <span
+                className={
+                  isExpressive
+                    ? "font-mono text-[10px] font-black text-zinc-500 uppercase"
+                    : isSoftTactility
+                      ? "text-[10px] font-semibold tracking-wider text-stone-500 uppercase"
+                      : isEditorial
+                        ? "font-mono text-[10px] tracking-widest text-stone-500 uppercase"
+                        : "text-[10px] font-semibold tracking-wider text-zinc-400 uppercase"
+                }
+              >
                 Art Direction Aesthetic
               </span>
-              <div className="text-2xl font-bold text-primary-900">
+              <div
+                className={
+                  isExpressive
+                    ? "text-2xl font-black text-black uppercase"
+                    : isSoftTactility
+                      ? "text-2xl font-bold text-stone-900"
+                      : isEditorial
+                        ? "text-2xl font-bold text-stone-950"
+                        : "text-2xl font-bold text-primary-900"
+                }
+              >
                 {moodInfo.title}
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <Badge
+                className={
+                  isExpressive
+                    ? theme.badgeAmber
+                    : isSoftTactility
+                      ? theme.badgePrimary
+                      : isEditorial
+                        ? theme.badgePrimary
+                        : "rounded-full"
+                }
+              >
+                {moodInfo.badge}
+              </Badge>
               <div className="text-right">
-                <span className="block text-[10px] text-zinc-400 uppercase">
-                  Lighting Caliber
-                </span>
-                <span className="text-xs font-bold text-zinc-800">
-                  {moodInfo.lighting}
-                </span>
+                {isExpressive ? (
+                  <Badge className={theme.badgeLime}>{moodInfo.lighting}</Badge>
+                ) : isSoftTactility ? (
+                  <Badge className={theme.badgeSecondary}>{moodInfo.lighting}</Badge>
+                ) : isEditorial ? (
+                  <span className="font-mono text-xs text-stone-700 uppercase tracking-wider">
+                    {moodInfo.lighting}
+                  </span>
+                ) : (
+                  <span className="text-xs font-bold text-zinc-800">
+                    {moodInfo.lighting}
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -140,7 +195,17 @@ export function PageImagery({
             <div className="grid grid-cols-12 gap-3">
               {/* Hero Landscape Shot */}
               <div className="col-span-7 space-y-1">
-                <div className="relative h-56 overflow-hidden bg-zinc-100">
+                <div
+                  className={
+                    isExpressive
+                      ? "relative h-56 overflow-hidden rounded-xl border-2 border-black bg-zinc-100 shadow-[3px_3px_0px_0px_#000]"
+                      : isSoftTactility
+                        ? "relative h-56 overflow-hidden rounded-2xl border border-stone-200/80 bg-stone-100 shadow-[4px_4px_12px_rgba(0,0,0,0.06)]"
+                        : isEditorial
+                          ? "relative h-56 overflow-hidden rounded-none border border-stone-300 bg-stone-100"
+                          : "relative h-56 overflow-hidden bg-zinc-100"
+                  }
+                >
                   <img
                     src={img0}
                     alt="Signature Hero Shot"
@@ -153,7 +218,17 @@ export function PageImagery({
                     />
                   )}
                 </div>
-                <div className="flex items-center justify-between text-[10px] text-zinc-400">
+                <div
+                  className={
+                    isExpressive
+                      ? "flex items-center justify-between font-mono text-[10px] font-bold text-black"
+                      : isSoftTactility
+                        ? "flex items-center justify-between text-[10px] text-stone-500"
+                        : isEditorial
+                          ? "flex items-center justify-between font-mono text-[10px] uppercase tracking-wider text-stone-600"
+                          : "flex items-center justify-between text-[10px] text-zinc-400"
+                  }
+                >
                   <span>01 / Atmospheric Hero Specimen</span>
                   <span>16:9 Landscape</span>
                 </div>
@@ -161,7 +236,17 @@ export function PageImagery({
 
               {/* Detail / Portrait Shot */}
               <div className="col-span-5 space-y-1">
-                <div className="relative h-56 overflow-hidden bg-zinc-100">
+                <div
+                  className={
+                    isExpressive
+                      ? "relative h-56 overflow-hidden rounded-xl border-2 border-black bg-zinc-100 shadow-[3px_3px_0px_0px_#000]"
+                      : isSoftTactility
+                        ? "relative h-56 overflow-hidden rounded-2xl border border-stone-200/80 bg-stone-100 shadow-[4px_4px_12px_rgba(0,0,0,0.06)]"
+                        : isEditorial
+                          ? "relative h-56 overflow-hidden rounded-none border border-stone-300 bg-stone-100"
+                          : "relative h-56 overflow-hidden bg-zinc-100"
+                  }
+                >
                   <img
                     src={img1}
                     alt="Detail Specimen"
@@ -174,7 +259,17 @@ export function PageImagery({
                     />
                   )}
                 </div>
-                <div className="flex items-center justify-between text-[10px] text-zinc-400">
+                <div
+                  className={
+                    isExpressive
+                      ? "flex items-center justify-between font-mono text-[10px] font-bold text-black"
+                      : isSoftTactility
+                        ? "flex items-center justify-between text-[10px] text-stone-500"
+                        : isEditorial
+                          ? "flex items-center justify-between font-mono text-[10px] uppercase tracking-wider text-stone-600"
+                          : "flex items-center justify-between text-[10px] text-zinc-400"
+                  }
+                >
                   <span>02 / Texture &amp; Form</span>
                   <span>4:5 Portrait</span>
                 </div>
@@ -184,7 +279,17 @@ export function PageImagery({
             {/* Bottom 3-Column Auxiliary Specimens */}
             <div className="grid grid-cols-3 gap-3 pt-0.5">
               <div className="space-y-1">
-                <div className="relative h-32 overflow-hidden bg-zinc-100">
+                <div
+                  className={
+                    isExpressive
+                      ? "relative h-32 overflow-hidden rounded-xl border-2 border-black bg-zinc-100 shadow-[2px_2px_0px_0px_#000]"
+                      : isSoftTactility
+                        ? "relative h-32 overflow-hidden rounded-2xl border border-stone-200/80 bg-stone-100 shadow-[3px_3px_10px_rgba(0,0,0,0.05)]"
+                        : isEditorial
+                          ? "relative h-32 overflow-hidden rounded-none border border-stone-300 bg-stone-100"
+                          : "relative h-32 overflow-hidden bg-zinc-100"
+                  }
+                >
                   <img
                     src={img2}
                     alt="Environmental Context"
@@ -197,14 +302,34 @@ export function PageImagery({
                     />
                   )}
                 </div>
-                <div className="flex items-center justify-between text-[10px] text-zinc-400">
+                <div
+                  className={
+                    isExpressive
+                      ? "flex items-center justify-between font-mono text-[10px] font-bold text-black"
+                      : isSoftTactility
+                        ? "flex items-center justify-between text-[10px] text-stone-500"
+                        : isEditorial
+                          ? "flex items-center justify-between font-mono text-[10px] uppercase tracking-wider text-stone-600"
+                          : "flex items-center justify-between text-[10px] text-zinc-400"
+                  }
+                >
                   <span>03 / Environment</span>
                   <span>Context</span>
                 </div>
               </div>
 
               <div className="space-y-1">
-                <div className="relative h-32 overflow-hidden bg-zinc-100">
+                <div
+                  className={
+                    isExpressive
+                      ? "relative h-32 overflow-hidden rounded-xl border-2 border-black bg-zinc-100 shadow-[2px_2px_0px_0px_#000]"
+                      : isSoftTactility
+                        ? "relative h-32 overflow-hidden rounded-2xl border border-stone-200/80 bg-stone-100 shadow-[3px_3px_10px_rgba(0,0,0,0.05)]"
+                        : isEditorial
+                          ? "relative h-32 overflow-hidden rounded-none border border-stone-300 bg-stone-100"
+                          : "relative h-32 overflow-hidden bg-zinc-100"
+                  }
+                >
                   <img
                     src={img3}
                     alt="Spatial Atmosphere"
@@ -217,14 +342,34 @@ export function PageImagery({
                     />
                   )}
                 </div>
-                <div className="flex items-center justify-between text-[10px] text-zinc-400">
+                <div
+                  className={
+                    isExpressive
+                      ? "flex items-center justify-between font-mono text-[10px] font-bold text-black"
+                      : isSoftTactility
+                        ? "flex items-center justify-between text-[10px] text-stone-500"
+                        : isEditorial
+                          ? "flex items-center justify-between font-mono text-[10px] uppercase tracking-wider text-stone-600"
+                          : "flex items-center justify-between text-[10px] text-zinc-400"
+                  }
+                >
                   <span>04 / Atmosphere</span>
                   <span>Lighting</span>
                 </div>
               </div>
 
               <div className="space-y-1">
-                <div className="relative h-32 overflow-hidden bg-zinc-100">
+                <div
+                  className={
+                    isExpressive
+                      ? "relative h-32 overflow-hidden rounded-xl border-2 border-black bg-zinc-100 shadow-[2px_2px_0px_0px_#000]"
+                      : isSoftTactility
+                        ? "relative h-32 overflow-hidden rounded-2xl border border-stone-200/80 bg-stone-100 shadow-[3px_3px_10px_rgba(0,0,0,0.05)]"
+                        : isEditorial
+                          ? "relative h-32 overflow-hidden rounded-none border border-stone-300 bg-stone-100"
+                          : "relative h-32 overflow-hidden bg-zinc-100"
+                  }
+                >
                   <img
                     src={img4}
                     alt="Perspective & Poise"
@@ -237,7 +382,17 @@ export function PageImagery({
                     />
                   )}
                 </div>
-                <div className="flex items-center justify-between text-[10px] text-zinc-400">
+                <div
+                  className={
+                    isExpressive
+                      ? "flex items-center justify-between font-mono text-[10px] font-bold text-black"
+                      : isSoftTactility
+                        ? "flex items-center justify-between text-[10px] text-stone-500"
+                        : isEditorial
+                          ? "flex items-center justify-between font-mono text-[10px] uppercase tracking-wider text-stone-600"
+                          : "flex items-center justify-between text-[10px] text-zinc-400"
+                  }
+                >
                   <span>05 / Perspective</span>
                   <span>Geometry</span>
                 </div>
@@ -248,48 +403,178 @@ export function PageImagery({
 
         {/* Art Direction Principles & Production Governance (3 Columns) */}
         <div className="space-y-2 pt-4">
-          <div className="flex items-center justify-between border-b border-zinc-200 pb-1 text-[10px] text-zinc-400 uppercase">
+          <div
+            className={
+              isExpressive
+                ? "flex items-center justify-between border-b-2 border-black pb-1 font-mono text-[10px] font-bold text-black uppercase"
+                : isSoftTactility
+                  ? "flex items-center justify-between border-b border-stone-200 pb-1 text-[10px] font-semibold text-stone-500 uppercase"
+                  : isEditorial
+                    ? "flex items-center justify-between border-b border-stone-300 pb-1 font-mono text-[10px] uppercase tracking-widest text-stone-600"
+                    : "flex items-center justify-between border-b border-zinc-200 pb-1 text-[10px] text-zinc-400 uppercase"
+            }
+          >
             <span>Art Direction Principles</span>
             <span>Production Standards</span>
           </div>
 
-          <div className="grid grid-cols-3 gap-6 pt-1">
-            <div className="space-y-1">
-              <div className="text-[10px] font-semibold text-zinc-400 uppercase">
+          <div className="grid grid-cols-3 gap-4 pt-1">
+            <div
+              className={
+                isExpressive
+                  ? "space-y-1.5 rounded-xl border-2 border-black bg-white p-3 shadow-[3px_3px_0px_0px_#000]"
+                  : isSoftTactility
+                    ? "space-y-1.5 rounded-2xl border border-stone-200/80 bg-white/90 p-3 shadow-[3px_3px_10px_rgba(0,0,0,0.04)]"
+                    : isEditorial
+                      ? "space-y-1.5 rounded-none border-l-2 border-stone-900 pl-3 py-1 bg-transparent"
+                      : "space-y-1"
+              }
+            >
+              <div
+                className={
+                  isExpressive
+                    ? "font-mono text-[10px] font-black text-amber-500 uppercase"
+                    : isSoftTactility
+                      ? "text-[10px] font-semibold text-stone-500 uppercase"
+                      : isEditorial
+                        ? "font-mono text-[10px] tracking-widest text-stone-500 uppercase"
+                        : "text-[10px] font-semibold text-zinc-400 uppercase"
+                }
+              >
                 01 Lighting &amp; Exposure
               </div>
-              <div className="text-xs font-bold text-primary-900">
+              <div
+                className={
+                  isExpressive
+                    ? "text-xs font-black text-black uppercase"
+                    : isSoftTactility
+                      ? "text-xs font-bold text-stone-900"
+                      : isEditorial
+                        ? "text-xs font-bold text-stone-950"
+                        : "text-xs font-bold text-primary-900"
+                }
+              >
                 Natural Diffused Light
               </div>
-              <p className="text-[11px] text-zinc-600">
+              <p
+                className={
+                  isExpressive
+                    ? "text-[11px] leading-relaxed text-zinc-700"
+                    : isSoftTactility
+                      ? "text-[11px] leading-relaxed text-stone-600"
+                      : isEditorial
+                        ? "text-[11px] leading-relaxed text-stone-700"
+                        : "text-[11px] text-zinc-600"
+                }
+              >
                 Calibrate capture around authentic daylight or soft ambient
                 illumination. Avoid harsh direct flash, oversaturated synthetic
                 color casts, and aggressive vignetting.
               </p>
             </div>
 
-            <div className="space-y-1">
-              <div className="text-[10px] font-semibold text-zinc-400 uppercase">
+            <div
+              className={
+                isExpressive
+                  ? "space-y-1.5 rounded-xl border-2 border-black bg-white p-3 shadow-[3px_3px_0px_0px_#000]"
+                  : isSoftTactility
+                    ? "space-y-1.5 rounded-2xl border border-stone-200/80 bg-white/90 p-3 shadow-[3px_3px_10px_rgba(0,0,0,0.04)]"
+                    : isEditorial
+                      ? "space-y-1.5 rounded-none border-l-2 border-stone-900 pl-3 py-1 bg-transparent"
+                      : "space-y-1"
+              }
+            >
+              <div
+                className={
+                  isExpressive
+                    ? "font-mono text-[10px] font-black text-amber-500 uppercase"
+                    : isSoftTactility
+                      ? "text-[10px] font-semibold text-stone-500 uppercase"
+                      : isEditorial
+                        ? "font-mono text-[10px] tracking-widest text-stone-500 uppercase"
+                        : "text-[10px] font-semibold text-zinc-400 uppercase"
+                }
+              >
                 02 Framing &amp; Balance
               </div>
-              <div className="text-xs font-bold text-primary-900">
+              <div
+                className={
+                  isExpressive
+                    ? "text-xs font-black text-black uppercase"
+                    : isSoftTactility
+                      ? "text-xs font-bold text-stone-900"
+                      : isEditorial
+                        ? "text-xs font-bold text-stone-950"
+                        : "text-xs font-bold text-primary-900"
+                }
+              >
                 Deliberate Negative Space
               </div>
-              <p className="text-[11px] text-zinc-600">
+              <p
+                className={
+                  isExpressive
+                    ? "text-[11px] leading-relaxed text-zinc-700"
+                    : isSoftTactility
+                      ? "text-[11px] leading-relaxed text-stone-600"
+                      : isEditorial
+                        ? "text-[11px] leading-relaxed text-stone-700"
+                        : "text-[11px] text-zinc-600"
+                }
+              >
                 Preserve generous visual breathing room around primary focal
                 subjects to maintain editorial composure and allow typography
                 overlays without visual conflict.
               </p>
             </div>
 
-            <div className="space-y-1">
-              <div className="text-[10px] font-semibold text-zinc-400 uppercase">
+            <div
+              className={
+                isExpressive
+                  ? "space-y-1.5 rounded-xl border-2 border-black bg-white p-3 shadow-[3px_3px_0px_0px_#000]"
+                  : isSoftTactility
+                    ? "space-y-1.5 rounded-2xl border border-stone-200/80 bg-white/90 p-3 shadow-[3px_3px_10px_rgba(0,0,0,0.04)]"
+                    : isEditorial
+                      ? "space-y-1.5 rounded-none border-l-2 border-stone-900 pl-3 py-1 bg-transparent"
+                      : "space-y-1"
+              }
+            >
+              <div
+                className={
+                  isExpressive
+                    ? "font-mono text-[10px] font-black text-amber-500 uppercase"
+                    : isSoftTactility
+                      ? "text-[10px] font-semibold text-stone-500 uppercase"
+                      : isEditorial
+                        ? "font-mono text-[10px] tracking-widest text-stone-500 uppercase"
+                        : "text-[10px] font-semibold text-zinc-400 uppercase"
+                }
+              >
                 03 Material Authenticity
               </div>
-              <div className="text-xs font-bold text-primary-900">
+              <div
+                className={
+                  isExpressive
+                    ? "text-xs font-black text-black uppercase"
+                    : isSoftTactility
+                      ? "text-xs font-bold text-stone-900"
+                      : isEditorial
+                        ? "text-xs font-bold text-stone-950"
+                        : "text-xs font-bold text-primary-900"
+                }
+              >
                 Tactile Texture Fidelity
               </div>
-              <p className="text-[11px] text-zinc-600">
+              <p
+                className={
+                  isExpressive
+                    ? "text-[11px] leading-relaxed text-zinc-700"
+                    : isSoftTactility
+                      ? "text-[11px] leading-relaxed text-stone-600"
+                      : isEditorial
+                        ? "text-[11px] leading-relaxed text-stone-700"
+                        : "text-[11px] text-zinc-600"
+                }
+              >
                 Retain genuine physical textures, organic surface grain, and
                 realistic shadow gradients. Post-processing must remain
                 disciplined and true to material reality.
@@ -299,14 +584,32 @@ export function PageImagery({
         </div>
 
         {/* Unsplash Attribution & Rights Disclaimer */}
-        <div className="flex items-center justify-between pt-3 text-[10px] text-zinc-500">
+        <div
+          className={
+            isExpressive
+              ? "flex items-center justify-between pt-3 font-mono text-[10px] font-bold text-zinc-600"
+              : isSoftTactility
+                ? "flex items-center justify-between pt-3 text-[10px] text-stone-500"
+                : isEditorial
+                  ? "flex items-center justify-between pt-3 font-mono text-[10px] text-stone-600 uppercase tracking-wider"
+                  : "flex items-center justify-between pt-3 text-[10px] text-zinc-500"
+          }
+        >
           <div className="flex items-center gap-2">
             <span>
               Photography sourced via Unsplash. All copyrights and intellectual
               property are attributed to their respective creators.
             </span>
           </div>
-          <span className="text-zinc-400">Unsplash License</span>
+          {isExpressive ? (
+            <Badge className={theme.badgeLime}>Unsplash License</Badge>
+          ) : isSoftTactility ? (
+            <Badge className={theme.badgeSecondary}>Unsplash License</Badge>
+          ) : isEditorial ? (
+            <Badge className={theme.badgeAmber}>Unsplash License</Badge>
+          ) : (
+            <span className="text-zinc-400">Unsplash License</span>
+          )}
         </div>
       </div>
     </A4PageFrame>

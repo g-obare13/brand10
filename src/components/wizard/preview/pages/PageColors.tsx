@@ -3,6 +3,7 @@ import type { PreviewStyleId } from "./A4PageFrame"
 import { A4PageFrame } from "./A4PageFrame"
 import type { ColorSwatch } from "@/lib/colorUtils"
 import { generateTonalShades } from "@/lib/colorUtils"
+import { getPdfTheme } from "./pdfPageTheme"
 import chroma from "chroma-js"
 
 interface PageColorsProps {
@@ -86,6 +87,11 @@ export function PageColors({
   pageNumber = 5,
   totalPages = 8,
 }: PageColorsProps) {
+  const theme = getPdfTheme(styleTheme)
+  const isExpressive = theme.isExpressive
+  const isSoftTactility = theme.isSoftTactility
+  const isEditorial = theme.isEditorial
+
   // Use exact dominant brand colors from step colors (filtering out neutral and background)
   const dominantSwatches = colors.filter(
     (c) => c.role !== "neutral" && c.role !== "background"
@@ -130,17 +136,17 @@ export function PageColors({
       displayFont={displayFont}
       bodyFont={bodyFont}
       monoFont={monoFont}
-      className="overflow-hidden border border-zinc-200 bg-white p-12 text-primary-900 shadow-2xl"
+      className={theme.pageFrame}
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Title & Introduction */}
         <div className="space-y-3 pt-2">
           <div className="space-y-2">
-            <h2 className="text-primary-900 uppercase"> COLOR PALETTE</h2>
-            <div className="h-0.5 w-16 bg-zinc-500" />
+            <h2 className={theme.title}> COLOR PALETTE</h2>
+            <div className={theme.accentBar} />
           </div>
 
-          <p className="max-w-xl text-zinc-600">
+          <p className={theme.introText}>
             The core chromatic system extracted from the brandmark geometry.
             Each dominant color is expanded into an 11-step mathematical tonal
             scale to ensure contrast accessibility and consistent visual
@@ -149,7 +155,7 @@ export function PageColors({
         </div>
 
         {/* Dominant Color Tonal Scales (Mirroring StepColorsPreview) */}
-        <div className="my-auto space-y-7 py-2">
+        <div className="my-auto space-y-5 py-2">
           {displaySwatches.map((swatch) => {
             const safeShades =
               Object.keys(swatch.shades).length === 11
@@ -161,20 +167,69 @@ export function PageColors({
             const label = getSwatchDisplayName(swatch.role, swatch.name)
 
             return (
-              <div key={swatch.id} className="space-y-3">
+              <div
+                key={swatch.id}
+                className={
+                  isExpressive
+                    ? "space-y-3 rounded-xl border-2 border-black bg-white p-4 shadow-[4px_4px_0px_0px_#000]"
+                    : isSoftTactility
+                      ? "space-y-3 rounded-3xl border border-stone-200/70 bg-white/90 p-4 shadow-[6px_6px_16px_rgba(0,0,0,0.05),-4px_-4px_12px_rgba(255,255,255,0.9)]"
+                      : isEditorial
+                        ? "space-y-3 border-b border-stone-300 pb-4 pt-1"
+                        : "space-y-3"
+                }
+              >
                 {/* Header: Label, Role Badge & Hex */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <span className="text-base font-semibold text-primary-900">
+                    <span
+                      className={
+                        isExpressive
+                          ? "text-base font-black uppercase text-black"
+                          : isSoftTactility
+                            ? "text-base font-semibold text-stone-900"
+                            : isEditorial
+                              ? "text-base font-semibold text-stone-950"
+                              : "text-base font-semibold text-primary-900"
+                      }
+                    >
                       {label}
                     </span>
-                    <Badge variant="outline" className="rounded-full">
-                      {swatch.role}
-                    </Badge>
+                    {isExpressive ? (
+                      <Badge className={theme.badgeAmber}>
+                        {swatch.role}
+                      </Badge>
+                    ) : isSoftTactility ? (
+                      <Badge className={theme.badgePrimary}>
+                        {swatch.role}
+                      </Badge>
+                    ) : isEditorial ? (
+                      <Badge className={theme.badgeOutline}>
+                        {swatch.role}
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="rounded-full">
+                        {swatch.role}
+                      </Badge>
+                    )}
                   </div>
-                  <span className="font-mono text-xs font-bold text-zinc-500 uppercase">
-                    Base: {swatch.hex}
-                  </span>
+                  {isExpressive ? (
+                    <Badge className={theme.badgeLime}>
+                      BASE: {swatch.hex}
+                    </Badge>
+                  ) : isSoftTactility ? (
+                    <Badge className={theme.badgeSecondary}>
+                      BASE: {swatch.hex}
+                    </Badge>
+                  ) : isEditorial ? (
+                    <span className="font-mono text-xs uppercase tracking-widest text-stone-600">
+                      Base: {swatch.hex}
+                    </span>
+                  ) : (
+                    <span className="font-mono text-xs font-bold text-zinc-500 uppercase">
+                      Base: {swatch.hex}
+                    </span>
+                  )}
                 </div>
 
                 {/* 11-Step Tonal Cards Row */}
@@ -188,7 +243,15 @@ export function PageColors({
                     return (
                       <div
                         key={step}
-                        className="relative flex min-h-24 flex-col justify-between rounded-xl p-2 text-left"
+                        className={
+                          isExpressive
+                            ? "relative flex min-h-24 flex-col justify-between rounded-lg border-2 border-black p-2 text-left shadow-[2px_2px_0px_0px_#000]"
+                            : isSoftTactility
+                              ? "relative flex min-h-24 flex-col justify-between rounded-xl p-2 text-left shadow-[2px_2px_6px_rgba(0,0,0,0.08)]"
+                              : isEditorial
+                                ? "relative flex min-h-24 flex-col justify-between rounded-none border border-stone-300 p-2 text-left"
+                                : "relative flex min-h-24 flex-col justify-between rounded-xl p-2 text-left"
+                        }
                         style={{ backgroundColor: shadeHex }}
                       >
                         {/* Active Base Indicator Dot */}
@@ -227,42 +290,48 @@ export function PageColors({
 
         {/* Chromatic Specifications */}
         {displaySwatches.length >= 3 && (
-          <div className="space-y-3 pt-5">
+          <div className={isExpressive ? "space-y-3 border-t-2 border-black pt-4" : "space-y-3 pt-5"}>
             <div className="flex items-center justify-between">
-              <div className="text-xs font-bold text-zinc-500 uppercase">
+              <div className={isExpressive ? "font-mono text-xs font-black uppercase text-black" : "text-xs font-bold text-zinc-500 uppercase"}>
                 Chromatic Specifications
               </div>
-              <span className="text-[11px] font-medium text-zinc-400">
-                Scale Distribution
-              </span>
+              {isExpressive ? (
+                <Badge className={theme.badgeLime}>
+                  Scale Distribution
+                </Badge>
+              ) : (
+                <span className="text-[11px] font-medium text-zinc-400">
+                  Scale Distribution
+                </span>
+              )}
             </div>
 
             <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-1">
-                <div className="text-xs font-bold text-primary-900">
+              <div className={isExpressive ? "rounded-xl border-2 border-black bg-white p-3 shadow-[3px_3px_0px_0px_#000] space-y-1" : "space-y-1"}>
+                <div className={isExpressive ? "text-xs font-black uppercase text-black" : "text-xs font-bold text-primary-900"}>
                   Contrast Compliance
                 </div>
-                <p className="text-[11px] text-zinc-600">
+                <p className={isExpressive ? "text-[11px] font-medium text-zinc-700" : "text-[11px] text-zinc-600"}>
                   Ensure minimum 4.5:1 contrast against background values for
                   all body copy and text elements.
                 </p>
               </div>
 
-              <div className="space-y-1">
-                <div className="text-xs font-bold text-primary-900">
+              <div className={isExpressive ? "rounded-xl border-2 border-black bg-white p-3 shadow-[3px_3px_0px_0px_#000] space-y-1" : "space-y-1"}>
+                <div className={isExpressive ? "text-xs font-black uppercase text-black" : "text-xs font-bold text-primary-900"}>
                   Tonal Interpolation
                 </div>
-                <p className="text-[11px] text-zinc-600">
+                <p className={isExpressive ? "text-[11px] font-medium text-zinc-700" : "text-[11px] text-zinc-600"}>
                   Step values from 50 (light surface tint) to 950 (deep shadow
                   tone) provide seamless dark and light modes.
                 </p>
               </div>
 
-              <div className="space-y-1">
-                <div className="text-xs font-bold text-primary-900">
+              <div className={isExpressive ? "rounded-xl border-2 border-black bg-white p-3 shadow-[3px_3px_0px_0px_#000] space-y-1" : "space-y-1"}>
+                <div className={isExpressive ? "text-xs font-black uppercase text-black" : "text-xs font-bold text-primary-900"}>
                   Dominant Hierarchy
                 </div>
-                <p className="text-[11px] text-zinc-600">
+                <p className={isExpressive ? "text-[11px] font-medium text-zinc-700" : "text-[11px] text-zinc-600"}>
                   Primary hue anchors brand awareness across main interactive
                   touchpoints and primary surfaces.
                 </p>

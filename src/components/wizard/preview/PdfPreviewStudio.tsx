@@ -70,6 +70,7 @@ export function PdfPreviewStudio({ projectId }: PdfPreviewStudioProps) {
       setDownloadProgress("Preparing pages...")
       await exportBrandManualPdf({
         brandName: brand.brandName || "Brand",
+        styleTheme: activeStyle,
         onProgress: (_current, _total, message) => {
           setDownloadProgress(message)
         },
