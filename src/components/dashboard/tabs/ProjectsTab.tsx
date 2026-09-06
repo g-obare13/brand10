@@ -25,6 +25,7 @@ import { useProjectsStore } from "@/store/projectsStore"
 import {
   IconAlertTriangle,
   IconArrowRight,
+  IconEye,
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react"
@@ -32,6 +33,10 @@ import { Link } from "@tanstack/react-router"
 import { gsap } from "gsap"
 import { get as idbGet } from "idb-keyval"
 import { useCallback, useEffect, useRef, useState } from "react"
+import { toast } from "sonner"
+import { PdfFullScreenPreviewModal } from "@/components/wizard/preview/PdfFullScreenPreviewModal"
+import type { PreviewStyleId } from "@/components/wizard/preview/pages/A4PageFrame"
+import { exportBrandManualPdf } from "@/lib/pdfExportService"
 
 interface ProjectsTabProps {
   onOpenCreateModal: () => void
@@ -241,6 +246,47 @@ export function ProjectsTab({ onOpenCreateModal }: ProjectsTabProps) {
     useState<BrandProjectItem | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
+  // State for full-screen PDF preview modal
+  const brandDesignMovement = useBrandStore((state) => state.designMovement)
+  const [loadingPreviewId, setLoadingPreviewId] = useState<string | null>(null)
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false)
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false)
+  const [downloadProgress, setDownloadProgress] = useState("")
+
+  const handleOpenPreview = async (project: BrandProjectItem) => {
+    try {
+      setLoadingPreviewId(project.id)
+      await useBrandStore.getState().loadFromProject(project.id)
+      setIsPreviewModalOpen(true)
+    } catch (err) {
+      console.error("Failed to load project for preview:", err)
+      toast.error("Unable to load brand project for preview.")
+    } finally {
+      setLoadingPreviewId(null)
+    }
+  }
+
+  const handleDownloadPdf = async () => {
+    try {
+      setIsDownloadingPdf(true)
+      setDownloadProgress("Preparing pages...")
+      const brand = useBrandStore.getState()
+      await exportBrandManualPdf({
+        brandName: brand.brandName || "Brand",
+        onProgress: (_current, _total, message) => {
+          setDownloadProgress(message)
+        },
+      })
+      toast.success("Brand Manual PDF exported.")
+    } catch (err) {
+      console.error("PDF generation failed:", err)
+      toast.error("Failed to export PDF manual. Please try again.")
+    } finally {
+      setIsDownloadingPdf(false)
+      setDownloadProgress("")
+    }
+  }
+
   useEffect(() => {
     if (!containerRef.current) return
     const ctx = gsap.context(() => {
@@ -355,6 +401,34 @@ export function ProjectsTab({ onOpenCreateModal }: ProjectsTabProps) {
                       />
 
                       <div className="flex items-center gap-1.5">
+                        {/* Preview Brand Manual Deck */}
+                        <Tooltip>
+                          <TooltipTrigger
+                            type="button"
+                            disabled={loadingPreviewId === project.id}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleOpenPreview(project)
+                            }}
+                            className="cursor-pointer rounded-full border border-border/60 p-2 text-muted-foreground transition hover:border-border hover:bg-muted hover:text-foreground disabled:opacity-50"
+                            aria-label="Preview Brand Deck"
+                          >
+                            {loadingPreviewId === project.id ? (
+                              <Loader size="sm" />
+                            ) : (
+                              <IconEye size={15} />
+                            )}
+                          </TooltipTrigger>
+                          <TooltipContent
+                            side="top"
+                            sideOffset={6}
+                            className="text-xs font-medium shadow-xl"
+                          >
+                            Preview Brand Manual
+                          </TooltipContent>
+                        </Tooltip>
+
+                        {/* Delete Brand */}
                         <Tooltip>
                           <TooltipTrigger
                             type="button"
@@ -500,13 +574,23 @@ export function ProjectsTab({ onOpenCreateModal }: ProjectsTabProps) {
                 onClick={handleConfirmDelete}
                 disabled={isDeleting}
                 className="cursor-pointer rounded-full"
-                icon={isDeleting && <Loader />}
+                icon={isDeleting ? <Loader size="sm" /> : undefined}
               >
                 {isDeleting ? "Deleting..." : "Delete Project"}
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        {/* Full-Screen Immersive PDF Presentation Modal */}
+        <PdfFullScreenPreviewModal
+          isOpen={isPreviewModalOpen}
+          onClose={() => setIsPreviewModalOpen(false)}
+          styleTheme={brandDesignMovement as PreviewStyleId}
+          initialPage={1}
+          onDownloadPdf={handleDownloadPdf}
+          isDownloadingPdf={isDownloadingPdf}
+          downloadProgress={downloadProgress}
+        />
       </div>
     </TooltipProvider>
   )

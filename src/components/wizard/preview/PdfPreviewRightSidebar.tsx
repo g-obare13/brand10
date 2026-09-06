@@ -6,10 +6,11 @@ import { Loader } from "@/components/ui/loader"
 import { buildAndDownloadZip } from "@/lib/zipBuilder"
 import { toast } from "sonner"
 import {
+  IconDeviceFloppy,
   IconDownload,
+  IconMaximize,
   IconPackage,
   IconPrinter,
-  IconDeviceFloppy,
 } from "@tabler/icons-react"
 
 export interface SectionOutlineItem {
@@ -78,6 +79,7 @@ interface PdfPreviewRightSidebarProps {
   isDownloadingPdf?: boolean
   downloadProgress?: string
   projectId: string
+  onOpenFullScreen?: () => void
 }
 
 export function PdfPreviewRightSidebar({
@@ -87,6 +89,7 @@ export function PdfPreviewRightSidebar({
   isDownloadingPdf = false,
   downloadProgress = "",
   projectId,
+  onOpenFullScreen,
 }: PdfPreviewRightSidebarProps) {
   const brand = useBrandStore()
   const navigate = useNavigate()
@@ -178,10 +181,26 @@ export function PdfPreviewRightSidebar({
         {/* <span className="text-xs">Export & Production</span> */}
 
         <div className="mt-2 space-y-2">
+          {/* Full Screen Preview Button */}
+          {onOpenFullScreen && (
+            <Button
+              variant="outline"
+              size="pill"
+              gsapFill
+              onClick={onOpenFullScreen}
+              className="w-full cursor-pointer justify-center"
+              icon={<IconMaximize size={14} />}
+              iconPlacement="right"
+            >
+              Full Screen Preview
+            </Button>
+          )}
+
           {/* Download PDF Button */}
           <Button
             variant="shiny"
             size="pill"
+            gsapFill
             onClick={onDownloadPdf}
             disabled={isDownloadingPdf}
             className="w-full cursor-pointer justify-center"
@@ -203,6 +222,7 @@ export function PdfPreviewRightSidebar({
           <Button
             variant="outline"
             size="pill"
+            gsapFill
             onClick={handleZipExport}
             disabled={isZipping}
             className="w-full cursor-pointer justify-center"
@@ -216,6 +236,7 @@ export function PdfPreviewRightSidebar({
           <Button
             variant="outline"
             size="pill"
+            gsapFill
             onClick={() => window.print()}
             className="w-full cursor-pointer justify-center"
             icon={<IconPrinter size={14} />}
@@ -231,6 +252,7 @@ export function PdfPreviewRightSidebar({
         <Button
           variant="default"
           size="pill"
+          gsapFill
           onClick={handleFinish}
           disabled={isFinishing}
           className="w-full cursor-pointer justify-center"

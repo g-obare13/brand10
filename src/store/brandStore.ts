@@ -1047,37 +1047,60 @@ export const useBrandStore = create<BrandState>()(
               isLoading: false,
             })
           } else {
-            // If no brand_data row exists yet, retrieve project name from brand_projects
+            // If no brand_data row exists yet, retrieve project details from brand_projects
             const { data: projData } = await supabase
               .from('brand_projects')
-              .select('name')
+              .select('name, brand_name, logo_url, primary_color, vision')
               .eq('id', projectId)
               .maybeSingle()
 
-            const brandName = projData?.name || 'Untitled Brand'
+            const brandName = projData?.brand_name || projData?.name || 'Untitled Brand'
+
+            let svgContent = cachedSvg || undefined
+            if (!svgContent && projData?.logo_url) {
+              try {
+                const res = await fetch(projData.logo_url)
+                if (res.ok) {
+                  svgContent = await res.text()
+                  await idbSet(`brand_svg_${id}`, svgContent)
+                }
+              } catch {}
+            }
+
+            const activeColors = projData?.primary_color
+              ? [
+                  createColorSwatch(projData.primary_color, 'primary', 'Primary Brand Color'),
+                  ...defaultApex.colors.filter((c) => c.role !== 'primary'),
+                ]
+              : defaultApex.colors
 
             set({
               projectId,
               brandName,
               tagline: '',
               mission: '',
-              vision: '',
+              vision: projData?.vision || '',
               coreValues: ['Excellence', 'Innovation', 'Integrity', 'Velocity'],
+              brandPillars: [],
               toneRatings: { formal: 60, playful: 20, minimalist: 85, bold: 90 },
               designMovement: 'quiet-precision',
-              colorPalette: defaultApex.colors,
+              logoUrl: projData?.logo_url || undefined,
+              secondaryLogoUrl: undefined,
+              svgContent,
+              secondarySvgContent: cachedSecondarySvg || undefined,
+              rasterDataUri: cachedRaster || undefined,
+              colorPalette: activeColors,
               displayFont: defaultApex.displayFont,
               bodyFont: defaultApex.bodyFont,
               monoFont: defaultApex.monoFont,
               baseFontSize: 16,
               typeScaleRatio: 1.25,
+              customFonts: [],
               clearspaceMultiplier: 1.0,
-              dosAndDonts:
-                get().dosAndDonts.length > 0
-                  ? get().dosAndDonts
-                  : DEFAULT_DOS_AND_DONTS,
+              dosAndDonts: DEFAULT_DOS_AND_DONTS,
               imageryMood: 'minimal',
               imageryOverlay: 'none',
+              imageryLinks: IMAGERY_MOOD_IMAGE_ARRAYS.minimal,
               iconStyle: 'stroke',
               iconRadius: 4,
               iconStroke: 2.0,

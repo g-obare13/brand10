@@ -1,4 +1,13 @@
 import GlassPanel from "@/components/shared/GlassPanel"
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Loader } from "@/components/ui/loader"
 import { cn } from "@/lib/utils"
@@ -10,6 +19,8 @@ import {
   IconCloudCheck,
   IconCloudOff,
 } from "@tabler/icons-react"
+import { useNavigate } from "@tanstack/react-router"
+import { useState } from "react"
 
 export const WIZARD_STEPS = [
   { id: 1, title: "Foundation", subtitle: "Identity & Vibe" },
@@ -40,11 +51,15 @@ interface WizardHeaderProps {
  * @param {string} props.projectId - Active project identifier.
  * @returns {React.ReactElement} The rendered wizard header controller.
  */
-export function WizardHeader({
-  currentStep,
-  onStepSelect,
-}: WizardHeaderProps) {
+export function WizardHeader({ currentStep, onStepSelect }: WizardHeaderProps) {
   const brand = useBrandStore()
+  const navigate = useNavigate()
+  const [showExitModal, setShowExitModal] = useState(false)
+
+  const handleConfirmExit = () => {
+    setShowExitModal(false)
+    navigate({ to: "/dashboard/projects" })
+  }
 
   return (
     <div className="space-y-4 pt-2 sm:pt-4">
@@ -59,12 +74,13 @@ export function WizardHeader({
             className="flex items-center rounded-full p-1 shadow-xs"
           >
             <Button
-              variant={"outline"}
+              variant="outline"
               gsapFill
-              href="/dashboard/projects"
+              type="button"
+              onClick={() => setShowExitModal(true)}
               title="Return to Dashboard"
               aria-label="Return to Dashboard"
-              className={"rounded-full"}
+              className="cursor-pointer rounded-full"
             >
               <IconArrowLeft size={18} />
             </Button>
@@ -75,7 +91,10 @@ export function WizardHeader({
             {/* Real-time Save & Sync Status Badge */}
             {brand.syncStatus === "saving" || brand.isSaving ? (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/60 px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground shadow-xs">
-                <Loader size="sm" className="size-3 text-primary stroke-primary" />
+                <Loader
+                  size="sm"
+                  className="size-3 stroke-primary text-primary"
+                />
                 <span>Saving...</span>
               </span>
             ) : brand.syncStatus === "error" || brand.saveError ? (
@@ -83,7 +102,7 @@ export function WizardHeader({
                 type="button"
                 onClick={() => brand.saveToSupabase()}
                 title={brand.saveError || "Cloud sync failed. Click to retry."}
-                className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-destructive/40 bg-destructive/10 px-2.5 py-0.5 text-[11px] font-medium text-destructive transition-colors hover:bg-destructive/20 shadow-xs"
+                className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-destructive/40 bg-destructive/10 px-2.5 py-0.5 text-[11px] font-medium text-destructive shadow-xs transition-colors hover:bg-destructive/20"
               >
                 <IconAlertCircle size={12} className="shrink-0" />
                 <span>Sync failed (retry)</span>
@@ -91,7 +110,7 @@ export function WizardHeader({
             ) : brand.syncStatus === "offline" ? (
               <span
                 title="Saved locally on this device"
-                className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-medium text-amber-600 dark:text-amber-400 shadow-xs"
+                className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-medium text-amber-600 shadow-xs dark:text-amber-400"
               >
                 <IconCloudOff size={12} className="shrink-0" />
                 <span>Offline draft</span>
@@ -99,7 +118,7 @@ export function WizardHeader({
             ) : brand.lastSavedAt ? (
               <span
                 title={`Last saved at ${new Date(brand.lastSavedAt).toLocaleTimeString()}`}
-                className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400 shadow-xs"
+                className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-medium text-emerald-600 shadow-xs dark:text-emerald-400"
               >
                 <IconCloudCheck size={12} className="shrink-0" />
                 <span>Saved</span>
@@ -161,6 +180,41 @@ export function WizardHeader({
           {Math.round((Math.min(currentStep, 6) / 6) * 100)}% Complete
         </span>
       </div>
+
+      {/* Return to Dashboard Confirmation Dialog */}
+      <AlertDialog open={showExitModal} onOpenChange={setShowExitModal}>
+        <AlertDialogContent className="max-w-md rounded-3xl border-0 bg-card/95 p-6 backdrop-blur-xl">
+          <AlertDialogHeader className="space-y-3">
+            <div className="flex size-11 items-center justify-center rounded-2xl border border-border/80 bg-muted/60 text-foreground shadow-xs">
+              <IconArrowLeft size={20} />
+            </div>
+            <AlertDialogTitle className="font-heading text-lg font-bold text-foreground">
+              Return to Dashboard?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base text-foreground">
+              Are you sure you want to leave this brand workspace? Any unsaved
+              edits will be preserved in your local draft, but make sure your
+              work is synced before exiting.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6 flex items-center justify-end gap-2.5">
+            <AlertDialogCancel
+              onClick={() => setShowExitModal(false)}
+              className="cursor-pointer rounded-full"
+            >
+              Stay in Workspace
+            </AlertDialogCancel>
+            <Button
+              variant="shiny"
+              size="sm"
+              onClick={handleConfirmExit}
+              className="cursor-pointer rounded-full"
+            >
+              Return to Dashboard
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

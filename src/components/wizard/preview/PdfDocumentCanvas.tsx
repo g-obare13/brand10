@@ -4,23 +4,14 @@ import { useBrandStore } from "@/store/brandStore"
 import {
   IconChevronLeft,
   IconChevronRight,
+  IconMaximize,
   IconZoomIn,
   IconZoomOut,
   IconZoomReset,
 } from "@tabler/icons-react"
 import { useEffect, useRef, useState } from "react"
 import type { PreviewStyleId } from "./pages/A4PageFrame"
-import { PageColorInfo } from "./pages/PageColorInfo"
-import { PageColors } from "./pages/PageColors"
-import { PageBackCover } from "./pages/PageBackCover"
-import { PageCover } from "./pages/PageCover"
-import { PageFoundation } from "./pages/PageFoundation"
-import { PageImagery } from "./pages/PageImagery"
-import { PageLogo } from "./pages/PageLogo"
-import { PageSecondaryLogo } from "./pages/PageSecondaryLogo"
-import { PageTableOfContents } from "./pages/PageTableOfContents"
-import { PageTypography } from "./pages/PageTypography"
-import { PageTypographyBody } from "./pages/PageTypographyBody"
+import { PdfDocumentPagesList } from "./PdfDocumentPagesList"
 
 interface PdfDocumentCanvasProps {
   styleTheme: PreviewStyleId
@@ -28,6 +19,7 @@ interface PdfDocumentCanvasProps {
   onPageChange: (page: number) => void
   onDownloadPdf: () => void
   isDownloadingPdf?: boolean
+  onOpenFullScreen?: () => void
 }
 
 export function PdfDocumentCanvas({
@@ -36,6 +28,7 @@ export function PdfDocumentCanvas({
   onPageChange,
   onDownloadPdf: _onDownloadPdf,
   isDownloadingPdf: _isDownloadingPdf = false,
+  onOpenFullScreen,
 }: PdfDocumentCanvasProps) {
   const brand = useBrandStore()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -144,11 +137,6 @@ export function PdfDocumentCanvas({
   )
   const totalPages = hasSecondaryLogo ? 11 : 10
 
-  const primaryColor =
-    brand.colorPalette.find((c) => c.role === "primary")?.hex || "#6366f1"
-  const secondaryColor =
-    brand.colorPalette.find((c) => c.role === "secondary")?.hex || "#0ea5e9"
-
   return (
     <div className="flex flex-col overflow-hidden rounded-3xl border border-border/80 bg-primary-900/90 shadow-lg backdrop-blur-xl">
       {/* Top Floating Control Bar (Inspired by PDFCN / Takumi toolbar) */}
@@ -224,6 +212,17 @@ export function PdfDocumentCanvas({
             >
               <IconZoomReset size={14} />
             </Button>
+
+            {onOpenFullScreen && (
+              <Button
+                variant={"ghost"}
+                onClick={onOpenFullScreen}
+                className="cursor-pointer p-1 text-primary-400 transition-colors hover:bg-transparent hover:text-primary-50"
+                title="Full Screen Preview"
+              >
+                <IconMaximize size={14} />
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -271,161 +270,7 @@ export function PdfDocumentCanvas({
             className="origin-top space-y-12 pb-16 transition-transform duration-200"
             style={{ transform: `scale(${zoom})` }}
           >
-            {/* Page 1: Cover & Foundation */}
-            <PageCover
-              brandName={brand.brandName}
-              tagline={brand.tagline}
-              mission={brand.mission}
-              vision={brand.vision}
-              coreValues={brand.coreValues}
-              primaryColor={primaryColor}
-              secondaryColor={secondaryColor}
-              svgContent={brand.svgContent}
-              rasterDataUri={brand.rasterDataUri}
-              styleTheme={styleTheme}
-              displayFont={brand.displayFont}
-              bodyFont={brand.bodyFont}
-              monoFont={brand.monoFont}
-            />
-
-            {/* Page 2: Table of Contents */}
-            <PageTableOfContents
-              brandName={brand.brandName}
-              styleTheme={styleTheme}
-              displayFont={brand.displayFont}
-              bodyFont={brand.bodyFont}
-              monoFont={brand.monoFont}
-              totalPages={totalPages}
-            />
-
-            {/* Page 3: Brand Strategy & Foundation */}
-            <PageFoundation
-              brandName={brand.brandName}
-              tagline={brand.tagline}
-              mission={brand.mission}
-              vision={brand.vision}
-              coreValues={brand.coreValues}
-              brandPillars={brand.brandPillars}
-              styleTheme={styleTheme}
-              displayFont={brand.displayFont}
-              bodyFont={brand.bodyFont}
-              monoFont={brand.monoFont}
-              pageNumber={3}
-              totalPages={totalPages}
-            />
-
-            {/* Page 4: Primary Logo System & Geometry */}
-            <PageLogo
-              brandName={brand.brandName}
-              primaryColor={primaryColor}
-              svgContent={brand.svgContent}
-              rasterDataUri={brand.rasterDataUri}
-              dosAndDonts={brand.dosAndDonts}
-              styleTheme={styleTheme}
-              displayFont={brand.displayFont}
-              bodyFont={brand.bodyFont}
-              monoFont={brand.monoFont}
-              pageNumber={4}
-              totalPages={totalPages}
-            />
-
-            {/* Page 5: Secondary Logo & Lockup (Rendered on its own page if it exists) */}
-            {hasSecondaryLogo && (
-              <PageSecondaryLogo
-                brandName={brand.brandName}
-                primaryColor={primaryColor}
-                secondarySvgContent={brand.secondarySvgContent}
-                secondaryLogoUrl={brand.secondaryLogoUrl}
-                styleTheme={styleTheme}
-                displayFont={brand.displayFont}
-                bodyFont={brand.bodyFont}
-                monoFont={brand.monoFont}
-                pageNumber={5}
-                totalPages={totalPages}
-              />
-            )}
-
-            {/* Page 5 or 6: Color Matrix & Palette */}
-            <PageColors
-              brandName={brand.brandName}
-              colors={brand.colorPalette}
-              styleTheme={styleTheme}
-              displayFont={brand.displayFont}
-              bodyFont={brand.bodyFont}
-              monoFont={brand.monoFont}
-              pageNumber={hasSecondaryLogo ? 6 : 5}
-              totalPages={totalPages}
-            />
-
-            {/* Page 6 or 7: Color Information & Metrics */}
-            <PageColorInfo
-              brandName={brand.brandName}
-              colors={brand.colorPalette}
-              styleTheme={styleTheme}
-              displayFont={brand.displayFont}
-              bodyFont={brand.bodyFont}
-              monoFont={brand.monoFont}
-              pageNumber={hasSecondaryLogo ? 7 : 6}
-              totalPages={totalPages}
-            />
-
-            {/* Page 7 or 8: Typography Hierarchy - Headings Modular Scale */}
-            <PageTypography
-              brandName={brand.brandName}
-              displayFont={brand.displayFont}
-              bodyFont={brand.bodyFont}
-              monoFont={brand.monoFont}
-              typeScaleRatio={brand.typeScaleRatio}
-              baseFontSize={brand.baseFontSize}
-              styleTheme={styleTheme}
-              pageNumber={hasSecondaryLogo ? 8 : 7}
-              totalPages={totalPages}
-            />
-
-            {/* Page 8 or 9: Typography - Body & Interface System */}
-            <PageTypographyBody
-              brandName={brand.brandName}
-              displayFont={brand.displayFont}
-              bodyFont={brand.bodyFont}
-              monoFont={brand.monoFont}
-              typeScaleRatio={brand.typeScaleRatio}
-              baseFontSize={brand.baseFontSize}
-              styleTheme={styleTheme}
-              pageNumber={hasSecondaryLogo ? 9 : 8}
-              totalPages={totalPages}
-            />
-
-            {/* Page 9 or 10: Imagery & Mood Direction */}
-            <PageImagery
-              brandName={brand.brandName}
-              imageryMood={brand.imageryMood}
-              imageryOverlay={brand.imageryOverlay}
-              imageryLinks={brand.imageryLinks}
-              primaryColor={primaryColor}
-              styleTheme={styleTheme}
-              displayFont={brand.displayFont}
-              bodyFont={brand.bodyFont}
-              monoFont={brand.monoFont}
-              pageNumber={hasSecondaryLogo ? 10 : 9}
-              totalPages={totalPages}
-            />
-
-            {/* Page 10 or 11: Back Cover Page */}
-            <PageBackCover
-              brandName={brand.brandName}
-              tagline={brand.tagline}
-              mission={brand.mission}
-              primaryColor={primaryColor}
-              secondaryColor={secondaryColor}
-              svgContent={brand.svgContent}
-              rasterDataUri={brand.rasterDataUri}
-              styleTheme={styleTheme}
-              displayFont={brand.displayFont}
-              bodyFont={brand.bodyFont}
-              monoFont={brand.monoFont}
-              pageNumber={hasSecondaryLogo ? 11 : 10}
-              totalPages={totalPages}
-            />
+            <PdfDocumentPagesList styleTheme={styleTheme} />
           </div>
         </div>
       </div>

@@ -8,6 +8,7 @@ import type { PreviewStyleId } from "@/components/wizard/preview/pages/A4PageFra
 import { PdfPreviewStylesSidebar } from "./PdfPreviewStylesSidebar"
 import { PdfDocumentCanvas } from "./PdfDocumentCanvas"
 import { PdfPreviewRightSidebar } from "./PdfPreviewRightSidebar"
+import { PdfFullScreenPreviewModal } from "./PdfFullScreenPreviewModal"
 
 interface PdfPreviewStudioProps {
   projectId: string
@@ -19,6 +20,7 @@ interface PdfPreviewStudioProps {
  * - Left Panel: Presentation Styles (StepFoundation Design Movements)
  * - Center Panel: Multi-page A4 document renderer with interactive zoom and page jumper
  * - Right Panel: Document outline, active section inspector, and export hub
+ * - Full Screen Modal: Immersive presentation deck hiding all surrounding studio chrome
  */
 export function PdfPreviewStudio({ projectId }: PdfPreviewStudioProps) {
   const brand = useBrandStore()
@@ -39,6 +41,7 @@ export function PdfPreviewStudio({ projectId }: PdfPreviewStudioProps) {
   const [activePage, setActivePage] = useState<number>(1)
   const [isDownloadingPdf, setIsDownloadingPdf] = useState<boolean>(false)
   const [downloadProgress, setDownloadProgress] = useState<string>("")
+  const [isFullScreenOpen, setIsFullScreenOpen] = useState<boolean>(false)
 
   const handleSelectStyle = (style: PreviewStyleId) => {
     setActiveStyle(style)
@@ -100,6 +103,7 @@ export function PdfPreviewStudio({ projectId }: PdfPreviewStudioProps) {
             onPageChange={setActivePage}
             onDownloadPdf={handleDownloadPdf}
             isDownloadingPdf={isDownloadingPdf}
+            onOpenFullScreen={() => setIsFullScreenOpen(true)}
           />
         </div>
 
@@ -112,9 +116,21 @@ export function PdfPreviewStudio({ projectId }: PdfPreviewStudioProps) {
             isDownloadingPdf={isDownloadingPdf}
             downloadProgress={downloadProgress}
             projectId={projectId}
+            onOpenFullScreen={() => setIsFullScreenOpen(true)}
           />
         </div>
       </div>
+
+      {/* Full-Screen Immersive Presentation Modal */}
+      <PdfFullScreenPreviewModal
+        isOpen={isFullScreenOpen}
+        onClose={() => setIsFullScreenOpen(false)}
+        styleTheme={activeStyle}
+        initialPage={activePage}
+        onDownloadPdf={handleDownloadPdf}
+        isDownloadingPdf={isDownloadingPdf}
+        downloadProgress={downloadProgress}
+      />
     </div>
   )
 }
