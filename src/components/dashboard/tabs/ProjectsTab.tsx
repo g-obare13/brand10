@@ -1,4 +1,3 @@
-import ImageComponentOptimized from "@/components/shared/ImageComponentOptimized"
 import { SpotlightCard } from "@/components/shared/SpotlightCard"
 import WordReveal from "@/components/shared/WordReveal"
 import {
@@ -32,7 +31,7 @@ import {
 import { Link } from "@tanstack/react-router"
 import { gsap } from "gsap"
 import { get as idbGet } from "idb-keyval"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 interface ProjectsTabProps {
   onOpenCreateModal: () => void
@@ -150,18 +149,55 @@ function ProjectCardLogo({
     currentSvgContent,
   ])
 
+  const handleImageError = useCallback(async () => {
+    // If it's already a data URI or blob and failed, stop and show initial
+    if (logoSrc?.startsWith("data:") || logoSrc?.startsWith("blob:")) {
+      setHasError(true)
+      return
+    }
+
+    try {
+      const cachedSvg = await idbGet<string>(`brand_svg_${project.id}`)
+      if (cachedSvg) {
+        setLogoSrc(`data:image/svg+xml;utf8,${encodeURIComponent(cachedSvg)}`)
+        return
+      }
+
+      const cachedRaster = await idbGet<string>(`brand_raster_${project.id}`)
+      if (cachedRaster) {
+        setLogoSrc(cachedRaster)
+        return
+      }
+
+      const raw = localStorage.getItem(`brandio_local_brand_${project.id}`)
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        if (parsed.svgContent) {
+          setLogoSrc(
+            `data:image/svg+xml;utf8,${encodeURIComponent(parsed.svgContent)}`
+          )
+          return
+        }
+        if (parsed.rasterDataUri) {
+          setLogoSrc(parsed.rasterDataUri)
+          return
+        }
+      }
+    } catch {}
+    setHasError(true)
+  }, [project.id, logoSrc])
+
   if (logoSrc && !hasError) {
     return (
       <div
         className="flex size-12 items-center justify-center overflow-hidden rounded-2xl border border-border/80 bg-background/80 p-2 transition-transform duration-300 group-hover:scale-105"
         style={{ borderColor: `${primaryColor}30` }}
       >
-        <ImageComponentOptimized
+        <img
           src={logoSrc}
           alt={project.brand_name || project.name}
           className="size-full object-contain"
-          imageClassName="w-full h-full object-cover"
-          onError={() => setHasError(true)}
+          onError={handleImageError}
         />
       </div>
     )

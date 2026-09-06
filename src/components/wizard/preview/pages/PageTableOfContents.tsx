@@ -68,15 +68,13 @@ export function PageTableOfContents({
       bodyFont={bodyFont}
       monoFont={monoFont}
       websiteUrl={websiteUrl}
-      className="overflow-hidden border border-zinc-200 bg-white p-12 text-black shadow-2xl"
+      className="overflow-hidden border border-zinc-200 bg-white p-12 text-primary-900 shadow-2xl"
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Page Title */}
-        <div className="space-y-2 pt-2">
-          <h2 className="text-4xl font-extrabold text-black uppercase sm:text-5xl">
-            CONTENTS
-          </h2>
-          <div className="h-0.5 w-16 bg-black" />
+        <div className="space-y-2">
+          <h2 className="text-primary-900 uppercase">CONTENTS</h2>
+          <div className="h-0.5 w-16 bg-zinc-500" />
         </div>
 
         {/* Contents List */}
@@ -84,18 +82,14 @@ export function PageTableOfContents({
           {sections.map((item) => (
             <div key={item.num} className="group flex items-start gap-6">
               {/* Number Index */}
-              <div className="w-12 shrink-0 pt-0.5 text-2xl font-bold text-black transition-colors group-hover:text-zinc-600">
+              <div className="w-12 shrink-0 pt-0.5 text-2xl font-bold text-primary-900 transition-colors group-hover:text-primary-950">
                 {item.num}
               </div>
 
               {/* Title & Description */}
               <div className="space-y-1">
-                <div className="text-lg font-bold tracking-tight text-black sm:text-xl">
-                  {item.title}
-                </div>
-                <p className="max-w-lg text-xs text-zinc-600">
-                  {item.desc}
-                </p>
+                <h5 className="text-primary-900">{item.title}</h5>
+                <p className="max-w-lg text-zinc-600">{item.desc}</p>
               </div>
             </div>
           ))}

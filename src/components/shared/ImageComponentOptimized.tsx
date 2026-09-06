@@ -80,7 +80,7 @@ const ImageComponentOptimized: React.FC<OptimizedImageProps> = memo(
     className = "",
     blurDataURL,
     priority = false,
-    // unoptimized = false,
+    unoptimized = false,
     onLoadComplete,
     onError,
     src,
@@ -135,9 +135,12 @@ const ImageComponentOptimized: React.FC<OptimizedImageProps> = memo(
     )
 
     useEffect(() => {
+      setHasError(false)
       // Check if image is already complete (e.g. from cache)
       if (imgRef.current?.complete) {
         setImageLoaded(true)
+      } else {
+        setImageLoaded(false)
       }
     }, [src])
 
@@ -507,33 +510,60 @@ const ImageComponentOptimized: React.FC<OptimizedImageProps> = memo(
         )}
 
         {src ? (
-          <UnpicImage
-            ref={imgRef}
-            src={src}
-            alt={alt}
-            width={layout === "fullWidth" ? undefined : width}
-            height={layout === "fullWidth" ? undefined : height}
-            layout={layout}
-            priority={priority ? true : undefined}
-            onLoad={handleLoad}
-            onError={handleError}
-            sizes={defaultSizes}
-            style={{
-              objectFit,
-              aspectRatio,
-              objectPosition,
-            }}
-            className={cn(
-              !effect && "transition-all duration-500",
-              imageLoaded || disableBlurhash
-                ? "scale-100 opacity-100"
-                : !effect
-                  ? "scale-105 opacity-0"
-                  : "opacity-0",
-              hasError ? "hidden" : "block",
-              imageClassName
-            )}
-          />
+          unoptimized || (typeof src === "string" && (src.includes(".svg") || src.startsWith("data:image/svg+xml"))) ? (
+            <img
+              ref={imgRef}
+              src={src}
+              alt={alt}
+              width={layout === "fullWidth" ? undefined : width}
+              height={layout === "fullWidth" ? undefined : height}
+              onLoad={handleLoad}
+              onError={handleError}
+              style={{
+                objectFit,
+                aspectRatio,
+                objectPosition,
+              }}
+              className={cn(
+                !effect && "transition-all duration-500",
+                imageLoaded || disableBlurhash
+                  ? "scale-100 opacity-100"
+                  : !effect
+                    ? "scale-105 opacity-0"
+                    : "opacity-0",
+                hasError ? "hidden" : "block",
+                imageClassName
+              )}
+            />
+          ) : (
+            <UnpicImage
+              ref={imgRef}
+              src={src}
+              alt={alt}
+              width={layout === "fullWidth" ? undefined : width}
+              height={layout === "fullWidth" ? undefined : height}
+              layout={layout}
+              priority={priority ? true : undefined}
+              onLoad={handleLoad}
+              onError={handleError}
+              sizes={defaultSizes}
+              style={{
+                objectFit,
+                aspectRatio,
+                objectPosition,
+              }}
+              className={cn(
+                !effect && "transition-all duration-500",
+                imageLoaded || disableBlurhash
+                  ? "scale-100 opacity-100"
+                  : !effect
+                    ? "scale-105 opacity-0"
+                    : "opacity-0",
+                hasError ? "hidden" : "block",
+                imageClassName
+              )}
+            />
+          )
         ) : (
           <div className="flex aspect-video h-full w-full items-center justify-center bg-muted/30">
             <span className="text-[10px] font-bold tracking-tight text-muted-foreground/40 uppercase">

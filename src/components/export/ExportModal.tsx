@@ -49,6 +49,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ open, onOpenChange }) 
         isVector: brand.isVector,
         svgContent: brand.svgContent,
         rasterDataUri: brand.rasterDataUri,
+        secondarySvgContent: brand.secondarySvgContent,
       })
       toast.success('Production asset package downloaded.')
     } catch (err) {

@@ -49,12 +49,12 @@ export function PageBackCover({
       websiteUrl={websiteUrl}
       className="overflow-hidden border border-zinc-200 bg-white p-0 shadow-2xl"
     >
-      <div className="relative flex h-full w-full flex-col justify-between overflow-hidden bg-white p-12 text-black select-none lg:p-16">
+      <div className="relative flex h-full w-full flex-col justify-between overflow-hidden bg-white p-12 text-primary-900 select-none lg:p-16">
         {/* Subtle Decorative Logo Watermark Shape (3% opacity, grayscale) */}
-        <div className="pointer-events-none absolute top-1/2 left-1/2 flex size-[680px] -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden select-none opacity-[0.03] grayscale contrast-50">
+        <div className="pointer-events-none absolute top-1/2 left-1/2 flex size-[680px] -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden opacity-[0.03] contrast-50 grayscale select-none">
           {svgContent ? (
             <div
-              className="flex size-full items-center justify-center [&_*]:!fill-black [&_*]:!stroke-transparent [&_svg]:size-full [&_svg]:max-h-full [&_svg]:max-w-full"
+              className="flex size-full items-center justify-center [&_*]:!fill-primary-900 [&_*]:!stroke-transparent [&_svg]:size-full [&_svg]:max-h-full [&_svg]:max-w-full"
               dangerouslySetInnerHTML={{ __html: svgContent }}
             />
           ) : rasterDataUri ? (
@@ -64,7 +64,7 @@ export function PageBackCover({
               className="size-full object-contain"
             />
           ) : (
-            <div className="text-[500px] leading-none font-bold text-black select-none">
+            <div className="text-[500px] leading-none font-bold text-primary-900 select-none">
               {(brandName || "B").charAt(0).toUpperCase()}
             </div>
           )}
@@ -97,14 +97,14 @@ export function PageBackCover({
             </div>
 
             {/* Document Index Notation */}
-            <div className="font-mono text-xs font-semibold tracking-wider text-zinc-500 uppercase">
+            <div className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
               Brand Manual · Concluding Index
             </div>
           </div>
 
           {/* Line UI: thick accent bar on left, gap, thin hairline on right (mirrored from front cover) */}
           <div className="flex w-full items-end gap-3 pt-1">
-            <div className="h-1 w-28 bg-black" />
+            <div className="h-1 w-28 bg-primary-900" />
             <div className="h-px flex-1 bg-zinc-300" />
           </div>
         </div>
@@ -113,11 +113,11 @@ export function PageBackCover({
         <div className="relative z-10 my-auto max-w-xl space-y-6 py-12">
           {/* Centered / Prominent Mark Display */}
           <div className="space-y-4">
-            <div className="font-mono text-xs font-bold tracking-widest text-zinc-400 uppercase">
+            <div className="text-xs font-bold tracking-widest text-zinc-400 uppercase">
               Visual Identity &amp; System Architecture
             </div>
 
-            <h1 className="text-5xl font-extrabold tracking-tight text-black sm:text-6xl">
+            <h1 className="text-5xl font-extrabold tracking-tight text-primary-900 sm:text-6xl">
               {brandName || "Brand Architecture"}
             </h1>
 
@@ -132,7 +132,7 @@ export function PageBackCover({
           </div>
 
           {mission && (
-            <div className="border-l-2 border-black pl-4">
+            <div className="border-l-2 border-primary-900 pl-4">
               <p className="max-w-lg text-xs leading-relaxed text-zinc-600">
                 {mission}
               </p>
@@ -158,12 +158,12 @@ export function PageBackCover({
             <div className="space-y-2 sm:col-span-5 sm:text-right">
               <div>
                 <div className="text-xs text-zinc-400">Release Version:</div>
-                <div className="font-mono text-xs font-semibold text-white">
+                <div className="text-xs font-semibold text-white">
                   v1.0.0 (Living Standard)
                 </div>
               </div>
 
-              <div className="font-mono text-[11px] text-zinc-400">
+              <div className="text-[11px] text-zinc-400">
                 &copy; {currentYear} {brandName || "Brand Identity"}. All rights
                 reserved.
               </div>

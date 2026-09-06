@@ -40,27 +40,30 @@ const MOVEMENT_META: Record<
   "editorial-character": {
     subtitle: "Refined & Literary",
     paletteAccent: "#d97706",
-    gradient: "from-amber-100 to-stone-200 dark:from-amber-950/30 dark:to-stone-900",
+    gradient:
+      "from-amber-100 to-stone-200 dark:from-amber-950/30 dark:to-stone-900",
   },
 }
 
-export const PREVIEW_STYLES: StyleOption[] = DESIGN_MOVEMENTS.map((movement) => {
-  const meta = MOVEMENT_META[movement.id] ?? {
-    subtitle: movement.vibe,
-    paletteAccent: "#71717a",
-    gradient: "from-zinc-100 to-zinc-200 dark:from-zinc-900 dark:to-zinc-800",
-  }
+export const PREVIEW_STYLES: StyleOption[] = DESIGN_MOVEMENTS.map(
+  (movement) => {
+    const meta = MOVEMENT_META[movement.id] ?? {
+      subtitle: movement.vibe,
+      paletteAccent: "#71717a",
+      gradient: "from-zinc-100 to-zinc-200 dark:from-zinc-900 dark:to-zinc-800",
+    }
 
-  return {
-    id: movement.id as PreviewStyleId,
-    title: movement.label,
-    subtitle: meta.subtitle,
-    badge: movement.badge,
-    description: movement.tagline || movement.description,
-    paletteAccent: meta.paletteAccent,
-    gradient: meta.gradient,
+    return {
+      id: movement.id as PreviewStyleId,
+      title: movement.label,
+      subtitle: meta.subtitle,
+      badge: movement.badge,
+      description: movement.tagline || movement.description,
+      paletteAccent: meta.paletteAccent,
+      gradient: meta.gradient,
+    }
   }
-})
+)
 
 interface PdfPreviewStylesSidebarProps {
   activeStyle: PreviewStyleId
@@ -121,18 +124,9 @@ export function PdfPreviewStylesSidebar({
                     {style.badge}
                   </Badge>
                 </div>
-
                 <div className="text-[11px] leading-relaxed text-muted-foreground">
                   {style.description}
                 </div>
-
-                {/* Aesthetic preview bar */}
-                <div
-                  className={cn(
-                    "h-1.5 w-full rounded-full bg-linear-to-r",
-                    style.gradient
-                  )}
-                />
               </div>
             </button>
           )

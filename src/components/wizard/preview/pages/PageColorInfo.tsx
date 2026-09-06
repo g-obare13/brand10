@@ -117,16 +117,14 @@ export function PageColorInfo({
       displayFont={displayFont}
       bodyFont={bodyFont}
       monoFont={monoFont}
-      className="overflow-hidden border border-zinc-200 bg-white p-12 text-black shadow-2xl"
+      className="overflow-hidden border border-zinc-200 bg-white p-12 text-primary-900 shadow-2xl"
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Title & Introduction */}
         <div className="space-y-3 pt-2">
           <div className="space-y-2">
-            <h2 className="text-4xl font-bold text-black uppercase sm:text-5xl">
-              COLOR METRICS
-            </h2>
-            <div className="h-0.5 w-16 bg-black" />
+            <h2 className="text-primary-900 uppercase"> COLOR METRICS</h2>
+            <div className="h-0.5 w-16 bg-zinc-500" />
           </div>
 
           <p className="max-w-xl text-zinc-600">
@@ -143,7 +141,9 @@ export function PageColorInfo({
             {/* Header: Label, Role Badge & Hex */}
             <div className="flex items-center justify-between pb-1">
               <div className="flex items-center gap-2.5">
-                <span className="text-base font-bold text-black">{label}</span>
+                <span className="text-base font-bold text-primary-900">
+                  {label}
+                </span>
                 <Badge variant="outline" className="rounded-full">
                   {swatch.role}
                 </Badge>
@@ -190,7 +190,7 @@ export function PageColorInfo({
                           <span className="flex items-center gap-1.5">
                             {step}
                             {isBase ? (
-                              <span className="size-1.5 rounded-full bg-black" />
+                              <span className="size-1.5 rounded-full bg-primary-900" />
                             ) : null}
                           </span>
                         </td>
@@ -198,7 +198,7 @@ export function PageColorInfo({
                         {/* Color Chip */}
                         <td className="px-2 py-2">
                           <div
-                            className="h-4 w-7 rounded-xs border border-black/10 shadow-2xs"
+                            className="h-4 w-7 rounded-xs border border-primary-900/10 shadow-2xs"
                             style={{ backgroundColor: shadeHex }}
                           />
                         </td>

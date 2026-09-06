@@ -102,25 +102,23 @@ export function PageFoundation({
       bodyFont={bodyFont}
       monoFont={monoFont}
       websiteUrl={websiteUrl}
-      className="overflow-hidden border border-zinc-200 bg-white p-12 text-black shadow-2xl"
+      className="overflow-hidden border border-zinc-200 bg-white p-12 text-primary-900 shadow-2xl"
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Page Title & Introductory Statement */}
-        <div className="space-y-4 pt-2">
+        <div className="space-y-4">
           <div className="space-y-2">
-            <h2 className="text-4xl font-bold text-black uppercase sm:text-5xl">
-              FOUNDATION
-            </h2>
-            <div className="h-0.5 w-16 bg-black" />
+            <h2 className="text-primary-900 uppercase">FOUNDATION</h2>
+            <div className="h-0.5 w-16 bg-zinc-500" />
           </div>
 
           <div className="space-y-1 pt-1">
             {tagline && (
-              <div className="text-base font-semibold text-zinc-900">
+              <div className="text-base font-semibold text-primary-900">
                 {tagline}
               </div>
             )}
-            <p className="max-w-xl text-base text-zinc-600">
+            <p className="max-w-xl text-zinc-600">
               The foundation defines the strategic purpose and ideological north
               star of {brandName || "the brand"}. Every visual asset, tone
               directive, and interactive touchpoint across this system derives
@@ -133,12 +131,12 @@ export function PageFoundation({
         <div className="my-auto space-y-6 py-2">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {/* Mission Block */}
-            <div className="flex flex-col justify-between border-t-2 border-black pt-4">
+            <div className="flex flex-col justify-between border-t-2 border-primary-900 pt-4">
               <div className="space-y-3">
                 <div className="text-xs font-bold text-zinc-500 uppercase">
                   01 / Mission Statement
                 </div>
-                <div className="text-lg font-bold text-black sm:text-xl">
+                <div className="text-lg font-bold text-primary-900 sm:text-xl">
                   {activeMission}
                 </div>
               </div>
@@ -151,12 +149,12 @@ export function PageFoundation({
             </div>
 
             {/* Vision Block */}
-            <div className="flex flex-col justify-between border-t-2 border-black pt-4">
+            <div className="flex flex-col justify-between border-t-2 border-primary-900 pt-4">
               <div className="space-y-3">
                 <div className="text-xs font-bold text-zinc-500 uppercase">
                   02 / Strategic Vision
                 </div>
-                <div className="text-lg font-bold text-black sm:text-xl">
+                <div className="text-lg font-bold text-primary-900 sm:text-xl">
                   {activeVision}
                 </div>
               </div>
@@ -187,7 +185,9 @@ export function PageFoundation({
           <div className="grid grid-cols-3 gap-6">
             {pillarsList.map((val) => (
               <div key={val.num} className="space-y-1">
-                <div className="text-sm font-bold text-black">{val.title}</div>
+                <div className="text-sm font-bold text-primary-900">
+                  {val.title}
+                </div>
                 <p className="text-xs text-zinc-600">{val.desc}</p>
               </div>
             ))}

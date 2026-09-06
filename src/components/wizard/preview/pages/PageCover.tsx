@@ -49,7 +49,7 @@ export function PageCover({
     >
       <div className="relative flex h-full w-full flex-col justify-between overflow-hidden bg-white p-12 text-black select-none lg:p-16">
         {/* Subtle Decorative Logo Watermark Shape (3.5% opacity, grayscale) */}
-        <div className="pointer-events-none absolute top-1/2 -right-[360px] flex size-[720px] -translate-y-1/2 items-center justify-center overflow-hidden select-none opacity-[0.035] grayscale contrast-50">
+        <div className="pointer-events-none absolute top-1/2 -right-90 flex size-180 -translate-y-1/2 items-center justify-center overflow-hidden opacity-[0.035] contrast-50 grayscale select-none">
           {svgContent ? (
             <div
               className="flex size-full items-center justify-center [&_*]:!fill-black [&_*]:!stroke-transparent [&_svg]:size-full [&_svg]:max-h-full [&_svg]:max-w-full"
@@ -62,7 +62,7 @@ export function PageCover({
               className="size-full object-contain"
             />
           ) : (
-            <div className="text-[500px] leading-none font-bold text-black select-none">
+            <div className="text-[500px] leading-none font-bold text-primary-950 select-none">
               {(brandName || "B").charAt(0).toUpperCase()}
             </div>
           )}
@@ -95,37 +95,31 @@ export function PageCover({
             </div>
 
             {/* Current Year at far end */}
-            <div className="text-sm font-semibold text-black/80">
+            <div className="text-sm font-semibold text-primary-950/80">
               {currentYear}
             </div>
-          </div>
-
-          {/* Custom line UI in header: thin hairline on left, gap, thick black accent bar on right */}
-          <div className="flex w-full items-end gap-3 pt-1">
-            <div className="h-px flex-1 bg-zinc-300" />
-            <div className="h-1 w-28 bg-black" />
           </div>
         </div>
 
         {/* Hero Title Section with Brand Name beneath */}
         <div className="relative z-10 my-auto max-w-xl space-y-4 py-8">
-          <h1 className="text-6xl text-black sm:text-7xl lg:text-8xl">
+          <h1 className="text-6xl text-primary-950 sm:text-7xl lg:text-8xl">
             Brand
             <br />
             Guidelines.
           </h1>
-          <p className="text-2xl font-semibold text-zinc-700 sm:text-3xl">
+          <p className="text-2xl font-semibold text-primary-700 sm:text-3xl">
             {brandName || "Brand Architecture"}
           </p>
         </div>
 
         {/* Bottom Footer Colophon Card on Cover */}
-        <div className="relative z-10 w-full space-y-4 rounded-none border border-zinc-800 bg-zinc-950 p-6 text-white shadow-xl">
+        <div className="relative z-10 w-full space-y-4 rounded-none border border-primary-800 bg-primary-950 p-6 text-white">
           {/* Top 2-Column Meta Details */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-12">
             {/* Left Column: Prepared for & Organization */}
             <div className="space-y-1 sm:col-span-7">
-              <div className="text-xs text-zinc-400">Prepared for:</div>
+              <div className="text-xs text-primary-200">Prepared for:</div>
               <div className="text-lg font-bold tracking-tight text-white">
                 {brandName || "Brand Identity System"}
               </div>
@@ -134,7 +128,7 @@ export function PageCover({
             {/* Right Column: Issued Date & Validity */}
             <div className="space-y-3 sm:col-span-5 sm:text-right">
               <div>
-                <div className="text-xs text-zinc-400">
+                <div className="text-xs text-zinc-200">
                   Documentation Issued:
                 </div>
                 <div className="text-xs font-semibold text-white">
@@ -143,7 +137,7 @@ export function PageCover({
               </div>
 
               <div>
-                <div className="text-xs text-zinc-400">Governance Status:</div>
+                <div className="text-xs text-zinc-200">Governance Status:</div>
                 <div className="text-xs font-semibold text-white">
                   Active Standard
                 </div>
@@ -153,10 +147,10 @@ export function PageCover({
 
           {/* Statement of Confidentiality Divider & Disclaimer */}
           <div className="space-y-1 border-t border-zinc-800/80 pt-3">
-            <div className="text-xs font-medium text-zinc-300">
+            <div className="text-xs font-medium text-zinc-200">
               Statement of Confidentiality
             </div>
-            <p className="text-[10px] leading-relaxed text-zinc-400">
+            <p className="text-[10px] leading-relaxed text-primary-100">
               This brand manual and supporting identity assets contain
               proprietary standards for {brandName || "this organization"}.
               These materials are published for official brand implementation,

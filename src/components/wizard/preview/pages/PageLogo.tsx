@@ -55,16 +55,14 @@ export function PageLogo({
       bodyFont={bodyFont}
       monoFont={monoFont}
       websiteUrl={websiteUrl}
-      className="overflow-hidden border border-zinc-200 bg-white p-12 text-black shadow-2xl"
+      className="overflow-hidden border border-zinc-200 bg-white p-12 text-primary-900 shadow-2xl"
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Title & Introduction */}
         <div className="space-y-3 pt-2">
           <div className="space-y-2">
-            <h2 className="text-4xl font-bold text-black uppercase sm:text-5xl">
-              PRIMARY MARK
-            </h2>
-            <div className="h-0.5 w-16 bg-black" />
+            <h2 className="text-primary-900 uppercase"> PRIMARY MARK</h2>
+            <div className="h-0.5 w-16 bg-zinc-500" />
           </div>
 
           <p className="max-w-xl text-zinc-600">
@@ -142,8 +140,8 @@ export function PageLogo({
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-6 gap-y-2.5">
-            {activeRules.map((item) => (
+          <div className="grid grid-cols-2 gap-2">
+            {activeRules.slice(0, 6).map((item) => (
               <div
                 key={item.id}
                 className="flex items-start justify-between gap-3 transition-colors"

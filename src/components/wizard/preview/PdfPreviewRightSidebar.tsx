@@ -2,7 +2,6 @@ import { useState } from "react"
 import { useNavigate } from "@tanstack/react-router"
 import { useBrandStore } from "@/store/brandStore"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Loader } from "@/components/ui/loader"
 import { buildAndDownloadZip } from "@/lib/zipBuilder"
 import { toast } from "sonner"
@@ -82,8 +81,8 @@ interface PdfPreviewRightSidebarProps {
 }
 
 export function PdfPreviewRightSidebar({
-  activePage,
-  onNavigateToPage,
+  activePage: _activePage,
+  onNavigateToPage: _onNavigateToPage,
   onDownloadPdf,
   isDownloadingPdf = false,
   downloadProgress = "",
@@ -112,6 +111,7 @@ export function PdfPreviewRightSidebar({
         isVector: brand.isVector,
         svgContent: brand.svgContent,
         rasterDataUri: brand.rasterDataUri,
+        secondarySvgContent: brand.secondarySvgContent,
       })
       toast.success("Production asset package downloaded.")
     } catch (err) {
@@ -143,7 +143,7 @@ export function PdfPreviewRightSidebar({
   return (
     <aside className="flex flex-col gap-5 rounded-3xl bg-card/85 p-5 backdrop-blur-xl">
       {/* 1. Document Outline / Table of Contents (Matching PDFCN screenshot) */}
-      <div className="space-y-2">
+      {/* <div className="space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-xs font-medium text-muted-foreground">
             Document Outline
@@ -171,10 +171,10 @@ export function PdfPreviewRightSidebar({
             )
           })}
         </div>
-      </div>
+      </div> */}
 
       {/* 3. Production Export Hub */}
-      <div className="space-y-2.5 border-t border-border/60 pt-4">
+      <div className="space-y-2.5 pt-4">
         {/* <span className="text-xs">Export & Production</span> */}
 
         <div className="mt-2 space-y-2">

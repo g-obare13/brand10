@@ -19,28 +19,135 @@ export interface ZipExportOptions {
   isVector: boolean
   svgContent?: string
   rasterDataUri?: string
+  secondarySvgContent?: string
+  secondaryRasterDataUri?: string
 }
 
 /**
- * Render an image/svg into a canvas and export as PNG Blob at given width/height
+ * Extract intrinsic SVG width, height, or viewBox dimensions
+ */
+export function getSvgIntrinsicDimensions(
+  svgString: string
+): { width: number; height: number } | null {
+  try {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(svgString, "image/svg+xml")
+    const svgEl = doc.querySelector("svg")
+    if (!svgEl) return null
+
+    const widthAttr = parseFloat(svgEl.getAttribute("width") || "")
+    const heightAttr = parseFloat(svgEl.getAttribute("height") || "")
+    if (widthAttr > 0 && heightAttr > 0) {
+      return { width: widthAttr, height: heightAttr }
+    }
+
+    const viewBox = svgEl.getAttribute("viewBox")
+    if (viewBox) {
+      const parts = viewBox.trim().split(/[\s,]+/).map(Number)
+      if (parts.length === 4 && parts[2] > 0 && parts[3] > 0) {
+        return { width: parts[2], height: parts[3] }
+      }
+    }
+  } catch {}
+  return null
+}
+
+interface RenderOptions {
+  /**
+   * "native": Scales image to fit within target bounds while matching its exact aspect ratio (no letterbox padding).
+   * "contain": Retains exact target canvas dimensions (e.g. 1:1 square for favicons/icons) and proportionally centers the image with safe padding.
+   */
+  fit?: "contain" | "native"
+  /** Safe padding ratio (e.g. 0.08 = 8% padding) */
+  paddingPercent?: number
+  intrinsicWidth?: number
+  intrinsicHeight?: number
+}
+
+/**
+ * Render an image/svg into a canvas and export as PNG Blob with strict aspect-ratio preservation
  */
 async function renderToPngBlob(
   sourceUri: string,
-  width: number,
-  height: number
+  targetWidth: number,
+  targetHeight: number,
+  options: RenderOptions = {}
 ): Promise<Blob | null> {
-  return new Promise((resolve) => {
-    const canvas = document.createElement("canvas")
-    canvas.width = width
-    canvas.height = height
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return resolve(null)
+  const {
+    fit = "contain",
+    paddingPercent = 0,
+    intrinsicWidth,
+    intrinsicHeight,
+  } = options
 
+  return new Promise((resolve) => {
     const img = new Image()
     img.crossOrigin = "anonymous"
     img.onload = () => {
-      ctx.clearRect(0, 0, width, height)
-      ctx.drawImage(img, 0, 0, width, height)
+      let naturalW =
+        intrinsicWidth || img.naturalWidth || img.width || targetWidth
+      let naturalH =
+        intrinsicHeight || img.naturalHeight || img.height || targetHeight
+
+      if (naturalW <= 0 || naturalH <= 0) {
+        naturalW = targetWidth
+        naturalH = targetHeight
+      }
+
+      const canvas = document.createElement("canvas")
+      const ctx = canvas.getContext("2d")
+      if (!ctx) return resolve(null)
+
+      if (fit === "native") {
+        const aspect = naturalW / naturalH
+        let finalW = targetWidth
+        let finalH = Math.round(targetWidth / aspect)
+
+        if (finalH > targetHeight) {
+          finalH = targetHeight
+          finalW = Math.round(targetHeight * aspect)
+        }
+
+        canvas.width = Math.max(1, finalW)
+        canvas.height = Math.max(1, finalH)
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        ctx.imageSmoothingEnabled = true
+        ctx.imageSmoothingQuality = "high"
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+      } else {
+        canvas.width = targetWidth
+        canvas.height = targetHeight
+
+        const pad = Math.round(
+          paddingPercent * Math.min(targetWidth, targetHeight)
+        )
+        const availW = Math.max(1, targetWidth - pad * 2)
+        const availH = Math.max(1, targetHeight - pad * 2)
+
+        const aspect = naturalW / naturalH
+        const targetAspect = availW / availH
+
+        let drawW: number
+        let drawH: number
+
+        if (aspect > targetAspect) {
+          drawW = availW
+          drawH = Math.round(availW / aspect)
+        } else {
+          drawH = availH
+          drawW = Math.round(availH * aspect)
+        }
+
+        const offsetX = Math.round((targetWidth - drawW) / 2)
+        const offsetY = Math.round((targetHeight - drawH) / 2)
+
+        ctx.clearRect(0, 0, targetWidth, targetHeight)
+        ctx.imageSmoothingEnabled = true
+        ctx.imageSmoothingQuality = "high"
+        ctx.drawImage(img, offsetX, offsetY, drawW, drawH)
+      }
+
       canvas.toBlob((blob) => resolve(blob), "image/png")
     }
     img.onerror = () => resolve(null)
@@ -230,30 +337,125 @@ export async function buildAndDownloadZip(
     ? `data:image/svg+xml;utf8,${encodeURIComponent(options.svgContent)}`
     : options.rasterDataUri
 
+  const intrinsicDims = options.svgContent
+    ? getSvgIntrinsicDimensions(options.svgContent)
+    : null
+  const intrinsicWidth = intrinsicDims?.width
+  const intrinsicHeight = intrinsicDims?.height
+
   if (logosFolder && imageSource) {
     if (options.isVector && options.svgContent) {
       logosFolder.file(`${slug}-logo-master.svg`, options.svgContent)
-      if (faviconsFolder) {
-        faviconsFolder.file("favicon.svg", options.svgContent)
+    }
+
+    // 1. High-resolution raster fallbacks at natural aspect ratio (no letterbox, no distortion)
+    const blobNative = await renderToPngBlob(imageSource, 1600, 1600, {
+      fit: "native",
+      intrinsicWidth,
+      intrinsicHeight,
+    })
+    if (blobNative) {
+      logosFolder.file(`${slug}-logo-primary.png`, blobNative)
+    }
+
+    const blobNative2x = await renderToPngBlob(imageSource, 3200, 3200, {
+      fit: "native",
+      intrinsicWidth,
+      intrinsicHeight,
+    })
+    if (blobNative2x) {
+      logosFolder.file(`${slug}-logo-primary-2x.png`, blobNative2x)
+    }
+
+    // 2. Square container variants (512x512 and 1024x1024) with proportional contain and safe breathing room
+    const blob512 = await renderToPngBlob(imageSource, 512, 512, {
+      fit: "contain",
+      paddingPercent: 0.08,
+      intrinsicWidth,
+      intrinsicHeight,
+    })
+    if (blob512) {
+      logosFolder.file(`${slug}-logo-square-512x512.png`, blob512)
+    }
+
+    const blob1024 = await renderToPngBlob(imageSource, 1024, 1024, {
+      fit: "contain",
+      paddingPercent: 0.08,
+      intrinsicWidth,
+      intrinsicHeight,
+    })
+    if (blob1024) {
+      logosFolder.file(`${slug}-logo-square-1024x1024.png`, blob1024)
+    }
+
+    // 3. Secondary mark or icon lockup if available
+    const secondarySource = options.secondarySvgContent
+      ? `data:image/svg+xml;utf8,${encodeURIComponent(options.secondarySvgContent)}`
+      : options.secondaryRasterDataUri
+
+    const secDims = options.secondarySvgContent
+      ? getSvgIntrinsicDimensions(options.secondarySvgContent)
+      : null
+
+    if (secondarySource) {
+      if (options.secondarySvgContent) {
+        logosFolder.file(`${slug}-mark-master.svg`, options.secondarySvgContent)
+      }
+
+      const secBlobNative = await renderToPngBlob(secondarySource, 1200, 1200, {
+        fit: "native",
+        intrinsicWidth: secDims?.width,
+        intrinsicHeight: secDims?.height,
+      })
+      if (secBlobNative) {
+        logosFolder.file(`${slug}-mark-primary.png`, secBlobNative)
+      }
+
+      const secBlob512 = await renderToPngBlob(secondarySource, 512, 512, {
+        fit: "contain",
+        paddingPercent: 0.08,
+        intrinsicWidth: secDims?.width,
+        intrinsicHeight: secDims?.height,
+      })
+      if (secBlob512) {
+        logosFolder.file(`${slug}-mark-square-512x512.png`, secBlob512)
       }
     }
 
-    // Generate high-res raster fallbacks (1x, 2x, 4x)
-    const blob1x = await renderToPngBlob(imageSource, 512, 512)
-    if (blob1x) logosFolder.file(`${slug}-logo-512x512.png`, blob1x)
-
-    const blob1024 = await renderToPngBlob(imageSource, 1024, 1024)
-    if (blob1024) logosFolder.file(`${slug}-logo-1024x1024.png`, blob1024)
-
-    // Generate favicons (16, 32, 180 Apple Touch Icon)
+    // 4. Favicon generation (uses secondary mark if present for high optical clarity, else primary)
     if (faviconsFolder) {
-      const fav16 = await renderToPngBlob(imageSource, 16, 16)
+      const favSource = secondarySource || imageSource
+      const favDims = secondarySource ? secDims : intrinsicDims
+
+      if (options.isVector) {
+        const favSvgContent = options.secondarySvgContent || options.svgContent
+        if (favSvgContent) {
+          faviconsFolder.file("favicon.svg", favSvgContent)
+        }
+      }
+
+      const fav16 = await renderToPngBlob(favSource, 16, 16, {
+        fit: "contain",
+        paddingPercent: 0.06,
+        intrinsicWidth: favDims?.width,
+        intrinsicHeight: favDims?.height,
+      })
       if (fav16) faviconsFolder.file("favicon-16x16.png", fav16)
 
-      const fav32 = await renderToPngBlob(imageSource, 32, 32)
+      const fav32 = await renderToPngBlob(favSource, 32, 32, {
+        fit: "contain",
+        paddingPercent: 0.06,
+        intrinsicWidth: favDims?.width,
+        intrinsicHeight: favDims?.height,
+      })
       if (fav32) faviconsFolder.file("favicon-32x32.png", fav32)
 
-      const appleTouch = await renderToPngBlob(imageSource, 180, 180)
+      const appleTouch = await renderToPngBlob(favSource, 180, 180, {
+        fit: "contain",
+        paddingPercent: 0.08,
+        intrinsicWidth: favDims?.width,
+        intrinsicHeight: favDims?.height,
+      })
       if (appleTouch) faviconsFolder.file("apple-touch-icon.png", appleTouch)
 
       faviconsFolder.file(

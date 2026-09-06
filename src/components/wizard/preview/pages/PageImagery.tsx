@@ -89,16 +89,16 @@ export function PageImagery({
       displayFont={displayFont}
       bodyFont={bodyFont}
       monoFont={monoFont}
-      className="overflow-hidden border border-zinc-200 bg-white p-12 text-black shadow-2xl"
+      className="overflow-hidden border border-zinc-200 bg-white p-12 text-primary-900 shadow-2xl"
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Header Section */}
         <div className="space-y-3 pt-2">
           <div className="space-y-2">
-            <h2 className="text-4xl font-bold text-black uppercase sm:text-5xl">
+            <h2 className="text-primary-900 uppercase">
               IMAGERY &amp; ART DIRECTION
             </h2>
-            <div className="h-0.5 w-16 bg-black" />
+            <div className="h-0.5 w-16 bg-zinc-500" />
           </div>
 
           <p className="max-w-xl text-zinc-600">
@@ -114,20 +114,20 @@ export function PageImagery({
           {/* Active Mood Specification Bar */}
           <div className="flex items-baseline justify-between pb-3">
             <div className="space-y-0.5">
-              <span className="font-mono text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
+              <span className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
                 Art Direction Aesthetic
               </span>
-              <div className="text-2xl font-bold text-black">
+              <div className="text-2xl font-bold text-primary-900">
                 {moodInfo.title}
               </div>
             </div>
 
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <span className="block font-mono text-[10px] text-zinc-400 uppercase">
+                <span className="block text-[10px] text-zinc-400 uppercase">
                   Lighting Caliber
                 </span>
-                <span className="font-mono text-xs font-bold text-zinc-800">
+                <span className="text-xs font-bold text-zinc-800">
                   {moodInfo.lighting}
                 </span>
               </div>
@@ -153,7 +153,7 @@ export function PageImagery({
                     />
                   )}
                 </div>
-                <div className="flex items-center justify-between font-mono text-[10px] text-zinc-400">
+                <div className="flex items-center justify-between text-[10px] text-zinc-400">
                   <span>01 / Atmospheric Hero Specimen</span>
                   <span>16:9 Landscape</span>
                 </div>
@@ -174,7 +174,7 @@ export function PageImagery({
                     />
                   )}
                 </div>
-                <div className="flex items-center justify-between font-mono text-[10px] text-zinc-400">
+                <div className="flex items-center justify-between text-[10px] text-zinc-400">
                   <span>02 / Texture &amp; Form</span>
                   <span>4:5 Portrait</span>
                 </div>
@@ -197,7 +197,7 @@ export function PageImagery({
                     />
                   )}
                 </div>
-                <div className="flex items-center justify-between font-mono text-[10px] text-zinc-400">
+                <div className="flex items-center justify-between text-[10px] text-zinc-400">
                   <span>03 / Environment</span>
                   <span>Context</span>
                 </div>
@@ -217,7 +217,7 @@ export function PageImagery({
                     />
                   )}
                 </div>
-                <div className="flex items-center justify-between font-mono text-[10px] text-zinc-400">
+                <div className="flex items-center justify-between text-[10px] text-zinc-400">
                   <span>04 / Atmosphere</span>
                   <span>Lighting</span>
                 </div>
@@ -237,7 +237,7 @@ export function PageImagery({
                     />
                   )}
                 </div>
-                <div className="flex items-center justify-between font-mono text-[10px] text-zinc-400">
+                <div className="flex items-center justify-between text-[10px] text-zinc-400">
                   <span>05 / Perspective</span>
                   <span>Geometry</span>
                 </div>
@@ -248,17 +248,17 @@ export function PageImagery({
 
         {/* Art Direction Principles & Production Governance (3 Columns) */}
         <div className="space-y-2 pt-4">
-          <div className="flex items-center justify-between border-b border-zinc-200 pb-1 font-mono text-[10px] text-zinc-400 uppercase">
+          <div className="flex items-center justify-between border-b border-zinc-200 pb-1 text-[10px] text-zinc-400 uppercase">
             <span>Art Direction Principles</span>
             <span>Production Standards</span>
           </div>
 
           <div className="grid grid-cols-3 gap-6 pt-1">
             <div className="space-y-1">
-              <div className="font-mono text-[10px] font-semibold text-zinc-400 uppercase">
+              <div className="text-[10px] font-semibold text-zinc-400 uppercase">
                 01 Lighting &amp; Exposure
               </div>
-              <div className="text-xs font-bold text-black">
+              <div className="text-xs font-bold text-primary-900">
                 Natural Diffused Light
               </div>
               <p className="text-[11px] text-zinc-600">
@@ -269,10 +269,10 @@ export function PageImagery({
             </div>
 
             <div className="space-y-1">
-              <div className="font-mono text-[10px] font-semibold text-zinc-400 uppercase">
+              <div className="text-[10px] font-semibold text-zinc-400 uppercase">
                 02 Framing &amp; Balance
               </div>
-              <div className="text-xs font-bold text-black">
+              <div className="text-xs font-bold text-primary-900">
                 Deliberate Negative Space
               </div>
               <p className="text-[11px] text-zinc-600">
@@ -283,10 +283,10 @@ export function PageImagery({
             </div>
 
             <div className="space-y-1">
-              <div className="font-mono text-[10px] font-semibold text-zinc-400 uppercase">
+              <div className="text-[10px] font-semibold text-zinc-400 uppercase">
                 03 Material Authenticity
               </div>
-              <div className="text-xs font-bold text-black">
+              <div className="text-xs font-bold text-primary-900">
                 Tactile Texture Fidelity
               </div>
               <p className="text-[11px] text-zinc-600">
@@ -306,7 +306,7 @@ export function PageImagery({
               property are attributed to their respective creators.
             </span>
           </div>
-          <span className="font-mono text-zinc-400">Unsplash License</span>
+          <span className="text-zinc-400">Unsplash License</span>
         </div>
       </div>
     </A4PageFrame>

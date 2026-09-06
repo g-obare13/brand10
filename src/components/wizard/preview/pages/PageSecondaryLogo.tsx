@@ -42,16 +42,14 @@ export function PageSecondaryLogo({
       bodyFont={bodyFont}
       monoFont={monoFont}
       websiteUrl={websiteUrl}
-      className="overflow-hidden border border-zinc-200 bg-white p-12 text-black shadow-2xl"
+      className="overflow-hidden border border-zinc-200 bg-white p-12 text-primary-900 shadow-2xl"
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Title & Introduction */}
         <div className="space-y-3 pt-2">
           <div className="space-y-2">
-            <h2 className="text-4xl font-bold text-black uppercase sm:text-5xl">
-              SECONDARY LOCKUP
-            </h2>
-            <div className="h-0.5 w-16 bg-black" />
+            <h2 className="text-primary-900 uppercase"> SECONDARY MARK</h2>
+            <div className="h-0.5 w-16 bg-zinc-500" />
           </div>
 
           <p className="max-w-xl text-zinc-600">
@@ -133,7 +131,7 @@ export function PageSecondaryLogo({
 
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-1">
-              <div className="text-xs font-bold text-black">
+              <div className="text-xs font-bold text-primary-900">
                 Horizontal Viewports
               </div>
               <p className="text-[11px] text-zinc-600">
@@ -143,7 +141,7 @@ export function PageSecondaryLogo({
             </div>
 
             <div className="space-y-1">
-              <div className="text-xs font-bold text-black">
+              <div className="text-xs font-bold text-primary-900">
                 Proportional Scaling
               </div>
               <p className="text-[11px] text-zinc-600">
@@ -153,7 +151,7 @@ export function PageSecondaryLogo({
             </div>
 
             <div className="space-y-1">
-              <div className="text-xs font-bold text-black">
+              <div className="text-xs font-bold text-primary-900">
                 Exclusion Geometry
               </div>
               <p className="text-[11px] text-zinc-600">

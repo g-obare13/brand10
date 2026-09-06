@@ -40,16 +40,14 @@ export function PageTypographyBody({
       displayFont={displayFamily}
       bodyFont={bodyFamily}
       monoFont={monoFont}
-      className="overflow-hidden border border-zinc-200 bg-white p-12 text-black shadow-2xl"
+      className="overflow-hidden border border-zinc-200 bg-white p-12 text-primary-900 shadow-2xl"
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Title & Introduction */}
         <div className="space-y-3 pt-2">
           <div className="space-y-2">
-            <h2 className="text-4xl font-bold text-black uppercase sm:text-5xl">
-              BODY &amp; INTERFACE
-            </h2>
-            <div className="h-0.5 w-16 bg-black" />
+            <h2 className="text-primary-900 uppercase">BODY &amp; INTERFACE</h2>
+            <div className="h-0.5 w-16 bg-zinc-500" />
           </div>
 
           <p className="max-w-xl text-zinc-600">
@@ -65,11 +63,11 @@ export function PageTypographyBody({
           {/* Primary Body Typeface Header Row */}
           <div className="flex items-baseline justify-between border-b border-zinc-200 pb-3">
             <div className="space-y-0.5">
-              <span className="font-mono text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
+              <span className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
                 Primary Body Typeface
               </span>
               <div
-                className="text-3xl font-bold text-black"
+                className="text-3xl font-bold text-primary-900"
                 style={{ fontFamily: `"${bodyFamily}", sans-serif` }}
               >
                 {bodyFamily}
@@ -78,10 +76,10 @@ export function PageTypographyBody({
 
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <span className="block font-mono text-[10px] text-zinc-400 uppercase">
+                <span className="block text-[10px] text-zinc-400 uppercase">
                   Default Base &amp; Leading
                 </span>
-                <span className="font-mono text-xs font-bold text-zinc-800">
+                <span className="text-xs font-bold text-zinc-800">
                   {baseFontSize}px / 1.60 Leading
                 </span>
               </div>
@@ -93,7 +91,7 @@ export function PageTypographyBody({
 
           {/* Weight Spectrum - Clean Flat Grid with Dividing Rules */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between border-b border-zinc-200 pb-1.5 font-mono text-[10px] text-zinc-400 uppercase">
+            <div className="flex items-center justify-between border-b border-zinc-200 pb-1.5 text-[10px] text-zinc-400 uppercase">
               <span>Weight Spectrum</span>
               <span>Application &amp; Optical Function</span>
             </div>
@@ -101,76 +99,76 @@ export function PageTypographyBody({
             <div className="grid grid-cols-2 gap-x-8 gap-y-3 pt-1">
               {/* Regular 400 */}
               <div className="space-y-1 border-b border-zinc-100 pb-2.5">
-                <div className="flex items-center justify-between font-mono text-[10px]">
+                <div className="flex items-center justify-between text-[10px]">
                   <span className="font-semibold text-zinc-500 uppercase">
                     Regular 400
                   </span>
                   <span className="text-zinc-400">Continuous Prose</span>
                 </div>
                 <div
-                  className="text-base font-normal text-black"
+                  className="text-base font-normal text-primary-900"
                   style={{ fontFamily: `"${bodyFamily}", sans-serif` }}
                 >
                   Clear long-form readability and balanced optical texture.
                 </div>
-                <div className="font-mono text-[10px] text-zinc-500">
+                <div className="text-[10px] text-zinc-500">
                   Editorial articles, narrative descriptions, documentation
                 </div>
               </div>
 
               {/* Medium 500 */}
               <div className="space-y-1 border-b border-zinc-100 pb-2.5">
-                <div className="flex items-center justify-between font-mono text-[10px]">
+                <div className="flex items-center justify-between text-[10px]">
                   <span className="font-semibold text-zinc-500 uppercase">
                     Medium 500
                   </span>
                   <span className="text-zinc-400">UI &amp; Lists</span>
                 </div>
                 <div
-                  className="text-base font-medium text-black"
+                  className="text-base font-medium text-primary-900"
                   style={{ fontFamily: `"${bodyFamily}", sans-serif` }}
                 >
                   Elevated legibility for dense interface environments.
                 </div>
-                <div className="font-mono text-[10px] text-zinc-500">
+                <div className="text-[10px] text-zinc-500">
                   Form controls, navigation links, table cells, bullet points
                 </div>
               </div>
 
               {/* SemiBold 600 */}
               <div className="space-y-1 border-b border-zinc-100 pb-2.5">
-                <div className="flex items-center justify-between font-mono text-[10px]">
+                <div className="flex items-center justify-between text-[10px]">
                   <span className="font-semibold text-zinc-500 uppercase">
                     SemiBold 600
                   </span>
                   <span className="text-zinc-400">Interactive</span>
                 </div>
                 <div
-                  className="text-base font-semibold text-black"
+                  className="text-base font-semibold text-primary-900"
                   style={{ fontFamily: `"${bodyFamily}", sans-serif` }}
                 >
                   Direct typographic emphasis without excessive weight.
                 </div>
-                <div className="font-mono text-[10px] text-zinc-500">
+                <div className="text-[10px] text-zinc-500">
                   Button actions, card headings, accordion triggers, badges
                 </div>
               </div>
 
               {/* Bold 700 */}
               <div className="space-y-1 border-b border-zinc-100 pb-2.5">
-                <div className="flex items-center justify-between font-mono text-[10px]">
+                <div className="flex items-center justify-between text-[10px]">
                   <span className="font-semibold text-zinc-500 uppercase">
                     Bold 700
                   </span>
                   <span className="text-zinc-400">Callouts</span>
                 </div>
                 <div
-                  className="text-base font-bold text-black"
+                  className="text-base font-bold text-primary-900"
                   style={{ fontFamily: `"${bodyFamily}", sans-serif` }}
                 >
                   High contrast accents and prominent structural anchors.
                 </div>
-                <div className="font-mono text-[10px] text-zinc-500">
+                <div className="text-[10px] text-zinc-500">
                   Key performance metrics, pull quotes, lead callout boxes
                 </div>
               </div>
@@ -179,7 +177,7 @@ export function PageTypographyBody({
 
           {/* Reading Prose Specimen - Clean Editorial Block */}
           <div className="space-y-2 pt-1">
-            <div className="flex items-center justify-between border-b border-zinc-200 pb-1.5 font-mono text-[10px] text-zinc-400 uppercase">
+            <div className="flex items-center justify-between border-b border-zinc-200 pb-1.5 text-[10px] text-zinc-400 uppercase">
               <span>Editorial Reading Specimen</span>
               <span>Base: {baseFontSize}px / 1.60 Leading</span>
             </div>
@@ -226,7 +224,7 @@ export function PageTypographyBody({
 
           {/* Complete Glyph Set in Body Font - Clean Flat Section */}
           <div className="space-y-1.5 pt-1">
-            <div className="flex items-center justify-between border-b border-zinc-200 pb-1 font-mono text-[10px] text-zinc-400 uppercase">
+            <div className="flex items-center justify-between border-b border-zinc-200 pb-1 text-[10px] text-zinc-400 uppercase">
               <span>Character &amp; Symbol Specimen ({bodyFamily})</span>
               <span>UTF-8 Standard</span>
             </div>
@@ -240,7 +238,7 @@ export function PageTypographyBody({
               <div className="pt-0.5 font-normal tracking-widest">
                 a b c d e f g h i j k l m n o p q r s t u v w x y z
               </div>
-              <div className="pt-0.5 font-mono text-[10px] tracking-wider text-zinc-500">
+              <div className="pt-0.5 text-[10px] tracking-wider text-zinc-500">
                 0 1 2 3 4 5 6 7 8 9 &amp; @ # $ % ! ? / ( ) [ ] &#123; &#125; ,
                 . ; : &quot; &apos; - + =
               </div>

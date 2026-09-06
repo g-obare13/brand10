@@ -130,22 +130,21 @@ export function PageColors({
       displayFont={displayFont}
       bodyFont={bodyFont}
       monoFont={monoFont}
-      className="overflow-hidden border border-zinc-200 bg-white p-12 text-black shadow-2xl"
+      className="overflow-hidden border border-zinc-200 bg-white p-12 text-primary-900 shadow-2xl"
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Title & Introduction */}
         <div className="space-y-3 pt-2">
           <div className="space-y-2">
-            <h2 className="text-4xl font-bold text-black uppercase sm:text-5xl">
-              COLOR PALETTE
-            </h2>
-            <div className="h-0.5 w-16 bg-black" />
+            <h2 className="text-primary-900 uppercase"> COLOR PALETTE</h2>
+            <div className="h-0.5 w-16 bg-zinc-500" />
           </div>
 
           <p className="max-w-xl text-zinc-600">
             The core chromatic system extracted from the brandmark geometry.
-            Each dominant color is expanded into an 11-step mathematical tonal scale
-            to ensure contrast accessibility and consistent visual hierarchy.
+            Each dominant color is expanded into an 11-step mathematical tonal
+            scale to ensure contrast accessibility and consistent visual
+            hierarchy.
           </p>
         </div>
 
@@ -166,7 +165,7 @@ export function PageColors({
                 {/* Header: Label, Role Badge & Hex */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <span className="text-base font-semibold text-black">
+                    <span className="text-base font-semibold text-primary-900">
                       {label}
                     </span>
                     <Badge variant="outline" className="rounded-full">
@@ -227,48 +226,50 @@ export function PageColors({
         </div>
 
         {/* Chromatic Specifications */}
-        <div className="space-y-3 pt-5">
-          <div className="flex items-center justify-between">
-            <div className="text-xs font-bold text-zinc-500 uppercase">
-              Chromatic Specifications
+        {displaySwatches.length >= 3 && (
+          <div className="space-y-3 pt-5">
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-bold text-zinc-500 uppercase">
+                Chromatic Specifications
+              </div>
+              <span className="text-[11px] font-medium text-zinc-400">
+                Scale Distribution
+              </span>
             </div>
-            <span className="text-[11px] font-medium text-zinc-400">
-              Scale Distribution
-            </span>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-1">
+                <div className="text-xs font-bold text-primary-900">
+                  Contrast Compliance
+                </div>
+                <p className="text-[11px] text-zinc-600">
+                  Ensure minimum 4.5:1 contrast against background values for
+                  all body copy and text elements.
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <div className="text-xs font-bold text-primary-900">
+                  Tonal Interpolation
+                </div>
+                <p className="text-[11px] text-zinc-600">
+                  Step values from 50 (light surface tint) to 950 (deep shadow
+                  tone) provide seamless dark and light modes.
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <div className="text-xs font-bold text-primary-900">
+                  Dominant Hierarchy
+                </div>
+                <p className="text-[11px] text-zinc-600">
+                  Primary hue anchors brand awareness across main interactive
+                  touchpoints and primary surfaces.
+                </p>
+              </div>
+            </div>
           </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-1">
-              <div className="text-xs font-bold text-black">
-                Contrast Compliance
-              </div>
-              <p className="text-[11px] text-zinc-600">
-                Ensure minimum 4.5:1 contrast against background values for all
-                body copy and text elements.
-              </p>
-            </div>
-
-            <div className="space-y-1">
-              <div className="text-xs font-bold text-black">
-                Tonal Interpolation
-              </div>
-              <p className="text-[11px] text-zinc-600">
-                Step values from 50 (light surface tint) to 950 (deep shadow tone)
-                provide seamless dark and light modes.
-              </p>
-            </div>
-
-            <div className="space-y-1">
-              <div className="text-xs font-bold text-black">
-                Dominant Hierarchy
-              </div>
-              <p className="text-[11px] text-zinc-600">
-                Primary hue anchors brand awareness across main interactive
-                touchpoints and primary surfaces.
-              </p>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </A4PageFrame>
   )
