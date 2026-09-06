@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge"
 import type { PreviewStyleId } from "./A4PageFrame"
 import { A4PageFrame } from "./A4PageFrame"
 import { getPdfTheme } from "./pdfPageTheme"
+import type { ColorSwatch } from "@/lib/colorUtils"
 
 interface PageTypographyBodyProps {
   brandName: string
@@ -13,6 +14,7 @@ interface PageTypographyBodyProps {
   styleTheme: PreviewStyleId
   pageNumber?: number
   totalPages?: number
+  colors?: ColorSwatch[]
 }
 
 export function PageTypographyBody({
@@ -25,6 +27,7 @@ export function PageTypographyBody({
   styleTheme,
   pageNumber = 9,
   totalPages = 10,
+  colors,
 }: PageTypographyBodyProps) {
   const theme = getPdfTheme(styleTheme)
   const isExpressive = theme.isExpressive
@@ -47,6 +50,7 @@ export function PageTypographyBody({
       bodyFont={bodyFamily}
       monoFont={monoFont}
       className={theme.pageFrame}
+      colors={colors}
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Title & Introduction */}
@@ -150,7 +154,7 @@ export function PageTypographyBody({
                   Secondary / Reading Voice
                 </Badge>
               ) : (
-                <Badge variant="outline" className="text-xs">
+                <Badge className={theme.badgeOutline}>
                   Secondary / Reading Voice
                 </Badge>
               )}

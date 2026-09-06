@@ -3,6 +3,7 @@ import { A4PageFrame } from "./A4PageFrame"
 import { BlueprintFrame } from "./BlueprintFrame"
 import { Badge } from "@/components/ui/badge"
 import { getPdfTheme } from "./pdfPageTheme"
+import type { ColorSwatch } from "@/lib/colorUtils"
 
 interface PageSecondaryLogoProps {
   brandName: string
@@ -16,6 +17,7 @@ interface PageSecondaryLogoProps {
   pageNumber?: number
   totalPages?: number
   websiteUrl?: string
+  colors?: ColorSwatch[]
 }
 
 export function PageSecondaryLogo({
@@ -30,6 +32,7 @@ export function PageSecondaryLogo({
   pageNumber = 5,
   totalPages = 9,
   websiteUrl,
+  colors,
 }: PageSecondaryLogoProps) {
   const theme = getPdfTheme(styleTheme)
   const isExpressive = theme.isExpressive
@@ -50,6 +53,7 @@ export function PageSecondaryLogo({
       monoFont={monoFont}
       websiteUrl={websiteUrl}
       className={theme.pageFrame}
+      colors={colors}
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Title & Introduction */}
@@ -135,7 +139,7 @@ export function PageSecondaryLogo({
               }
             >
               {isExpressive ? (
-                <Badge className="mb-2 border-2 border-black bg-amber-300 text-black font-black uppercase text-[10px] shadow-[2px_2px_0px_0px_#000] rounded-md">
+                <Badge className="mb-2 border-2 border-black pdf-badge-expressive-primary font-black uppercase text-[10px] shadow-[2px_2px_0px_0px_#000] rounded-md">
                   Light Presentation
                 </Badge>
               ) : isSoftTactility ? (
@@ -175,7 +179,7 @@ export function PageSecondaryLogo({
               }
             >
               {isExpressive ? (
-                <Badge className="mb-2 border-2 border-white bg-lime-300 text-black font-black uppercase text-[10px] shadow-[2px_2px_0px_0px_#fff] rounded-md">
+                <Badge className="mb-2 border-2 border-white pdf-badge-expressive-secondary font-black uppercase text-[10px] shadow-[2px_2px_0px_0px_#fff] rounded-md">
                   Dark Contrast Reversed
                 </Badge>
               ) : isSoftTactility ? (

@@ -51,6 +51,7 @@ export function PdfDocumentPagesList({ styleTheme }: PdfDocumentPagesListProps) 
         displayFont={brand.displayFont}
         bodyFont={brand.bodyFont}
         monoFont={brand.monoFont}
+        colors={brand.colorPalette}
       />
 
       {/* Page 2: Table of Contents */}
@@ -61,6 +62,7 @@ export function PdfDocumentPagesList({ styleTheme }: PdfDocumentPagesListProps) 
         bodyFont={brand.bodyFont}
         monoFont={brand.monoFont}
         totalPages={totalPages}
+        colors={brand.colorPalette}
       />
 
       {/* Page 3: Brand Strategy & Foundation */}
@@ -77,6 +79,7 @@ export function PdfDocumentPagesList({ styleTheme }: PdfDocumentPagesListProps) 
         monoFont={brand.monoFont}
         pageNumber={3}
         totalPages={totalPages}
+        colors={brand.colorPalette}
       />
 
       {/* Page 4: Primary Logo System & Geometry */}
@@ -92,6 +95,7 @@ export function PdfDocumentPagesList({ styleTheme }: PdfDocumentPagesListProps) 
         monoFont={brand.monoFont}
         pageNumber={4}
         totalPages={totalPages}
+        colors={brand.colorPalette}
       />
 
       {/* Page 5: Secondary Logo & Lockup (Rendered on its own page if it exists) */}
@@ -107,6 +111,7 @@ export function PdfDocumentPagesList({ styleTheme }: PdfDocumentPagesListProps) 
           monoFont={brand.monoFont}
           pageNumber={5}
           totalPages={totalPages}
+          colors={brand.colorPalette}
         />
       )}
 
@@ -145,6 +150,7 @@ export function PdfDocumentPagesList({ styleTheme }: PdfDocumentPagesListProps) 
         styleTheme={styleTheme}
         pageNumber={hasSecondaryLogo ? 8 : 7}
         totalPages={totalPages}
+        colors={brand.colorPalette}
       />
 
       {/* Page 8 or 9: Typography - Body & Interface System */}
@@ -158,6 +164,7 @@ export function PdfDocumentPagesList({ styleTheme }: PdfDocumentPagesListProps) 
         styleTheme={styleTheme}
         pageNumber={hasSecondaryLogo ? 9 : 8}
         totalPages={totalPages}
+        colors={brand.colorPalette}
       />
 
       {/* Page 9 or 10: Imagery & Mood Direction */}
@@ -173,6 +180,7 @@ export function PdfDocumentPagesList({ styleTheme }: PdfDocumentPagesListProps) 
         monoFont={brand.monoFont}
         pageNumber={hasSecondaryLogo ? 10 : 9}
         totalPages={totalPages}
+        colors={brand.colorPalette}
       />
 
       {/* Page 10 or 11: Back Cover Page */}
@@ -190,6 +198,7 @@ export function PdfDocumentPagesList({ styleTheme }: PdfDocumentPagesListProps) 
         monoFont={brand.monoFont}
         pageNumber={hasSecondaryLogo ? 11 : 10}
         totalPages={totalPages}
+        colors={brand.colorPalette}
       />
     </>
   )

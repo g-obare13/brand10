@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge"
 import type { PreviewStyleId } from "./A4PageFrame"
 import { A4PageFrame } from "./A4PageFrame"
 import { getPdfTheme } from "./pdfPageTheme"
+import type { ColorSwatch } from "@/lib/colorUtils"
 
 interface PageTypographyProps {
   brandName: string
@@ -13,6 +14,7 @@ interface PageTypographyProps {
   styleTheme: PreviewStyleId
   pageNumber?: number
   totalPages?: number
+  colors?: ColorSwatch[]
 }
 
 function getRatioName(ratio: number): string {
@@ -33,6 +35,7 @@ export function PageTypography({
   styleTheme,
   pageNumber = 7,
   totalPages = 10,
+  colors,
 }: PageTypographyProps) {
   const theme = getPdfTheme(styleTheme)
   const isExpressive = theme.isExpressive
@@ -67,6 +70,7 @@ export function PageTypography({
       bodyFont={bodyFamily}
       monoFont={monoFamily}
       className={theme.pageFrame}
+      colors={colors}
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Title & Introduction */}
@@ -155,7 +159,7 @@ export function PageTypography({
                     {getRatioName(ratio)}
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="text-xs">
+                  <Badge className={theme.badgeOutline}>
                     {getRatioName(ratio)}
                   </Badge>
                 )}

@@ -1,6 +1,11 @@
 import React from "react"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
+import type { ColorSwatch } from "@/lib/colorUtils"
+import {
+  getPdfColorVariables,
+  resolvePdfColorMatrix,
+} from "./pdfColorMatrix"
 
 export type PreviewStyleId =
   | "quiet-precision"
@@ -27,6 +32,7 @@ interface A4PageFrameProps {
   isCover?: boolean
   websiteUrl?: string
   className?: string
+  colors?: ColorSwatch[]
 }
 
 /**
@@ -49,10 +55,14 @@ export function A4PageFrame({
   isCover = false,
   websiteUrl: _websiteUrl = "www.brand10.vercel.app",
   className,
+  colors,
 }: A4PageFrameProps) {
   const isExpressive = styleTheme === "expressive-energy"
   const isSoftTactility = styleTheme === "soft-tactility"
   const isEditorial = styleTheme === "editorial-character"
+
+  const resolvedColors = resolvePdfColorMatrix(colors)
+  const colorVars = getPdfColorVariables(resolvedColors)
 
   // Determine page theme classes based on selected style
   const themeStyles: Record<
@@ -124,6 +134,7 @@ export function A4PageFrame({
     <div
       id={id}
       data-page={pageNumber}
+      data-pdf-page="true"
       className={cn(
         "preview-a4-page relative mx-auto flex flex-col justify-between overflow-hidden shadow-2xl transition-all duration-300 print:m-0 print:shadow-none",
         "h-[1123px] max-h-[1123px] min-h-[1123px] w-[794px] max-w-[794px] min-w-[794px] p-12",
@@ -142,6 +153,7 @@ export function A4PageFrame({
           "--active-display-font": `"${displayFont}", sans-serif`,
           "--active-body-font": `"${bodyFont}", sans-serif`,
           "--active-mono-font": `"${monoFont}", monospace`,
+          ...colorVars,
         } as React.CSSProperties
       }
     >
@@ -150,11 +162,11 @@ export function A4PageFrame({
         <header className="shrink-0 space-y-2 pb-2">
           {isExpressive ? (
             <div className="flex items-center justify-between text-xs tracking-tight text-black">
-              <Badge className="rounded-md border-2 border-black bg-amber-300 text-[10px] font-black tracking-wider text-black uppercase shadow-[2px_2px_0px_0px_#000]">
+              <Badge className="rounded-md border-2 border-black pdf-badge-expressive-primary text-[10px] font-black tracking-wider uppercase shadow-[2px_2px_0px_0px_#000]">
                 {sectionTitle || "Brand Guidelines"}
               </Badge>
 
-              <Badge className="rounded-md border-2 border-black bg-lime-300 font-mono text-[10px] font-black text-black shadow-[2px_2px_0px_0px_#000]">
+              <Badge className="rounded-md border-2 border-black pdf-badge-expressive-secondary font-mono text-[10px] font-black shadow-[2px_2px_0px_0px_#000]">
                 {currentYear}
               </Badge>
             </div>
@@ -267,7 +279,7 @@ export function A4PageFrame({
 
             <div>
               {isExpressive ? (
-                <Badge className="rounded-md border-2 border-black bg-lime-300 font-mono text-[10px] font-black text-black shadow-[2px_2px_0px_0px_#000]">
+                <Badge className="rounded-md border-2 border-black pdf-badge-expressive-secondary font-mono text-[10px] font-black shadow-[2px_2px_0px_0px_#000]">
                   {pageNumber.toString().padStart(2, "0")} /{" "}
                   {totalPages.toString().padStart(2, "0")}
                 </Badge>

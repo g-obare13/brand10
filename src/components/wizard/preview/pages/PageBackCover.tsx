@@ -2,6 +2,8 @@ import type { PreviewStyleId } from "./A4PageFrame"
 import { A4PageFrame } from "./A4PageFrame"
 import { Badge } from "@/components/ui/badge"
 import { getPdfTheme } from "./pdfPageTheme"
+import type { ColorSwatch } from "@/lib/colorUtils"
+import { getPerceptualTextColor } from "./pdfColorMatrix"
 
 interface PageBackCoverProps {
   brandName: string
@@ -18,6 +20,7 @@ interface PageBackCoverProps {
   pageNumber?: number
   totalPages?: number
   websiteUrl?: string
+  colors?: ColorSwatch[]
 }
 
 export function PageBackCover({
@@ -34,12 +37,14 @@ export function PageBackCover({
   pageNumber = 10,
   totalPages = 10,
   websiteUrl = "www.brand10.vercel.app",
+  colors,
 }: PageBackCoverProps) {
   const currentYear = new Date().getFullYear()
   const theme = getPdfTheme(styleTheme)
   const isExpressive = theme.isExpressive
   const isSoftTactility = theme.isSoftTactility
   const isEditorial = theme.isEditorial
+  const logoLetterColor = getPerceptualTextColor(primaryColor || "#18181b")
 
   const pageFrameClass = isExpressive
     ? "overflow-hidden border-2 border-black bg-white p-0 shadow-2xl"
@@ -62,6 +67,7 @@ export function PageBackCover({
       isCover
       websiteUrl={websiteUrl}
       className={pageFrameClass}
+      colors={colors}
     >
       <div
         className={
@@ -112,14 +118,17 @@ export function PageBackCover({
                 <div
                   className={
                     isExpressive
-                      ? "flex size-12 shrink-0 items-center justify-center rounded-xl border-2 border-black text-lg font-black text-white shadow-[2px_2px_0px_0px_#000]"
+                      ? "flex size-12 shrink-0 items-center justify-center rounded-xl border-2 border-black text-lg font-black shadow-[2px_2px_0px_0px_#000]"
                       : isSoftTactility
-                        ? "flex size-12 shrink-0 items-center justify-center rounded-2xl border border-stone-200/80 text-lg font-bold text-white shadow-[3px_3px_8px_rgba(0,0,0,0.1)]"
+                        ? "flex size-12 shrink-0 items-center justify-center rounded-2xl border border-stone-200/80 text-lg font-bold shadow-[3px_3px_8px_rgba(0,0,0,0.1)]"
                         : isEditorial
-                          ? "flex size-12 shrink-0 items-center justify-center rounded-none border border-stone-950 text-lg font-bold text-white"
-                          : "flex size-12 shrink-0 items-center justify-center rounded-xl text-lg font-bold text-white shadow-xs"
+                          ? "flex size-12 shrink-0 items-center justify-center rounded-none border border-stone-950 text-lg font-bold"
+                          : "flex size-12 shrink-0 items-center justify-center rounded-xl text-lg font-bold shadow-xs"
                   }
-                  style={{ backgroundColor: primaryColor || "#18181b" }}
+                  style={{
+                    backgroundColor: primaryColor || "#18181b",
+                    color: logoLetterColor,
+                  }}
                 >
                   {(brandName || "B").charAt(0).toUpperCase()}
                 </div>
@@ -185,11 +194,10 @@ export function PageBackCover({
               </h1>
 
               {tagline && (
-                <div
-                  className="inline-block rounded-md border-2 border-black bg-lime-300 px-3 py-1 text-lg font-bold text-black shadow-[2px_2px_0px_0px_#000]"
-                  style={{ fontFamily: `"${displayFont}", sans-serif` }}
-                >
-                  {tagline}
+                <div>
+                  <Badge className="inline-block rounded-md border-2 border-black pdf-badge-expressive-secondary px-3 py-1 text-lg font-black shadow-[2px_2px_0px_0px_#000]">
+                    {tagline}
+                  </Badge>
                 </div>
               )}
             </div>

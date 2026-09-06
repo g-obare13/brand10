@@ -68,13 +68,13 @@ export function getPdfTheme(styleTheme: PreviewStyleId): PdfThemeTokens {
       contrastCardLight:
         "relative flex flex-col items-center justify-center rounded-xl border-2 border-black bg-white p-8 text-black shadow-[4px_4px_0px_0px_#000]",
       badgePrimary:
-        "border-2 border-black bg-amber-300 text-black font-black uppercase tracking-wider text-[10px] shadow-[2px_2px_0px_0px_#000] rounded-md",
+        "border-2 border-black pdf-badge-expressive-primary font-black uppercase tracking-wider text-[10px] shadow-[2px_2px_0px_0px_#000] rounded-md",
       badgeSecondary:
-        "border-2 border-black bg-lime-300 text-black font-black uppercase tracking-wider text-[10px] shadow-[2px_2px_0px_0px_#000] rounded-md",
+        "border-2 border-black pdf-badge-expressive-secondary font-black uppercase tracking-wider text-[10px] shadow-[2px_2px_0px_0px_#000] rounded-md",
       badgeAmber:
-        "border-2 border-black bg-amber-300 text-black font-black uppercase tracking-wider text-[10px] shadow-[2px_2px_0px_0px_#000] rounded-md",
+        "border-2 border-black pdf-badge-expressive-primary font-black uppercase tracking-wider text-[10px] shadow-[2px_2px_0px_0px_#000] rounded-md",
       badgeLime:
-        "border-2 border-black bg-lime-300 text-black font-black uppercase tracking-wider text-[10px] shadow-[2px_2px_0px_0px_#000] rounded-md",
+        "border-2 border-black pdf-badge-expressive-secondary font-black uppercase tracking-wider text-[10px] shadow-[2px_2px_0px_0px_#000] rounded-md",
       badgeOutline:
         "border-2 border-black bg-white text-black font-black uppercase tracking-wider text-[10px] shadow-[2px_2px_0px_0px_#000] rounded-md",
       divider: "border-2 border-black",
@@ -186,11 +186,16 @@ export function getPdfTheme(styleTheme: PreviewStyleId): PdfThemeTokens {
       "relative flex flex-col items-center justify-center rounded-xl bg-zinc-950 p-8 text-white",
     contrastCardLight:
       "relative flex flex-col items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 p-8 text-zinc-900",
-    badgePrimary: "rounded-full",
-    badgeSecondary: "rounded-full",
-    badgeAmber: "rounded-full",
-    badgeLime: "rounded-full",
-    badgeOutline: "rounded-full",
+    badgePrimary:
+      "rounded-full border border-zinc-200 bg-zinc-100 text-zinc-800 text-[10px] font-medium px-2.5 py-0.5",
+    badgeSecondary:
+      "rounded-full border border-zinc-200 bg-zinc-50 text-zinc-600 text-[10px] font-medium px-2.5 py-0.5",
+    badgeAmber:
+      "rounded-full border border-zinc-200 bg-zinc-100 text-zinc-800 text-[10px] font-medium px-2.5 py-0.5",
+    badgeLime:
+      "rounded-full border border-zinc-200 bg-zinc-100 text-zinc-800 text-[10px] font-medium px-2.5 py-0.5",
+    badgeOutline:
+      "rounded-full border border-zinc-200 bg-white text-zinc-700 text-[10px] font-medium px-2.5 py-0.5",
     divider: "border-zinc-200",
     borderAccent: "border-primary-900",
     monoLabel: "text-xs font-bold text-zinc-500 uppercase",

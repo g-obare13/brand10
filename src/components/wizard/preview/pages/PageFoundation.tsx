@@ -3,6 +3,7 @@ import type { PreviewStyleId } from "./A4PageFrame"
 import { A4PageFrame } from "./A4PageFrame"
 import { Badge } from "@/components/ui/badge"
 import { getPdfTheme } from "./pdfPageTheme"
+import type { ColorSwatch } from "@/lib/colorUtils"
 
 interface PageFoundationProps {
   brandName: string
@@ -18,6 +19,7 @@ interface PageFoundationProps {
   pageNumber?: number
   totalPages?: number
   websiteUrl?: string
+  colors?: ColorSwatch[]
 }
 
 const DEFAULT_MISSION =
@@ -58,6 +60,7 @@ export function PageFoundation({
   pageNumber = 3,
   totalPages = 8,
   websiteUrl,
+  colors,
 }: PageFoundationProps) {
   const trimmedMission = mission?.trim()
   const trimmedVision = vision?.trim()
@@ -98,7 +101,7 @@ export function PageFoundation({
 
   return (
     <A4PageFrame
-      id="page-foundation"
+      id="page-03"
       pageNumber={pageNumber}
       totalPages={totalPages}
       sectionNumber="01"
@@ -110,6 +113,7 @@ export function PageFoundation({
       monoFont={monoFont}
       websiteUrl={websiteUrl}
       className={theme.pageFrame}
+      colors={colors}
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Page Title & Introductory Statement */}
@@ -257,7 +261,7 @@ export function PageFoundation({
             <div
               className={
                 isExpressive
-                  ? "rounded-lg border-2 border-dashed border-black bg-amber-50 px-4 py-2 text-xs font-medium text-black"
+                  ? "rounded-lg border-2 border-dashed border-black pdf-tint-expressive-primary px-4 py-2 text-xs font-medium text-black"
                   : isSoftTactility
                     ? "rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-4 py-2 text-xs text-stone-600"
                     : isEditorial

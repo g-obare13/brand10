@@ -137,6 +137,7 @@ export function PageColors({
       bodyFont={bodyFont}
       monoFont={monoFont}
       className={theme.pageFrame}
+      colors={colors}
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Title & Introduction */}
@@ -208,7 +209,7 @@ export function PageColors({
                         {swatch.role}
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="rounded-full">
+                      <Badge className={theme.badgeOutline}>
                         {swatch.role}
                       </Badge>
                     )}

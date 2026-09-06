@@ -2,6 +2,7 @@ import type { PreviewStyleId } from "./A4PageFrame"
 import { A4PageFrame } from "./A4PageFrame"
 import { Badge } from "@/components/ui/badge"
 import { getPdfTheme } from "./pdfPageTheme"
+import type { ColorSwatch } from "@/lib/colorUtils"
 
 interface TableOfContentItem {
   num: string
@@ -46,6 +47,7 @@ interface PageTableOfContentsProps {
   totalPages?: number
   websiteUrl?: string
   sections?: TableOfContentItem[]
+  colors?: ColorSwatch[]
 }
 
 export function PageTableOfContents({
@@ -57,6 +59,7 @@ export function PageTableOfContents({
   totalPages = 8,
   websiteUrl = "www.brand10.vercel.app",
   sections = DEFAULT_SECTIONS,
+  colors,
 }: PageTableOfContentsProps) {
   const theme = getPdfTheme(styleTheme)
   const isExpressive = theme.isExpressive
@@ -68,7 +71,8 @@ export function PageTableOfContents({
       id="page-02"
       pageNumber={2}
       totalPages={totalPages}
-      sectionTitle="Table of Contents"
+      sectionNumber="00"
+      sectionTitle="Index of Contents"
       brandName={brandName}
       styleTheme={styleTheme}
       displayFont={displayFont}
@@ -76,6 +80,7 @@ export function PageTableOfContents({
       monoFont={monoFont}
       websiteUrl={websiteUrl}
       className={theme.pageFrame}
+      colors={colors}
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Page Title */}
@@ -111,7 +116,7 @@ export function PageTableOfContents({
             >
               {/* Number Index */}
               {isExpressive ? (
-                <Badge className="flex size-9 shrink-0 items-center justify-center rounded-lg border-2 border-black bg-amber-300 p-0 font-mono text-base font-black text-black shadow-[2px_2px_0px_0px_#000]">
+                <Badge className="flex size-9 shrink-0 items-center justify-center rounded-lg border-2 border-black pdf-badge-expressive-primary p-0 font-mono text-base font-black shadow-[2px_2px_0px_0px_#000]">
                   {item.num}
                 </Badge>
               ) : isSoftTactility ? (

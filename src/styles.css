@@ -376,3 +376,54 @@
   }
 }
 
+/* ==========================================================================
+   PDF Preview Print Isolation: Fixed Print Page - Never Dark Mode Aware
+   ========================================================================== */
+[data-pdf-page],
+.preview-a4-page {
+  color-scheme: light !important;
+  --background: #ffffff;
+  --foreground: #18181b;
+  --card: #ffffff;
+  --card-foreground: #18181b;
+  --popover: #ffffff;
+  --popover-foreground: #18181b;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --primary: #18181b;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --accent: #f4f4f5;
+  --accent-foreground: #18181b;
+  --destructive: #ef4444;
+  --ring: #18181b;
+}
+
+/* PDF Color Matrix Badges & Tints (Using Human Perception APCA Contrast) */
+.pdf-badge-expressive-primary {
+  background-color: var(--pdf-primary, #6366f1) !important;
+  color: var(--pdf-primary-fg, #ffffff) !important;
+}
+
+.pdf-badge-expressive-secondary {
+  background-color: var(--pdf-secondary, #0ea5e9) !important;
+  color: var(--pdf-secondary-fg, #000000) !important;
+}
+
+.pdf-badge-expressive-accent {
+  background-color: var(--pdf-accent, #10b981) !important;
+  color: var(--pdf-accent-fg, #000000) !important;
+}
+
+.pdf-tint-expressive-primary {
+  background-color: var(--pdf-matrix-p50, #f5f3ff) !important;
+}
+
+.pdf-tint-expressive-row {
+  background-color: var(--pdf-matrix-p100, #ede9fe) !important;
+}
+
+

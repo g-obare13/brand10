@@ -3,6 +3,7 @@ import type { PreviewStyleId } from "./A4PageFrame"
 import { A4PageFrame } from "./A4PageFrame"
 import { Badge } from "@/components/ui/badge"
 import { getPdfTheme } from "./pdfPageTheme"
+import type { ColorSwatch } from "@/lib/colorUtils"
 
 interface PageImageryProps {
   brandName: string
@@ -16,6 +17,7 @@ interface PageImageryProps {
   monoFont: string
   pageNumber?: number
   totalPages?: number
+  colors?: ColorSwatch[]
 }
 
 const MOOD_DETAILS: Record<
@@ -64,17 +66,15 @@ export function PageImagery({
   monoFont,
   pageNumber = 10,
   totalPages = 10,
+  colors,
 }: PageImageryProps) {
   const theme = getPdfTheme(styleTheme)
   const isExpressive = theme.isExpressive
   const isSoftTactility = theme.isSoftTactility
   const isEditorial = theme.isEditorial
 
-  const resolvedMood = imageryMood
-
-  const moodInfo = MOOD_DETAILS[resolvedMood]
-
-  const fallbackImages = IMAGERY_MOOD_IMAGE_ARRAYS[resolvedMood]
+  const moodInfo = MOOD_DETAILS[imageryMood]
+  const fallbackImages = IMAGERY_MOOD_IMAGE_ARRAYS[imageryMood]
   const images =
     imageryLinks && imageryLinks.length > 0 ? imageryLinks : fallbackImages
 
@@ -90,45 +90,44 @@ export function PageImagery({
       pageNumber={pageNumber}
       totalPages={totalPages}
       sectionNumber="05"
-      sectionTitle="Imagery &amp; Art Direction"
+      sectionTitle="Imagery & Art Direction"
       brandName={brandName}
       styleTheme={styleTheme}
       displayFont={displayFont}
       bodyFont={bodyFont}
       monoFont={monoFont}
       className={theme.pageFrame}
+      colors={colors}
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Header Section */}
         <div className="space-y-3 pt-2">
           <div className="space-y-2">
-            <h2 className={theme.title}>IMAGERY &amp; ART DIRECTION</h2>
+            <h2 className={theme.title}>ART DIRECTION</h2>
             <div className={theme.accentBar} />
           </div>
 
           <p className={theme.introText}>
-            Visual art direction and photographic treatments establish the
-            atmosphere, tonal fidelity, and human resonance of the brand. Visual
-            assets strictly adhere to architectural framing, natural
-            illumination, and authentic material texture.
+            Visual standards and aesthetic direction for brand photography,
+            ambient tone, and compositional balance across all print and digital
+            surfaces.
           </p>
         </div>
 
-        {/* Content Body */}
-        <div className="my-auto space-y-5 py-2">
-          {/* Active Mood Specification Bar */}
+        {/* Selected Mood Showcase Banner */}
+        <div className="my-auto space-y-4 py-1">
           <div
             className={
               isExpressive
-                ? "flex items-baseline justify-between rounded-xl border-2 border-black bg-white p-4 shadow-[4px_4px_0px_0px_#000]"
+                ? "flex items-center justify-between rounded-xl border-2 border-black bg-white p-4 shadow-[4px_4px_0px_0px_#000]"
                 : isSoftTactility
-                  ? "flex items-baseline justify-between rounded-2xl border border-stone-200/80 bg-white/90 p-4 shadow-[4px_4px_12px_rgba(0,0,0,0.04)]"
+                  ? "flex items-center justify-between rounded-2xl border border-stone-200/80 bg-white/90 p-4 shadow-[4px_4px_16px_rgba(0,0,0,0.04)]"
                   : isEditorial
-                    ? "flex items-baseline justify-between rounded-none border-b border-stone-300 pb-3"
-                    : "flex items-baseline justify-between pb-3"
+                    ? "flex items-center justify-between border-t border-b border-stone-300 py-3"
+                    : "flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 p-4"
             }
           >
-            <div className="space-y-0.5">
+            <div>
               <span
                 className={
                   isExpressive
@@ -166,7 +165,7 @@ export function PageImagery({
                       ? theme.badgePrimary
                       : isEditorial
                         ? theme.badgePrimary
-                        : "rounded-full"
+                        : theme.badgeOutline
                 }
               >
                 {moodInfo.badge}
@@ -433,7 +432,7 @@ export function PageImagery({
               <div
                 className={
                   isExpressive
-                    ? "font-mono text-[10px] font-black text-amber-500 uppercase"
+                    ? "font-mono text-[10px] font-black text-black uppercase"
                     : isSoftTactility
                       ? "text-[10px] font-semibold text-stone-500 uppercase"
                       : isEditorial
@@ -487,7 +486,7 @@ export function PageImagery({
               <div
                 className={
                   isExpressive
-                    ? "font-mono text-[10px] font-black text-amber-500 uppercase"
+                    ? "font-mono text-[10px] font-black text-black uppercase"
                     : isSoftTactility
                       ? "text-[10px] font-semibold text-stone-500 uppercase"
                       : isEditorial
@@ -541,7 +540,7 @@ export function PageImagery({
               <div
                 className={
                   isExpressive
-                    ? "font-mono text-[10px] font-black text-amber-500 uppercase"
+                    ? "font-mono text-[10px] font-black text-black uppercase"
                     : isSoftTactility
                       ? "text-[10px] font-semibold text-stone-500 uppercase"
                       : isEditorial

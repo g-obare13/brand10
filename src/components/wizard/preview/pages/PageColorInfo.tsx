@@ -124,6 +124,7 @@ export function PageColorInfo({
       bodyFont={bodyFont}
       monoFont={monoFont}
       className={theme.pageFrame}
+      colors={colors}
     >
       <div className="flex h-full flex-col justify-between py-6">
         {/* Title & Introduction */}
@@ -173,7 +174,7 @@ export function PageColorInfo({
                     {swatch.role}
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="rounded-full">
+                  <Badge className={theme.badgeOutline}>
                     {swatch.role}
                   </Badge>
                 )}
@@ -258,7 +259,7 @@ export function PageColorInfo({
                         className={`transition-colors ${
                           isBase
                             ? isExpressive
-                              ? "bg-amber-100/70 font-bold"
+                              ? "pdf-tint-expressive-row font-bold"
                               : isSoftTactility
                                 ? "bg-stone-100/80 font-bold"
                                 : isEditorial
@@ -383,7 +384,7 @@ export function PageColorInfo({
           <div
             className={
               isExpressive
-                ? "flex items-center justify-between rounded-lg border-2 border-black bg-amber-50 p-3 shadow-[2px_2px_0px_0px_#000]"
+                ? "flex items-center justify-between rounded-lg border-2 border-black pdf-tint-expressive-primary p-3 shadow-[2px_2px_0px_0px_#000]"
                 : isSoftTactility
                   ? "flex items-center justify-between rounded-2xl border border-stone-200/80 bg-stone-50/80 p-3"
                   : isEditorial
