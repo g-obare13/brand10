@@ -137,7 +137,7 @@ export function Hero() {
             </Button>
 
             <Button
-              onClick={() => handleLaunchPreset("apex")}
+              href="/ai"
               variant={"outline"}
               size={"pill"}
               gsapFill
@@ -145,7 +145,7 @@ export function Hero() {
               className={"hero-cta-btn rounded-full px-12! py-8!"}
               icon={<ArrowRightStroke />}
             >
-              See use cases
+              Explore AI
             </Button>
           </div>
         </div>

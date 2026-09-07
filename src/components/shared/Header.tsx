@@ -21,6 +21,7 @@ import gsap from "gsap"
 import { useEffect, useRef, useState } from "react"
 import GlassPanel from "./GlassPanel"
 import ImageComponentOptimized from "./ImageComponentOptimized"
+import AnimatedUnderline from "../ui/animated-underline"
 
 export interface HeaderProps {
   action?: "default" | "logout"
@@ -251,7 +252,7 @@ export function Header({ action }: HeaderProps = {}) {
 
             <div className="relative z-10 flex flex-col gap-5">
               {/* Avatar */}
-              <div className="menu-nav-link opacity-0">
+              {/* <div className="menu-nav-link opacity-0">
                 <div className="border/20 relative h-20 w-20 overflow-hidden rounded-full border sm:h-24 sm:w-24">
                   <ImageComponentOptimized
                     src={headerData.contactCard.image}
@@ -260,22 +261,28 @@ export function Header({ action }: HeaderProps = {}) {
                     imageClassName="h-full w-full object-cover"
                   />
                 </div>
-              </div>
+              </div> */}
 
               {/* Name & Headline */}
-              <div className="flex flex-col gap-2">
-                <h3 className="menu-nav-link text-2xl font-bold tracking-tight text-foreground opacity-0 sm:text-3xl">
-                  {headerData.contactCard.name}
-                </h3>
-                <p className="menu-nav-link text-sm leading-snug font-semibold text-foreground/90 opacity-0 sm:text-base">
-                  {headerData.contactCard.role}
-                </p>
+              <div className="flex flex-col gap-4">
+                {headerData.menuLinks.map((link) => (
+                  <p
+                    key={link.href}
+                    className="menu-nav-link text-sm leading-snug font-semibold text-foreground/90 opacity-0 sm:text-base"
+                  >
+                    <AnimatedUnderline>
+                      <Link to={link.href} className="inline-flex">
+                        {link.label}
+                      </Link>
+                    </AnimatedUnderline>
+                  </p>
+                ))}
               </div>
 
               {/* Bio Description */}
-              <p className="menu-nav-link text-xs leading-relaxed text-muted-foreground opacity-0 sm:text-sm">
+              {/* <p className="menu-nav-link text-xs leading-relaxed text-muted-foreground opacity-0 sm:text-sm">
                 {headerData.contactCard.bio}
-              </p>
+              </p> */}
 
               {/* Contact Pills / Actions */}
               <div className="flex flex-wrap items-center gap-2.5 pt-2">

@@ -1,21 +1,15 @@
 /**
  * @file guidelines.tsx
- * @description Dashboard guidelines route rendering the brand architecture blueprint tab.
+ * @description Redirects /dashboard/guidelines to top-level /guidelines route.
  */
 
-import { createFileRoute } from "@tanstack/react-router"
-import { GuidelinesTab } from "@/components/dashboard/tabs/GuidelinesTab"
-import { useProjectsStore } from "@/store/projectsStore"
+import { createFileRoute, redirect } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/dashboard/guidelines")({
-  component: DashboardGuidelinesRoute,
+  beforeLoad: () => {
+    throw redirect({
+      to: "/guidelines",
+    })
+  },
 })
 
-/**
- * Dashboard guidelines view component connected to project creation actions.
- */
-function DashboardGuidelinesRoute() {
-  const openCreateModal = useProjectsStore((s) => s.openCreateModal)
-
-  return <GuidelinesTab onOpenCreateModal={openCreateModal} />
-}

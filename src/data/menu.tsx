@@ -15,7 +15,7 @@ export const heroData = {
 
 export const headerData = {
   chatLabel: "Get Started",
-  menuLabel: "Chat with Me",
+  menuLabel: "Menu",
   contactCard: {
     label: "Contact card",
     name: "Obare Geoffrey",
@@ -39,10 +39,9 @@ export const headerData = {
     ],
   },
   menuLinks: [
-    { label: "Services", href: "/creative-agency/services" },
-    { label: "Case Studies", href: "/creative-agency/case-studies" },
-    { label: "Insights", href: "/creative-agency/insights" },
-    { label: "Contact", href: "/creative-agency/contact" },
+    { label: "AI Assistance", href: "/ai" },
+    { label: "Design Systems", href: "/systems" },
+    { label: "Guidelines", href: "/guidelines" },
   ],
   menuDetails: [
     {

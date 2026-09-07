@@ -6,7 +6,6 @@
 
 import { createFileRoute } from "@tanstack/react-router"
 import { Header } from "@/components/shared/Header"
-import { Footer } from "@/components/shared/Footer"
 import { TemplateDocReader } from "@/components/templates/TemplateDocReader"
 import { APPLE_BRAND_GUIDELINES } from "@/data/templates"
 
@@ -49,9 +48,8 @@ function TemplateDetailPage() {
     <div className="min-h-screen overflow-x-hidden bg-background">
       <Header />
       <main className="relative z-10 bg-background pt-28 pb-24">
-        <TemplateDocReader document={document} backTo="/dashboard/templates" />
+        <TemplateDocReader document={document} backTo="/systems" />
       </main>
-      <Footer />
     </div>
   )
 }

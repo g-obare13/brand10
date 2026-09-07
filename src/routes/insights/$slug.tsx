@@ -6,7 +6,6 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { mediaData } from "@/data/insights"
 import Header from "@/components/shared/Header"
-import Footer from "@/components/shared/Footer"
 import InsightsDetails from "@/components/hero/InsightsDetails"
 
 export const Route = createFileRoute("/insights/$slug")({
@@ -85,7 +84,6 @@ function BlogDetailsPage() {
       <main className="relative z-10 bg-background pt-32 pb-24">
         <InsightsDetails slug={slug} />
       </main>
-      <Footer />
     </div>
   )
 }

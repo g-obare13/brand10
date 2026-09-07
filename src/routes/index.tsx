@@ -2,7 +2,6 @@ import { Hero } from "@/components/hero"
 import FAQSection from "@/components/hero/FAQSection"
 import HowItWorks from "@/components/hero/HowItWorks"
 import InsightsSection from "@/components/hero/InsightsSection"
-import Footer from "@/components/shared/Footer"
 import { Header } from "@/components/shared/Header"
 import { useAuthStore } from "@/store/authStore"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
@@ -69,7 +68,6 @@ function LandingPage() {
           <FAQSection />
         </div>
       </main>
-      <Footer />
     </div>
   )
 }

@@ -29,6 +29,13 @@ export const PUBLIC_ROUTES = [
   "/auth/callback",
   "/insights",
   "/templates",
+  "/guidelines",
+  "/systems",
+  "/ai",
+  "/dashboard/guidelines",
+  "/dashboard/systems",
+  "/dashboard/ai",
+  "/dashboard/templates",
 ] as const
 
 /**
@@ -100,17 +107,17 @@ export const DASHBOARD_NAV_ROUTES: DashboardRouteItem[] = [
     icon: <GridCircleDiagonalLeft />,
   },
   {
-    to: "/dashboard/systems",
+    to: "/systems",
     label: "Systems",
     icon: <AppsAlt />,
   },
   {
-    to: "/dashboard/guidelines",
+    to: "/guidelines",
     label: "Guidelines",
     icon: <LayoutCheck />,
   },
   {
-    to: "/dashboard/ai",
+    to: "/ai",
     label: "AI Assistance",
     icon: <SparklesAlt />,
   },

@@ -1,21 +1,15 @@
 /**
  * @file ai.tsx
- * @description Dashboard AI assistance route rendering generation and extractor tools.
+ * @description Redirects /dashboard/ai to top-level /ai route.
  */
 
-import { createFileRoute } from "@tanstack/react-router"
-import { AiAssistanceTab } from "@/components/dashboard/tabs/AiAssistanceTab"
-import { useProjectsStore } from "@/store/projectsStore"
+import { createFileRoute, redirect } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/dashboard/ai")({
-  component: DashboardAiRoute,
+  beforeLoad: () => {
+    throw redirect({
+      to: "/ai",
+    })
+  },
 })
 
-/**
- * Dashboard AI assistance view component connected to project creation actions.
- */
-function DashboardAiRoute() {
-  const openCreateModal = useProjectsStore((s) => s.openCreateModal)
-
-  return <AiAssistanceTab onOpenCreateModal={openCreateModal} />
-}

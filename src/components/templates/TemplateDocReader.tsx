@@ -36,7 +36,7 @@ interface TemplateDocReaderProps {
  */
 export function TemplateDocReader({
   document: doc,
-  backTo = "/dashboard/templates",
+  backTo = "/systems",
 }: TemplateDocReaderProps) {
   const [activeSectionId, setActiveSectionId] = useState<string>(
     doc.sections[0]?.id || "about-this-guide"

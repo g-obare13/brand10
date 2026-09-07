@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AiRouteImport } from './routes/ai'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as SystemsRouteImport } from './routes/systems'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardAiRouteImport } from './routes/dashboard/ai'
 import { Route as DashboardGuidelinesRouteImport } from './routes/dashboard/guidelines'
@@ -18,6 +20,8 @@ import { Route as DashboardProjectsRouteImport } from './routes/dashboard/projec
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardSystemsRouteImport } from './routes/dashboard/systems'
 import { Route as DashboardTemplatesRouteImport } from './routes/dashboard/templates'
+import { Route as GuidelinesIndexRouteImport } from './routes/guidelines/index'
+import { Route as GuidelinesSlugRouteImport } from './routes/guidelines/$slug'
 import { Route as InsightsSlugRouteImport } from './routes/insights/$slug'
 import { Route as StudioProjectIdRouteImport } from './routes/studio.$projectId'
 import { Route as TemplatesTemplateIdRouteImport } from './routes/templates.$templateId'
@@ -27,9 +31,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiRoute = AiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SystemsRoute = SystemsRouteImport.update({
+  id: '/systems',
+  path: '/systems',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
@@ -67,6 +81,16 @@ const DashboardTemplatesRoute = DashboardTemplatesRouteImport.update({
   path: '/templates',
   getParentRoute: () => DashboardRoute,
 } as any)
+const GuidelinesIndexRoute = GuidelinesIndexRouteImport.update({
+  id: '/guidelines/',
+  path: '/guidelines/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidelinesSlugRoute = GuidelinesSlugRouteImport.update({
+  id: '/guidelines/$slug',
+  path: '/guidelines/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InsightsSlugRoute = InsightsSlugRouteImport.update({
   id: '/insights/$slug',
   path: '/insights/$slug',
@@ -85,96 +109,124 @@ const TemplatesTemplateIdRoute = TemplatesTemplateIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai': typeof AiRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/systems': typeof SystemsRoute
   '/dashboard/ai': typeof DashboardAiRoute
   '/dashboard/guidelines': typeof DashboardGuidelinesRoute
   '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/systems': typeof DashboardSystemsRoute
   '/dashboard/templates': typeof DashboardTemplatesRoute
+  '/guidelines/$slug': typeof GuidelinesSlugRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/studio/$projectId': typeof StudioProjectIdRoute
   '/templates/$templateId': typeof TemplatesTemplateIdRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/guidelines/': typeof GuidelinesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai': typeof AiRoute
+  '/systems': typeof SystemsRoute
   '/dashboard/ai': typeof DashboardAiRoute
   '/dashboard/guidelines': typeof DashboardGuidelinesRoute
   '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/systems': typeof DashboardSystemsRoute
   '/dashboard/templates': typeof DashboardTemplatesRoute
+  '/guidelines/$slug': typeof GuidelinesSlugRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/studio/$projectId': typeof StudioProjectIdRoute
   '/templates/$templateId': typeof TemplatesTemplateIdRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/guidelines': typeof GuidelinesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai': typeof AiRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/systems': typeof SystemsRoute
   '/dashboard/ai': typeof DashboardAiRoute
   '/dashboard/guidelines': typeof DashboardGuidelinesRoute
   '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/systems': typeof DashboardSystemsRoute
   '/dashboard/templates': typeof DashboardTemplatesRoute
+  '/guidelines/$slug': typeof GuidelinesSlugRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/studio/$projectId': typeof StudioProjectIdRoute
   '/templates/$templateId': typeof TemplatesTemplateIdRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/guidelines/': typeof GuidelinesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/ai'
     | '/dashboard'
+    | '/systems'
     | '/dashboard/ai'
     | '/dashboard/guidelines'
     | '/dashboard/projects'
     | '/dashboard/settings'
     | '/dashboard/systems'
     | '/dashboard/templates'
+    | '/guidelines/$slug'
     | '/insights/$slug'
     | '/studio/$projectId'
     | '/templates/$templateId'
     | '/dashboard/'
+    | '/guidelines/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ai'
+    | '/systems'
     | '/dashboard/ai'
     | '/dashboard/guidelines'
     | '/dashboard/projects'
     | '/dashboard/settings'
     | '/dashboard/systems'
     | '/dashboard/templates'
+    | '/guidelines/$slug'
     | '/insights/$slug'
     | '/studio/$projectId'
     | '/templates/$templateId'
     | '/dashboard'
+    | '/guidelines'
   id:
     | '__root__'
     | '/'
+    | '/ai'
     | '/dashboard'
+    | '/systems'
     | '/dashboard/ai'
     | '/dashboard/guidelines'
     | '/dashboard/projects'
     | '/dashboard/settings'
     | '/dashboard/systems'
     | '/dashboard/templates'
+    | '/guidelines/$slug'
     | '/insights/$slug'
     | '/studio/$projectId'
     | '/templates/$templateId'
     | '/dashboard/'
+    | '/guidelines/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiRoute: typeof AiRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  SystemsRoute: typeof SystemsRoute
+  GuidelinesSlugRoute: typeof GuidelinesSlugRoute
   InsightsSlugRoute: typeof InsightsSlugRoute
   StudioProjectIdRoute: typeof StudioProjectIdRoute
   TemplatesTemplateIdRoute: typeof TemplatesTemplateIdRoute
+  GuidelinesIndexRoute: typeof GuidelinesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -186,11 +238,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai': {
+      id: '/ai'
+      path: '/ai'
+      fullPath: '/ai'
+      preLoaderRoute: typeof AiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/systems': {
+      id: '/systems'
+      path: '/systems'
+      fullPath: '/systems'
+      preLoaderRoute: typeof SystemsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/': {
@@ -242,6 +308,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTemplatesRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/guidelines/': {
+      id: '/guidelines/'
+      path: '/guidelines'
+      fullPath: '/guidelines/'
+      preLoaderRoute: typeof GuidelinesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guidelines/$slug': {
+      id: '/guidelines/$slug'
+      path: '/guidelines/$slug'
+      fullPath: '/guidelines/$slug'
+      preLoaderRoute: typeof GuidelinesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/insights/$slug': {
       id: '/insights/$slug'
       path: '/insights/$slug'
@@ -292,10 +372,14 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiRoute: AiRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  SystemsRoute: SystemsRoute,
+  GuidelinesSlugRoute: GuidelinesSlugRoute,
   InsightsSlugRoute: InsightsSlugRoute,
   StudioProjectIdRoute: StudioProjectIdRoute,
   TemplatesTemplateIdRoute: TemplatesTemplateIdRoute,
+  GuidelinesIndexRoute: GuidelinesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

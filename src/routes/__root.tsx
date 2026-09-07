@@ -16,6 +16,7 @@ import "sonner/dist/styles.css"
 import "@/styles.css"
 import { ProgressiveBlur } from "@/components/shared/ProgressiveBlur"
 import { PUBLIC_ROUTES } from "@/data/navigation"
+import Footer from "@/components/shared/Footer"
 
 initConsole()
 
@@ -233,6 +234,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         {/* <ScrollManager> */}
         <ThemeProvider>
           {children}
+          <Footer />
           <Toaster
             position="bottom-right"
             closeButton
