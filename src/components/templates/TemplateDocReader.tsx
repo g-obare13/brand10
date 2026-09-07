@@ -41,7 +41,6 @@ export function TemplateDocReader({
   const [activeSectionId, setActiveSectionId] = useState<string>(
     doc.sections[0]?.id || "about-this-guide"
   )
-  const [feedbackState, setFeedbackState] = useState<"idle" | "submitted">("idle")
   const [selectedReaction, setSelectedReaction] = useState<
     "sad" | "neutral" | "smile" | null
   >(null)
@@ -82,7 +81,6 @@ export function TemplateDocReader({
 
   const handleFeedback = (type: "sad" | "neutral" | "smile") => {
     setSelectedReaction(type)
-    setFeedbackState("submitted")
     toast.success("Thank you for your feedback!")
   }
 
@@ -419,7 +417,7 @@ export function TemplateDocReader({
                 Was this helpful?
               </span>
 
-              {feedbackState === "idle" ? (
+              {selectedReaction === null ? (
                 <div className="flex items-center gap-3 pt-1">
                   <button
                     type="button"

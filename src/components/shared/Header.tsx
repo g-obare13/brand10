@@ -19,9 +19,8 @@ import {
 import { Link, useLocation } from "@tanstack/react-router"
 import gsap from "gsap"
 import { useEffect, useRef, useState } from "react"
+import AnimatedUnderline from "@/components/ui/animated-underline"
 import GlassPanel from "./GlassPanel"
-import ImageComponentOptimized from "./ImageComponentOptimized"
-import AnimatedUnderline from "../ui/animated-underline"
 
 export interface HeaderProps {
   action?: "default" | "logout"

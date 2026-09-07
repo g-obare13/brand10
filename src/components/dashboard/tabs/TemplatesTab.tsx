@@ -5,15 +5,14 @@
  * to educate and guide users on world-class brand architecture.
  */
 
-import { useEffect, useRef, useState } from "react"
-import { Link } from "@tanstack/react-router"
-import { IconArrowRight, IconBook, IconSparkles } from "@tabler/icons-react"
-import { BRAND_SHOWCASE_CATALOG } from "@/data/templates"
 import { SpotlightCard } from "@/components/shared/SpotlightCard"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import WordReveal from "@/components/shared/WordReveal"
+import { Button } from "@/components/ui/button"
+import { BRAND_SHOWCASE_CATALOG } from "@/data/templates"
 import { animateFadeUp } from "@/lib/gsap-animations"
+import { IconArrowRight, IconBook } from "@tabler/icons-react"
+import { Link } from "@tanstack/react-router"
+import { useEffect, useRef, useState } from "react"
 
 interface TemplatesTabProps {
   onOpenCreateModal?: () => void

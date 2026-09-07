@@ -72,16 +72,6 @@ export function Hero() {
     return () => ctx.revert()
   }, [])
 
-  const handleLaunchPreset = (presetKey: "apex" | "bloom" | "nova") => {
-    const projectId = `demo-${presetKey}`
-    brand.setProjectId(projectId)
-    brand.loadPreset(presetKey)
-    navigate({
-      to: "/studio/$projectId",
-      params: { projectId },
-    })
-  }
-
   return (
     <section
       ref={heroRef}
