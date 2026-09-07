@@ -27,6 +27,44 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("/fonts/templates/sf-pro-display-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("/fonts/templates/sf-pro-display-medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("/fonts/templates/sf-pro-display-bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Die Grotesk";
+  src: url("/fonts/templates/test-die-grotesk-vf-roman.woff2") format("woff2-variations"),
+       url("/fonts/templates/test-die-grotesk-vf-roman.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-sf-pro {
+  font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.font-die-grotesk {
+  font-family: "Die Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

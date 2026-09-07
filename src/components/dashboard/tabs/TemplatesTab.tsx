@@ -1,89 +1,154 @@
-import { BRAND_TEMPLATES } from "@/data/dashboard"
-import { IconPlus } from "@tabler/icons-react"
-import { useState } from "react"
+/**
+ * @file TemplatesTab.tsx
+ * @description Dashboard tab displaying the Real-World Brand Guidelines Showcase.
+ * Features official reference standards (headlined by Apple Style Guide & Brand Guidelines)
+ * to educate and guide users on world-class brand architecture.
+ */
+
+import { useEffect, useRef, useState } from "react"
+import { Link } from "@tanstack/react-router"
+import { IconArrowRight, IconBook, IconSparkles } from "@tabler/icons-react"
+import { BRAND_SHOWCASE_CATALOG } from "@/data/templates"
 import { SpotlightCard } from "@/components/shared/SpotlightCard"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import WordReveal from "@/components/shared/WordReveal"
+import { animateFadeUp } from "@/lib/gsap-animations"
 
 interface TemplatesTabProps {
-  onOpenCreateModal: () => void
+  onOpenCreateModal?: () => void
 }
 
 /**
- * Dashboard tab displaying pre-configured brand identity starter templates.
- * Features:
- * - Starter kits (Apex Autonomous, Nova Creative, Bloom Organics, etc.).
- * - Swatch palette previews and typography movement details.
- * - One-click adoption triggering project creation dialog.
+ * Dashboard tab displaying authentic real-world brand guidelines reference catalog.
  *
  * @component
- * @param {TemplatesTabProps} props - The component props.
- * @param {() => void} props.onOpenCreateModal - Callback to create a project from template.
- * @returns {React.ReactElement} The rendered templates catalog tab.
+ * @param {TemplatesTabProps} props - Component properties.
+ * @returns {React.ReactElement} The rendered templates showcase tab.
  */
-export function TemplatesTab({ onOpenCreateModal }: TemplatesTabProps) {
+export function TemplatesTab({
+  onOpenCreateModal: _onOpenCreateModal,
+}: TemplatesTabProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    const ctx = gsap.context(() => {
+      const cards = containerRef.current?.querySelectorAll(".project-card")
+      if (cards && cards.length > 0) {
+        animateFadeUp(cards, {
+          y: 30,
+          duration: 1.1,
+          stagger: 0.1,
+          delay: 0.2,
+          ease: "power3.out",
+        })
+      }
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [])
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between border-b border-border/60 pb-3">
-        <div>
-          <h2 className="font-heading text-xl font-bold tracking-tight text-foreground">
-            Brand Identity Templates
-          </h2>
-          <p className="text-xs text-muted-foreground">
-            Pre-configured identity systems and aesthetic frameworks.
-          </p>
+    <div className="space-y-8">
+      {/* Tab Header */}
+      <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+        <div className="max-w-3xl space-y-4 pt-4 sm:pt-8">
+          <WordReveal as="h2" stagger={0.03} duration={1.4} start="top 90%">
+            Brand Guidelines Showcase
+          </WordReveal>
+
+          <WordReveal as="p" stagger={0.02} duration={1.2} start="top 90%">
+            Authoritative industry reference guidelines to help you understand
+            how world-class organizations structure, specify, and enforce brand
+            identity systems.
+          </WordReveal>
         </div>
       </div>
 
+      {/* Showcase Grid */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {BRAND_TEMPLATES.map((tmpl) => (
+        {BRAND_SHOWCASE_CATALOG.map((item) => (
           <SpotlightCard
-            key={tmpl.id}
-            color={tmpl.colors[0] || "#6366f1"}
-            dimmed={hoveredId !== null && hoveredId !== tmpl.id}
-            onMouseEnter={() => setHoveredId(tmpl.id)}
+            key={item.id}
+            color={item.colors[2] || "#0071E3"}
+            dimmed={hoveredId !== null && hoveredId !== item.id}
+            onMouseEnter={() => setHoveredId(item.id)}
             onMouseLeave={() => setHoveredId(null)}
-            className="flex min-h-[300px] flex-col justify-between"
+            className="project-card flex min-h-[380px] flex-col justify-between p-6"
           >
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                {tmpl.colors.map((c, i) => (
-                  <div
-                    key={i}
-                    className="size-6 rounded-full border border-white/20 shadow-xs"
-                    style={{ backgroundColor: c }}
-                  />
-                ))}
+            <div className="space-y-5">
+              {/* Card Header & Badges */}
+              <div className="flex items-center justify-between gap-2">
+                {/* Color Swatch Previews */}
+                <div className="flex items-center gap-2">
+                  {item.colors.map((c, i) => (
+                    <div
+                      key={i}
+                      className="size-6 rounded-full border border-white/20 shadow-xs transition-transform hover:scale-110"
+                      style={{ backgroundColor: c }}
+                      title={c}
+                    />
+                  ))}
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {item.edition}
+                </span>
               </div>
 
-              <div>
-                <span className="font-mono text-[11px] tracking-wider text-muted-foreground uppercase">
-                  {tmpl.category}
-                </span>
-                <h3 className="mt-1 font-heading text-lg font-bold text-foreground transition group-hover:text-primary">
-                  {tmpl.name}
-                </h3>
-                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                  {tmpl.description}
+              {/* Content Description */}
+              <div className="space-y-2">
+                <h5>{item.name}</h5>
+                <p className="line-clamp-3 text-muted-foreground">
+                  {item.description}
                 </p>
               </div>
             </div>
 
+            {/* Card Footer Actions */}
             <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-5">
-              <span className="font-mono text-[11px] text-muted-foreground">
-                {tmpl.fontFamily}
-              </span>
-              <Button
-                size="pill"
-                variant="outline"
-                gsapFill
-                onClick={onOpenCreateModal}
-                className="rounded-full px-5 py-2 text-xs font-semibold"
-                icon={<IconPlus size={14} />}
-              >
-                Use Template
-              </Button>
+              <div className="space-y-0.5">
+                <span className="block text-[10px] text-muted-foreground">
+                  {item.fontFamily}
+                </span>
+                <span className="text-[10px] text-muted-foreground">
+                  {item.sectionCount} Structured Pillars
+                </span>
+              </div>
+
+              {item.id === "apple" ? (
+                <Link
+                  to="/templates/$templateId"
+                  params={{ templateId: item.id }}
+                >
+                  <Button
+                    size="pill"
+                    variant="outline"
+                    gsapFill
+                    className="cursor-pointer rounded-full px-5 py-3 text-xs font-semibold"
+                    icon={
+                      <IconArrowRight
+                        size={14}
+                        className="transition-transform group-hover:translate-x-0.5"
+                      />
+                    }
+                    iconPlacement="right"
+                  >
+                    Read Guidelines
+                  </Button>
+                </Link>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled
+                  className="rounded-full px-5 py-3 text-xs font-semibold opacity-60"
+                  icon={<IconBook size={14} />}
+                >
+                  Coming Soon
+                </Button>
+              )}
             </div>
           </SpotlightCard>
         ))}
@@ -91,4 +156,3 @@ export function TemplatesTab({ onOpenCreateModal }: TemplatesTabProps) {
     </div>
   )
 }
-

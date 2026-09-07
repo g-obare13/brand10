@@ -28,6 +28,7 @@ export const PUBLIC_ROUTES = [
   "/login",
   "/auth/callback",
   "/insights",
+  "/templates",
 ] as const
 
 /**
@@ -99,8 +100,8 @@ export const DASHBOARD_NAV_ROUTES: DashboardRouteItem[] = [
     icon: <GridCircleDiagonalLeft />,
   },
   {
-    to: "/dashboard/templates",
-    label: "Templates",
+    to: "/dashboard/systems",
+    label: "Systems",
     icon: <AppsAlt />,
   },
   {

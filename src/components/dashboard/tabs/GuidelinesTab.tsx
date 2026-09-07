@@ -97,6 +97,7 @@ export function GuidelinesTab({ onOpenCreateModal }: GuidelinesTabProps) {
 
   return (
     <div ref={containerRef} className="space-y-6">
+      {/* Tab Header */}
       <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
         <div className="max-w-3xl space-y-4 pt-4 sm:pt-8">
           <WordReveal as="h2" stagger={0.03} duration={1.4} start="top 90%">

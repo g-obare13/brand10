@@ -1,21 +1,14 @@
 /**
  * @file templates.tsx
- * @description Dashboard templates route displaying pre-configured brand archetypes.
+ * @description Redirects legacy /dashboard/templates route to /dashboard/systems.
  */
 
-import { createFileRoute } from "@tanstack/react-router"
-import { TemplatesTab } from "@/components/dashboard/tabs/TemplatesTab"
-import { useProjectsStore } from "@/store/projectsStore"
+import { createFileRoute, redirect } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/dashboard/templates")({
-  component: DashboardTemplatesRoute,
+  beforeLoad: () => {
+    throw redirect({
+      to: "/dashboard/systems",
+    })
+  },
 })
-
-/**
- * Dashboard templates view component.
- */
-function DashboardTemplatesRoute() {
-  const openCreateModal = useProjectsStore((s) => s.openCreateModal)
-
-  return <TemplatesTab onOpenCreateModal={openCreateModal} />
-}

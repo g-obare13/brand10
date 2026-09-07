@@ -16,9 +16,11 @@ import { Route as DashboardAiRouteImport } from './routes/dashboard/ai'
 import { Route as DashboardGuidelinesRouteImport } from './routes/dashboard/guidelines'
 import { Route as DashboardProjectsRouteImport } from './routes/dashboard/projects'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
+import { Route as DashboardSystemsRouteImport } from './routes/dashboard/systems'
 import { Route as DashboardTemplatesRouteImport } from './routes/dashboard/templates'
 import { Route as InsightsSlugRouteImport } from './routes/insights/$slug'
 import { Route as StudioProjectIdRouteImport } from './routes/studio.$projectId'
+import { Route as TemplatesTemplateIdRouteImport } from './routes/templates.$templateId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -55,6 +57,11 @@ const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardSystemsRoute = DashboardSystemsRouteImport.update({
+  id: '/systems',
+  path: '/systems',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardTemplatesRoute = DashboardTemplatesRouteImport.update({
   id: '/templates',
   path: '/templates',
@@ -70,6 +77,11 @@ const StudioProjectIdRoute = StudioProjectIdRouteImport.update({
   path: '/studio/$projectId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TemplatesTemplateIdRoute = TemplatesTemplateIdRouteImport.update({
+  id: '/templates/$templateId',
+  path: '/templates/$templateId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -78,9 +90,11 @@ export interface FileRoutesByFullPath {
   '/dashboard/guidelines': typeof DashboardGuidelinesRoute
   '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/systems': typeof DashboardSystemsRoute
   '/dashboard/templates': typeof DashboardTemplatesRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/studio/$projectId': typeof StudioProjectIdRoute
+  '/templates/$templateId': typeof TemplatesTemplateIdRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRoutesByTo {
@@ -89,9 +103,11 @@ export interface FileRoutesByTo {
   '/dashboard/guidelines': typeof DashboardGuidelinesRoute
   '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/systems': typeof DashboardSystemsRoute
   '/dashboard/templates': typeof DashboardTemplatesRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/studio/$projectId': typeof StudioProjectIdRoute
+  '/templates/$templateId': typeof TemplatesTemplateIdRoute
   '/dashboard': typeof DashboardIndexRoute
 }
 export interface FileRoutesById {
@@ -102,9 +118,11 @@ export interface FileRoutesById {
   '/dashboard/guidelines': typeof DashboardGuidelinesRoute
   '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/systems': typeof DashboardSystemsRoute
   '/dashboard/templates': typeof DashboardTemplatesRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/studio/$projectId': typeof StudioProjectIdRoute
+  '/templates/$templateId': typeof TemplatesTemplateIdRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRouteTypes {
@@ -116,9 +134,11 @@ export interface FileRouteTypes {
     | '/dashboard/guidelines'
     | '/dashboard/projects'
     | '/dashboard/settings'
+    | '/dashboard/systems'
     | '/dashboard/templates'
     | '/insights/$slug'
     | '/studio/$projectId'
+    | '/templates/$templateId'
     | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -127,9 +147,11 @@ export interface FileRouteTypes {
     | '/dashboard/guidelines'
     | '/dashboard/projects'
     | '/dashboard/settings'
+    | '/dashboard/systems'
     | '/dashboard/templates'
     | '/insights/$slug'
     | '/studio/$projectId'
+    | '/templates/$templateId'
     | '/dashboard'
   id:
     | '__root__'
@@ -139,9 +161,11 @@ export interface FileRouteTypes {
     | '/dashboard/guidelines'
     | '/dashboard/projects'
     | '/dashboard/settings'
+    | '/dashboard/systems'
     | '/dashboard/templates'
     | '/insights/$slug'
     | '/studio/$projectId'
+    | '/templates/$templateId'
     | '/dashboard/'
   fileRoutesById: FileRoutesById
 }
@@ -150,6 +174,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRouteWithChildren
   InsightsSlugRoute: typeof InsightsSlugRoute
   StudioProjectIdRoute: typeof StudioProjectIdRoute
+  TemplatesTemplateIdRoute: typeof TemplatesTemplateIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -203,6 +228,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/systems': {
+      id: '/dashboard/systems'
+      path: '/systems'
+      fullPath: '/dashboard/systems'
+      preLoaderRoute: typeof DashboardSystemsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/templates': {
       id: '/dashboard/templates'
       path: '/templates'
@@ -224,6 +256,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudioProjectIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/templates/$templateId': {
+      id: '/templates/$templateId'
+      path: '/templates/$templateId'
+      fullPath: '/templates/$templateId'
+      preLoaderRoute: typeof TemplatesTemplateIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -232,6 +271,7 @@ interface DashboardRouteChildren {
   DashboardGuidelinesRoute: typeof DashboardGuidelinesRoute
   DashboardProjectsRoute: typeof DashboardProjectsRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardSystemsRoute: typeof DashboardSystemsRoute
   DashboardTemplatesRoute: typeof DashboardTemplatesRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
@@ -241,6 +281,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardGuidelinesRoute: DashboardGuidelinesRoute,
   DashboardProjectsRoute: DashboardProjectsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardSystemsRoute: DashboardSystemsRoute,
   DashboardTemplatesRoute: DashboardTemplatesRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
@@ -254,6 +295,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRouteWithChildren,
   InsightsSlugRoute: InsightsSlugRoute,
   StudioProjectIdRoute: StudioProjectIdRoute,
+  TemplatesTemplateIdRoute: TemplatesTemplateIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

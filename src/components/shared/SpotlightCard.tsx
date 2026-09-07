@@ -121,15 +121,28 @@ export const SpotlightCard = React.forwardRef<
         ref={cardRef}
         className={cn(
           "group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border/40 bg-card p-7 text-card-foreground shadow-xs transition-all duration-300 dark:bg-card/75 dark:backdrop-blur-md",
-          interactive &&
-            "cursor-pointer hover:border-primary/20 hover:shadow-2xl active:scale-[0.985] active:brightness-95",
+          // interactive &&
+          //   "cursor-pointer hover:border-primary/20 hover:shadow-2xl active:scale-[0.985] active:brightness-95",
           dimmed && "scale-[0.97] opacity-50 blur-[0.2px] saturate-50",
           className
         )}
+        // style={{
+        //   transform: tilt
+        //     ? `perspective(900px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`
+        //     : undefined,
+        //   transition: isHovered
+        //     ? "transform 0.12s ease-out, border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, filter 0.3s ease"
+        //     : "transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, filter 0.3s ease",
+        //   ...style,
+        // }}
         style={{
           transform: tilt
             ? `perspective(900px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`
             : undefined,
+          boxShadow:
+            isHovered && interactive
+              ? `0 12px 30px -10px ${color}40, 0 4px 10px -4px ${color}20`
+              : undefined,
           transition: isHovered
             ? "transform 0.12s ease-out, border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, filter 0.3s ease"
             : "transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, filter 0.3s ease",

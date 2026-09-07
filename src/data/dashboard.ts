@@ -6,6 +6,7 @@
 
 export type DashboardTab =
   | "projects"
+  | "systems"
   | "templates"
   | "guidelines"
   | "ai"
@@ -24,9 +25,9 @@ export const DASHBOARD_SIDEBAR_ITEMS: DashboardSidebarItem[] = [
     description: "Manage your active brand workspaces",
   },
   {
-    id: "templates",
-    label: "Templates",
-    description: "Explore pre-configured brand archetypes",
+    id: "systems",
+    label: "Systems",
+    description: "Explore world-class design systems & guidelines",
   },
   {
     id: "guidelines",
