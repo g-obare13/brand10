@@ -4,6 +4,11 @@ import { A4PageFrame } from "./A4PageFrame"
 import { Badge } from "@/components/ui/badge"
 import { getPdfTheme } from "./pdfPageTheme"
 import type { ColorSwatch } from "@/lib/colorUtils"
+import {
+  DEFAULT_MISSION,
+  DEFAULT_VISION,
+  DEFAULT_VALUES,
+} from "@/data/preview"
 
 interface PageFoundationProps {
   brandName: string
@@ -21,30 +26,6 @@ interface PageFoundationProps {
   websiteUrl?: string
   colors?: ColorSwatch[]
 }
-
-const DEFAULT_MISSION =
-  "To empower audiences through deliberate craftsmanship, thoughtful design, and disciplined execution across every touchpoint."
-
-const DEFAULT_VISION =
-  "To establish an enduring standard of clarity, reliability, and timeless excellence in modern brand architecture."
-
-const DEFAULT_VALUES = [
-  {
-    num: "01",
-    title: "Precision",
-    desc: "Rigorous attention to detail and proportion in every output.",
-  },
-  {
-    num: "02",
-    title: "Clarity",
-    desc: "Communicating purpose without unnecessary decoration or friction.",
-  },
-  {
-    num: "03",
-    title: "Authenticity",
-    desc: "Honest expression of materials, identity, and customer promises.",
-  },
-]
 
 export function PageFoundation({
   brandName,

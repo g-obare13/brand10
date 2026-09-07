@@ -12,6 +12,7 @@ import {
 } from "@/lib/colorUtils"
 import { getPdfTheme } from "./pdfPageTheme"
 import chroma from "chroma-js"
+import { SHADE_KEYS } from "@/data/preview"
 
 interface PageColorInfoProps {
   brandName: string
@@ -23,20 +24,6 @@ interface PageColorInfoProps {
   pageNumber?: number
   totalPages?: number
 }
-
-const SHADE_KEYS = [
-  "50",
-  "100",
-  "200",
-  "300",
-  "400",
-  "500",
-  "600",
-  "700",
-  "800",
-  "900",
-  "950",
-] as const
 
 function findClosestShade(
   baseHex: string,

@@ -12,20 +12,7 @@ import { IconCheck } from "@tabler/icons-react"
 import { toast } from "sonner"
 import { ColorInfoDialog } from "./ColorInfoDialog"
 import { cn } from "@/lib/utils"
-
-const SHADE_KEYS = [
-  "50",
-  "100",
-  "200",
-  "300",
-  "400",
-  "500",
-  "600",
-  "700",
-  "800",
-  "900",
-  "950",
-] as const
+import { SHADE_KEYS } from "@/data/preview"
 
 function findClosestShade(
   baseHex: string,

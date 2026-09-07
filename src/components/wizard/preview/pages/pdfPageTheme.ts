@@ -1,3 +1,9 @@
+/**
+ * @file pdfPageTheme.ts
+ * @description Theme token resolver generating styling classes for PDF guideline deck pages
+ * matching the active design movement archetype.
+ */
+
 import type { PreviewStyleId } from "./A4PageFrame"
 
 export interface PdfThemeTokens {

@@ -21,15 +21,9 @@ import {
 } from "@tabler/icons-react"
 import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
+import { WIZARD_STEPS } from "@/data/wizard"
 
-export const WIZARD_STEPS = [
-  { id: 1, title: "Foundation", subtitle: "Identity & Vibe" },
-  { id: 2, title: "Logo System", subtitle: "Marks & Geometry" },
-  { id: 3, title: "Color Matrix", subtitle: "Palette & Contrast" },
-  { id: 4, title: "Typography", subtitle: "Pairings & Scale" },
-  { id: 5, title: "Imagery", subtitle: "Mood & Photography" },
-  { id: 6, title: "Preview", subtitle: "Brand System Master Overview" },
-] as const
+export { WIZARD_STEPS }
 
 interface WizardHeaderProps {
   currentStep: number

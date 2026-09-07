@@ -1,3 +1,9 @@
+/**
+ * @file menu.tsx
+ * @description Navigation menus, header contact cards, footer link structures,
+ * and FAQ accordion items used across marketing pages.
+ */
+
 import { IconBrandGithub, IconBrandX, IconGlobe } from "@tabler/icons-react"
 
 export const heroData = {

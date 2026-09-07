@@ -1,7 +1,6 @@
 import Auralis from "@/components/shared/Auralis"
 import { cn } from "@/lib/utils"
-
-const DASHBOARD_BACKGROUND_COLORS = ["#6366f1", "#a855f7", "#38bdf8"]
+import { DEFAULT_AMBIENT_COLORS as DASHBOARD_BACKGROUND_COLORS } from "@/data/marketing"
 
 /**
  * Ambient visual background canvas for the main dashboard views.

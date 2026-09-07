@@ -1,3 +1,8 @@
+/**
+ * @file $slug.tsx
+ * @description Dynamic editorial article route with SEO metadata generation and detail view.
+ */
+
 import { createFileRoute } from "@tanstack/react-router"
 import { mediaData } from "@/data/insights"
 import Header from "@/components/shared/Header"

@@ -1,5 +1,3 @@
-import { Link } from "@tanstack/react-router"
-import type { ReactNode } from "react"
 import GlassPanel from "@/components/shared/GlassPanel"
 import {
   Tooltip,
@@ -7,47 +5,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import {
-  AppsAlt,
-  Cog,
-  GridCircleDiagonalLeft,
-  LayoutCheck,
-  SparklesAlt,
-} from "@boxicons/react"
+import { Link } from "@tanstack/react-router"
 
-interface DashboardRouteItem {
-  to: string
-  label: string
-  icon: ReactNode
-}
+import type { DashboardRouteItem } from "@/data/navigation"
+import { DASHBOARD_NAV_ROUTES } from "@/data/navigation"
 
-export const DASHBOARD_NAV_ROUTES: DashboardRouteItem[] = [
-  {
-    to: "/dashboard/projects",
-    label: "Projects",
-    icon: <GridCircleDiagonalLeft />,
-  },
-  {
-    to: "/dashboard/templates",
-    label: "Templates",
-    icon: <AppsAlt />,
-  },
-  {
-    to: "/dashboard/guidelines",
-    label: "Guidelines",
-    icon: <LayoutCheck />,
-  },
-  {
-    to: "/dashboard/ai",
-    label: "AI Assistance",
-    icon: <SparklesAlt />,
-  },
-  {
-    to: "/dashboard/settings",
-    label: "Settings",
-    icon: <Cog />,
-  },
-]
+export { DASHBOARD_NAV_ROUTES }
+export type { DashboardRouteItem }
 /**
  * Floating bottom navigation toolbar for navigating primary dashboard tabs.
  * Features:

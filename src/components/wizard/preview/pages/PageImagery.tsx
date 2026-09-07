@@ -1,4 +1,5 @@
 import { IMAGERY_MOOD_IMAGE_ARRAYS } from "@/data/wizard"
+import { MOOD_DETAILS } from "@/data/preview"
 import type { PreviewStyleId } from "./A4PageFrame"
 import { A4PageFrame } from "./A4PageFrame"
 import { Badge } from "@/components/ui/badge"
@@ -18,40 +19,6 @@ interface PageImageryProps {
   pageNumber?: number
   totalPages?: number
   colors?: ColorSwatch[]
-}
-
-const MOOD_DETAILS: Record<
-  "minimal" | "cinematic" | "vibrant" | "editorial",
-  { title: string; subtitle: string; lighting: string; badge: string }
-> = {
-  minimal: {
-    title: "Studio Minimal & Architectural",
-    subtitle:
-      "High-key ambient daylight, subtle shadow gradation, and intentional negative space.",
-    lighting: "Diffused Daylight & High-Key Ambient",
-    badge: "Architectural Minimal",
-  },
-  cinematic: {
-    title: "Moody & Cinematic Direction",
-    subtitle:
-      "Dramatic directional lighting, deep obsidian contrast, and filmic composition.",
-    lighting: "Low-Key Directional & Rim Highlights",
-    badge: "Cinematic Drama",
-  },
-  vibrant: {
-    title: "Vibrant & Prismatic Chromatics",
-    subtitle:
-      "Refractive frosted glass, vivid accent reflections, and dynamic tactile energy.",
-    lighting: "High-Energy Chromatic & Prismatic Speculars",
-    badge: "Chromatic Vitality",
-  },
-  editorial: {
-    title: "Editorial & Authentic Human Poise",
-    subtitle:
-      "Natural golden-hour sunlight, tactile grain, and documentary-style composition.",
-    lighting: "Natural Golden Hour & Soft Ambient",
-    badge: "Tactile Editorial",
-  },
 }
 
 export function PageImagery({

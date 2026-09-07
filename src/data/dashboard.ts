@@ -1,3 +1,9 @@
+/**
+ * @file dashboard.ts
+ * @description Master data configurations for dashboard tabs, templates,
+ * guidelines architecture, and AI assistance tools.
+ */
+
 export type DashboardTab =
   | "projects"
   | "templates"

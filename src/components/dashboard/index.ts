@@ -1,3 +1,8 @@
+/**
+ * @file index.ts
+ * @description Central export barrel for dashboard view components, modals, and tab panels.
+ */
+
 export { CreateProjectModal } from "./CreateProjectModal"
 export { DashboardBackground } from "./DashboardBackground"
 export { DashboardHero } from "./DashboardHero"

@@ -1,44 +1,11 @@
-export interface GoogleFontItem {
-  family: string
-  category: "sans-serif" | "serif" | "display" | "handwriting" | "monospace" | string
-  variants: string[]
-  subsets: string[]
-  version: string
-  lastModified: string
-  files?: Record<string, string>
-}
+import { POPULAR_FALLBACK_FONTS } from "@/data/fonts"
+import type { GoogleFontItem } from "@/data/fonts"
+
+export { POPULAR_FALLBACK_FONTS }
+export type { GoogleFontItem }
 
 let cachedGoogleFonts: GoogleFontItem[] | null = null
 let fetchPromise: Promise<GoogleFontItem[]> | null = null
-
-const POPULAR_FALLBACK_FONTS: GoogleFontItem[] = [
-  { family: "Plus Jakarta Sans", category: "sans-serif", variants: ["regular", "600", "700", "800"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Inter", category: "sans-serif", variants: ["regular", "500", "600", "700"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Outfit", category: "sans-serif", variants: ["regular", "500", "600", "700"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Syne", category: "display", variants: ["regular", "700", "800"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Space Grotesk", category: "sans-serif", variants: ["regular", "500", "700"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Playfair Display", category: "serif", variants: ["regular", "600", "700", "800"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Fraunces", category: "serif", variants: ["regular", "600", "700", "900"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "DM Sans", category: "sans-serif", variants: ["regular", "500", "700"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Manrope", category: "sans-serif", variants: ["regular", "600", "700", "800"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Poppins", category: "sans-serif", variants: ["regular", "500", "600", "700"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Montserrat", category: "sans-serif", variants: ["regular", "600", "700", "800"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Cabinet Grotesk", category: "sans-serif", variants: ["regular", "700", "800"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "General Sans", category: "sans-serif", variants: ["regular", "600", "700"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Geist Mono", category: "monospace", variants: ["regular", "500", "600"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "JetBrains Mono", category: "monospace", variants: ["regular", "500", "700"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Space Mono", category: "monospace", variants: ["regular", "700"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Fira Code", category: "monospace", variants: ["regular", "500", "700"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "DM Mono", category: "monospace", variants: ["regular", "500"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Lora", category: "serif", variants: ["regular", "500", "600", "700"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Cinzel", category: "serif", variants: ["regular", "600", "700"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Bebas Neue", category: "display", variants: ["regular"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Oswald", category: "sans-serif", variants: ["regular", "500", "600", "700"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Raleway", category: "sans-serif", variants: ["regular", "600", "700", "800"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Cormorant Garamond", category: "serif", variants: ["regular", "600", "700"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Clash Display", category: "display", variants: ["regular", "600", "700"], subsets: ["latin"], version: "v1", lastModified: "" },
-  { family: "Cinzel Decorative", category: "display", variants: ["regular", "700"], subsets: ["latin"], version: "v1", lastModified: "" },
-]
 
 /**
  * Fetch all available Google Fonts using the Developer API key

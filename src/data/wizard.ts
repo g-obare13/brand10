@@ -1,3 +1,9 @@
+/**
+ * @file wizard.ts
+ * @description Centralized datasets for the brand creation wizard, including
+ * design movements, imagery moods, steps, outline sections, and icon styles.
+ */
+
 export interface DesignMovement {
   id: string
   label: string
@@ -375,4 +381,112 @@ export const IMAGERY_BENTO_SHOWCASES: Record<
     },
   },
 }
+
+/**
+ * Sequential steps of the brand creation wizard.
+ */
+export const WIZARD_STEPS = [
+  { id: 1, title: "Foundation", subtitle: "Identity & Vibe" },
+  { id: 2, title: "Logo System", subtitle: "Marks & Geometry" },
+  { id: 3, title: "Color Matrix", subtitle: "Palette & Contrast" },
+  { id: 4, title: "Typography", subtitle: "Pairings & Scale" },
+  { id: 5, title: "Imagery", subtitle: "Mood & Photography" },
+  { id: 6, title: "Preview", subtitle: "Brand System Master Overview" },
+] as const
+
+/**
+ * Section item in the PDF preview right sidebar outline.
+ */
+export interface SectionOutlineItem {
+  number: string
+  title: string
+  page: number
+  stepNumber: number
+  summary: string
+}
+
+/**
+ * PDF brand deck outline sections mapped to wizard steps.
+ */
+export const OUTLINE_SECTIONS: SectionOutlineItem[] = [
+  {
+    number: "01",
+    title: "Brand Foundation",
+    page: 1,
+    stepNumber: 1,
+    summary:
+      "Hero brand identity, mission, vision statements, and core brand values.",
+  },
+  {
+    number: "02",
+    title: "Logo System",
+    page: 2,
+    stepNumber: 2,
+    summary:
+      "Primary marks, dark mode variants, clearspace geometry, and usage rules.",
+  },
+  {
+    number: "03",
+    title: "Color Matrix",
+    page: 3,
+    stepNumber: 3,
+    summary:
+      "Primary and secondary swatches, WCAG contrast ratings, and tonal scales.",
+  },
+  {
+    number: "04",
+    title: "Typography Scale",
+    page: 4,
+    stepNumber: 4,
+    summary:
+      "Display, body, and monospace font pairings with modular type ladder.",
+  },
+  {
+    number: "05",
+    title: "Imagery Direction",
+    page: 5,
+    stepNumber: 5,
+    summary:
+      "Moodboard photography art direction, lighting standards, and overlays.",
+  },
+  {
+    number: "06",
+    title: "System Specs",
+    page: 6,
+    stepNumber: 6,
+    summary:
+      "Iconography geometry, token export manifest, and governance signoff.",
+  },
+]
+
+/**
+ * Supported iconography style families.
+ */
+export const STYLE_FAMILIES = [
+  {
+    id: "stroke",
+    title: "Linear Stroke",
+    desc: "Refined mathematical stroke keylines with open internal space.",
+  },
+  {
+    id: "solid",
+    title: "Solid Filled",
+    desc: "Bold high-emphasis silhouettes for prominent UI navigation.",
+  },
+  {
+    id: "duotone",
+    title: "Duotone Two-Tone",
+    desc: "Layered secondary opacity accents for rich micro-interactions.",
+  },
+] as const
+
+/**
+ * Available corner radius presets for iconography and components.
+ */
+export const RADIUS_OPTIONS = [
+  { label: "Sharp", value: 0 },
+  { label: "Soft 4px", value: 4 },
+  { label: "Squircle 8px", value: 8 },
+  { label: "Pill 99px", value: 99 },
+]
 

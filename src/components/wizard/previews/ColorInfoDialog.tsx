@@ -34,20 +34,7 @@ import {
 import { IconCheck, IconCopy, IconInfoCircle } from "@tabler/icons-react"
 import { toast } from "sonner"
 import { Shield } from "@boxicons/react"
-
-const SHADE_KEYS = [
-  "50",
-  "100",
-  "200",
-  "300",
-  "400",
-  "500",
-  "600",
-  "700",
-  "800",
-  "900",
-  "950",
-] as const
+import { SHADE_KEYS } from "@/data/preview"
 
 interface ColorInfoDialogProps {
   label: string

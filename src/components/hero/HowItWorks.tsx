@@ -1,66 +1,26 @@
 "use client"
 
-import { useRef, useEffect, useState } from "react"
-import { gsap } from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
-import Container from "@/components/ui/container"
+/**
+ * @file HowItWorks.tsx
+ * @description Interactive scroll-pinned product workflow section showcasing brand creation
+ * steps from SVG ingestion to living guidelines export.
+ */
+
 import ImageComponentOptimized from "@/components/shared/ImageComponentOptimized"
 import WordReveal from "@/components/shared/WordReveal"
+import Container from "@/components/ui/container"
+import { DEFAULT_SHOWCASE_PROJECTS } from "@/data/marketing"
+import type { ShowcaseStepProject } from "@/data/marketing"
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { useEffect, useRef, useState } from "react"
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger)
 }
 
-export type Project = {
-  title: string
-  img: string
-  link: string
-  contribution: "contributed" | "led"
-  leftText: string
-  rightList: string[]
-  location: string
-  description: string
-  stroke1: string
-}
-
-const DEFAULT_PROJECTS: Project[] = [
-  {
-    title: "Foundation & Logo",
-    link: "#",
-    contribution: "led",
-    img: "/showcases/Foundationn.png",
-    leftText: "Brand Identity",
-    rightList: ["#svg-ingestion", "#brand-foundation", "#clearspace-rules"],
-    location: "Step 01",
-    description:
-      "Upload your logo or vector SVG to automatically extract colors and geometry. Establish core values, tone ratings, design movements, and clearspace rules in minutes.",
-    stroke1: "#101828",
-  },
-  {
-    title: "Tokens & Typography",
-    link: "#",
-    contribution: "led",
-    img: "/showcases/Typographyy.png",
-    leftText: "Design Systems",
-    rightList: ["#color-palette", "#modular-typography", "#wcag-contrast"],
-    location: "Step 02",
-    description:
-      "Generate accessible WCAG-compliant color palettes and responsive typography scales. Fine-tune contrast ratios, modular sizing, and photography art direction with live interactive previews.",
-    stroke1: "#5B91FF",
-  },
-  {
-    title: "Guidelines & Export",
-    link: "#",
-    contribution: "led",
-    img: "/showcases/Colorss.png",
-    leftText: "Asset Delivery",
-    rightList: ["#pdf-brand-deck", "#tailwind-tokens", "#vector-packages"],
-    location: "Step 03",
-    description:
-      "Instantly compile your living design system into exportable deliverables. Download print-ready PDF brand decks, production token bundles for Tailwind/CSS, and structured vector packages.",
-    stroke1: "#E7EBEB",
-  },
-]
+export type Project = ShowcaseStepProject
+const DEFAULT_PROJECTS: Project[] = DEFAULT_SHOWCASE_PROJECTS
 
 // Internal Project Card component
 const Card = ({

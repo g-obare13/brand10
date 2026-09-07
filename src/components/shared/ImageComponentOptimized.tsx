@@ -1,13 +1,14 @@
 "use client"
 
-import React, { memo, useEffect, useMemo, useRef, useState } from "react"
-import { createPortal } from "react-dom"
-import { Blurhash } from "react-blurhash"
+import { DEFAULT_BLURHASHES } from "@/data/marketing"
+import { cn } from "@/lib/utils"
+import { SearchBig } from "@boxicons/react"
 import { Image as UnpicImageOriginal } from "@unpic/react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { SearchBig } from "@boxicons/react"
-import { cn } from "@/lib/utils"
+import React, { memo, useEffect, useMemo, useRef, useState } from "react"
+import { Blurhash } from "react-blurhash"
+import { createPortal } from "react-dom"
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger)
@@ -43,16 +44,6 @@ export interface OptimizedImageProps {
     | "water-ripple"
     | "magnifier"
 }
-
-const DEFAULT_BLURHASHES = [
-  "LFMQR]~o%LHq0WVrMc-P9|IVrVrp",
-  "L1LNuy00%gQ+00D$.9kD00_4VrMw",
-  "L5Of*?cb.ArV?EM_xvx]E3xUkWWs",
-  "L2Lz?QDNt600_34T8^IT?cofRPax",
-  "LEPsbYRjM{s:0Kf8oet7?wjYt7ay",
-  "LDQ9[|D*~Bt7xvofniR*-Uoe9aWB",
-  "LHQJcbH?-r.9?HruV[NZ?^XmE0ic",
-]
 
 const BlurhashComponent = Blurhash as unknown as React.ComponentType<{
   hash: string
@@ -510,7 +501,9 @@ const ImageComponentOptimized: React.FC<OptimizedImageProps> = memo(
         )}
 
         {src ? (
-          unoptimized || (typeof src === "string" && (src.includes(".svg") || src.startsWith("data:image/svg+xml"))) ? (
+          unoptimized ||
+          (typeof src === "string" &&
+            (src.includes(".svg") || src.startsWith("data:image/svg+xml"))) ? (
             <img
               ref={imgRef}
               src={src}

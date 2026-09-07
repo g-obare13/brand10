@@ -1,3 +1,9 @@
+/**
+ * @file insights.ts
+ * @description Editorial insights articles, analysis breakdowns, case studies,
+ * and key takeaways on brand perception and UX systems.
+ */
+
 export interface InsightBullet {
   label: string
   text: string

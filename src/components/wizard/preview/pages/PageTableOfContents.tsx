@@ -4,39 +4,8 @@ import { Badge } from "@/components/ui/badge"
 import { getPdfTheme } from "./pdfPageTheme"
 import type { ColorSwatch } from "@/lib/colorUtils"
 
-interface TableOfContentItem {
-  num: string
-  title: string
-  desc: string
-}
-
-const DEFAULT_SECTIONS: TableOfContentItem[] = [
-  {
-    num: "01",
-    title: "Brand Strategy & Foundation",
-    desc: "Core mission, vision, brand personality attributes, and guiding brand values.",
-  },
-  {
-    num: "02",
-    title: "Logo System & Geometry",
-    desc: "Primary mark, secondary lockup, construction grid, clearspace margins, and sizing.",
-  },
-  {
-    num: "03",
-    title: "Color Palette & Harmony",
-    desc: "Primary, secondary, and accent swatches with tonal colorimetry and accessibility standards.",
-  },
-  {
-    num: "04",
-    title: "Typography Hierarchy",
-    desc: "Modular scale display headings, secondary body systems, character sets, and typesetting rules.",
-  },
-  {
-    num: "05",
-    title: "Imagery & Art Direction",
-    desc: "Photography art direction, ambient lighting, compositional balance, and asset attribution.",
-  },
-]
+import { DEFAULT_SECTIONS } from "@/data/preview"
+import type { TableOfContentItem } from "@/data/preview"
 
 interface PageTableOfContentsProps {
   brandName: string

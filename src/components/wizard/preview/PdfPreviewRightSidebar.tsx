@@ -13,64 +13,11 @@ import {
   IconPrinter,
 } from "@tabler/icons-react"
 
-export interface SectionOutlineItem {
-  number: string
-  title: string
-  page: number
-  stepNumber: number
-  summary: string
-}
+import { OUTLINE_SECTIONS } from "@/data/wizard"
+import type { SectionOutlineItem } from "@/data/wizard"
 
-export const OUTLINE_SECTIONS: SectionOutlineItem[] = [
-  {
-    number: "01",
-    title: "Brand Foundation",
-    page: 1,
-    stepNumber: 1,
-    summary:
-      "Hero brand identity, mission, vision statements, and core brand values.",
-  },
-  {
-    number: "02",
-    title: "Logo System",
-    page: 2,
-    stepNumber: 2,
-    summary:
-      "Primary marks, dark mode variants, clearspace geometry, and usage rules.",
-  },
-  {
-    number: "03",
-    title: "Color Matrix",
-    page: 3,
-    stepNumber: 3,
-    summary:
-      "Primary and secondary swatches, WCAG contrast ratings, and tonal scales.",
-  },
-  {
-    number: "04",
-    title: "Typography Scale",
-    page: 4,
-    stepNumber: 4,
-    summary:
-      "Display, body, and monospace font pairings with modular type ladder.",
-  },
-  {
-    number: "05",
-    title: "Imagery Direction",
-    page: 5,
-    stepNumber: 5,
-    summary:
-      "Moodboard photography art direction, lighting standards, and overlays.",
-  },
-  {
-    number: "06",
-    title: "System Specs",
-    page: 6,
-    stepNumber: 6,
-    summary:
-      "Iconography geometry, token export manifest, and governance signoff.",
-  },
-]
+export { OUTLINE_SECTIONS }
+export type { SectionOutlineItem }
 
 interface PdfPreviewRightSidebarProps {
   activePage: number

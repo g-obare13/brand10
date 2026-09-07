@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -10,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Textarea } from "@/components/ui/textarea"
+import { DEFAULT_AI_MODELS as DEFAULT_MODELS } from "@/data/marketing"
 import { cn } from "@/lib/utils"
 import {
   ArrowRightStroke,
@@ -18,6 +17,8 @@ import {
   Paperclip,
   Robot,
 } from "@boxicons/react"
+import type React from "react"
+import { useState } from "react"
 
 export function OpenAiIcon({ className }: { className?: string }) {
   return (
@@ -87,16 +88,8 @@ interface AIPromptProps {
   className?: string
 }
 
-const DEFAULT_MODELS = [
-  "Gemini 3 Pro",
-  "GPT-5.6 Mini",
-  "Claude Fable 5",
-  "GPT-5.6 Codex",
-  "GPT-5.6",
-]
-
 /**
- * Interactive prompt input widget simulating an AI multi-model chat interface.
+ * Interactive prompt input  widget simulating an AI multi-model chat interface.
  * Features:
  * - Model selector dropdown supporting OpenAI, Anthropic, and Gemini models.
  * - Auto-expanding or scrollable prompt textarea.

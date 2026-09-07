@@ -15,11 +15,9 @@ import { Toaster } from "sonner"
 import "sonner/dist/styles.css"
 import "@/styles.css"
 import { ProgressiveBlur } from "@/components/shared/ProgressiveBlur"
+import { PUBLIC_ROUTES } from "@/data/navigation"
 
 initConsole()
-
-/** Routes that do NOT require authentication */
-const PUBLIC_ROUTES = ["/", "/login", "/auth/callback", "/insights"]
 
 export const Route = createRootRoute({
   head: () => ({

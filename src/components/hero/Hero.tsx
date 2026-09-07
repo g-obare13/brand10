@@ -10,6 +10,7 @@ import { useBrandStore } from "@/store/brandStore"
 import { useAuthStore } from "@/store/authStore"
 import { DashboardBackground } from "@/components/dashboard"
 import { MagneticCards } from "@/components/shared/MagneticCards"
+import { HERO_MAGNETIC_ITEMS } from "@/data/marketing"
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger)
@@ -81,13 +82,6 @@ export function Hero() {
     })
   }
 
-  const items = [
-    { src: "/showcases/maximalism.avif", alt: "Card one" },
-    { src: "/showcases/minimalist.jpg", alt: "Card one" },
-    { src: "/showcases/semi-flat.avif", alt: "Card one" },
-    { src: "/showcases/neo-brutalism.jpg", alt: "Card one" },
-  ]
-
   return (
     <section
       ref={heroRef}
@@ -98,7 +92,7 @@ export function Hero() {
 
       {/* Magnetic Cards anchored to the bottom-right of the full screen height */}
       <div className="pointer-events-auto absolute right-4 bottom-2 z-0 hidden h-80 w-full max-w-2xl md:block lg:right-8 lg:bottom-6 lg:h-96 lg:max-w-2xl xl:right-16">
-        <MagneticCards items={items} />
+        <MagneticCards items={HERO_MAGNETIC_ITEMS} />
       </div>
 
       <Container className="relative z-10 flex w-full flex-col items-start justify-start">

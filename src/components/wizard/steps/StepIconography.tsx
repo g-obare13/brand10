@@ -9,31 +9,7 @@ import {
   IconShield,
 } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
-
-const STYLE_FAMILIES = [
-  {
-    id: "stroke",
-    title: "Linear Stroke",
-    desc: "Refined mathematical stroke keylines with open internal space.",
-  },
-  {
-    id: "solid",
-    title: "Solid Filled",
-    desc: "Bold high-emphasis silhouettes for prominent UI navigation.",
-  },
-  {
-    id: "duotone",
-    title: "Duotone Two-Tone",
-    desc: "Layered secondary opacity accents for rich micro-interactions.",
-  },
-] as const
-
-const RADIUS_OPTIONS = [
-  { label: "Sharp", value: 0 },
-  { label: "Soft 4px", value: 4 },
-  { label: "Squircle 8px", value: 8 },
-  { label: "Pill 99px", value: 99 },
-]
+import { STYLE_FAMILIES, RADIUS_OPTIONS } from "@/data/wizard"
 
 /**
  * Form component for configuring brand iconography geometry and style families.

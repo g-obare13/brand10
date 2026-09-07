@@ -1,7 +1,8 @@
 "use client"
 
-import { useEffect, useMemo, useRef } from "react"
+import { DEFAULT_AMBIENT_COLORS as DEFAULT_COLORS } from "@/data/marketing"
 import { cn } from "@/lib/utils"
+import { useEffect, useMemo, useRef } from "react"
 
 const vertexShaderGLSL = `
 attribute vec2 position;
@@ -82,8 +83,6 @@ export interface AuralisProps {
   height?: string
   className?: string
 }
-
-const DEFAULT_COLORS = ["#6366f1", "#a855f7", "#38bdf8"]
 
 /**
  * WebGL-powered generative animated aurora shader mesh background.

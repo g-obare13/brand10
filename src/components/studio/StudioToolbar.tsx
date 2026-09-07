@@ -1,54 +1,16 @@
-import type { ReactNode } from 'react'
-import GlassPanel from '@/components/shared/GlassPanel'
+import GlassPanel from "@/components/shared/GlassPanel"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
-import {
-  IconSparkles,
-  IconVectorBezier2,
-  IconPalette,
-  IconTypography,
-  IconDeviceLaptop,
-} from '@tabler/icons-react'
+} from "@/components/ui/tooltip"
 
-export type StudioTab = 'overview' | 'logo' | 'colors' | 'typography' | 'mockups'
+import type { StudioTab, StudioTabItem } from "@/data/navigation"
+import { STUDIO_TABS } from "@/data/navigation"
 
-interface StudioTabItem {
-  id: StudioTab
-  label: string
-  icon: ReactNode
-}
-
-export const STUDIO_TABS: StudioTabItem[] = [
-  {
-    id: 'overview',
-    label: 'Strategy & Tone',
-    icon: <IconSparkles size={18} />,
-  },
-  {
-    id: 'logo',
-    label: 'Logo System',
-    icon: <IconVectorBezier2 size={18} />,
-  },
-  {
-    id: 'colors',
-    label: 'Color Matrix',
-    icon: <IconPalette size={18} />,
-  },
-  {
-    id: 'typography',
-    label: 'Typography',
-    icon: <IconTypography size={18} />,
-  },
-  {
-    id: 'mockups',
-    label: 'Live Mockups',
-    icon: <IconDeviceLaptop size={18} />,
-  },
-]
+export { STUDIO_TABS }
+export type { StudioTab, StudioTabItem }
 
 interface StudioToolbarProps {
   activeTab: StudioTab
@@ -79,7 +41,7 @@ export function StudioToolbar({ activeTab, onTabChange }: StudioToolbarProps) {
           noise
           noiseOpacity={0.02}
           contentClassName="flex flex-row items-center gap-1.5 sm:gap-2"
-          className="rounded-full border border-border/80 bg-card/85 p-2 backdrop-blur-xl shadow-2xl"
+          className="rounded-full border border-border/80 bg-card/85 p-2 shadow-2xl backdrop-blur-xl"
         >
           <div className="flex flex-row items-center gap-1.5 sm:gap-2">
             {STUDIO_TABS.map((item) => {
@@ -92,8 +54,8 @@ export function StudioToolbar({ activeTab, onTabChange }: StudioToolbarProps) {
                       onClick={() => onTabChange(item.id)}
                       className={`flex size-9 cursor-pointer items-center justify-center rounded-full p-2 transition-all duration-300 ${
                         isActive
-                          ? 'scale-105 bg-foreground text-background shadow-md'
-                          : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+                          ? "scale-105 bg-foreground text-background shadow-md"
+                          : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
                       }`}
                       aria-label={item.label}
                     >
