@@ -6,7 +6,6 @@ import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useEffect, useRef } from "react"
 import Container from "@/components/ui/container"
-import { useBrandStore } from "@/store/brandStore"
 import { useAuthStore } from "@/store/authStore"
 import { DashboardBackground } from "@/components/dashboard"
 import { MagneticCards } from "@/components/shared/MagneticCards"
@@ -26,7 +25,6 @@ if (typeof window !== "undefined") {
  */
 export function Hero() {
   const navigate = useNavigate()
-  const brand = useBrandStore()
   const { user, setLoginModalOpen } = useAuthStore()
 
   const heroRef = useRef<HTMLElement>(null)

@@ -224,7 +224,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         {/* Modal Content */}
         <div className="relative z-10 flex flex-col items-center gap-3 text-center">
           {/* Heading */}
-          <h4 className="login-anim-item opacity-0">Sign in to Brand Studio</h4>
+          <h5 className="login-anim-item opacity-0">Sign in to Brand Studio</h5>
 
           {/* Description */}
           <p className="login-anim-item max-w-xs text-center text-foreground opacity-0">

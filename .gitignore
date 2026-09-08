@@ -4,6 +4,7 @@ dist
 dist-ssr
 *.local
 .env*
+!.env.example
 .tanstack
 .wrangler
 .output
@@ -20,4 +21,4 @@ graft/
 .gemini
 .mcp.json
 GEMINI.md
-TODO.md
+TODO.md 

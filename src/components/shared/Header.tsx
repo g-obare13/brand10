@@ -242,7 +242,7 @@ export function Header({ action }: HeaderProps = {}) {
           {/* Contact Card Modal */}
           <div
             ref={menuRef}
-            className="absolute top-[calc(100%+0.75rem)] right-0 hidden w-[92vw] overflow-hidden rounded-3xl border border-white/70 bg-white/95 p-6 text-foreground shadow-2xl backdrop-blur-2xl sm:w-[480px] sm:p-8 md:w-[520px] dark:border-white/10 dark:bg-zinc-950/90"
+            className="absolute top-[calc(100%+0.75rem)] right-0 hidden w-[92vw] overflow-hidden rounded-3xl border border-white/70 bg-white/95 p-6 text-foreground shadow-2xl backdrop-blur-2xl sm:w-[420px] sm:p-8 dark:border-white/10 dark:bg-zinc-950/90"
           >
             {/* Ambient Background Gradient following DashboardBackground */}
             <div className="pointer-events-none absolute -top-28 -left-20 h-72 w-72 rounded-full bg-linear-to-br from-indigo-500/20 via-sky-400/20 to-purple-500/20 blur-3xl" />
