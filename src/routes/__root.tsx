@@ -16,6 +16,15 @@ import "sonner/dist/styles.css"
 import "@/styles.css"
 import { ProgressiveBlur } from "@/components/shared/ProgressiveBlur"
 import { PUBLIC_ROUTES } from "@/data/navigation"
+import {
+  DEFAULT_OG_IMAGE,
+  DEFAULT_OG_IMAGE_ALT,
+  DEFAULT_OG_IMAGE_HEIGHT,
+  DEFAULT_OG_IMAGE_TYPE,
+  DEFAULT_OG_IMAGE_WIDTH,
+  SITE_NAME,
+  SITE_URL,
+} from "@/data/seo"
 import Footer from "@/components/shared/Footer"
 
 initConsole()
@@ -58,7 +67,11 @@ export const Route = createRootRoute({
       },
       {
         property: "og:site_name",
-        content: "Brand10",
+        content: SITE_NAME,
+      },
+      {
+        property: "og:url",
+        content: SITE_URL,
       },
       {
         property: "og:title",
@@ -72,7 +85,27 @@ export const Route = createRootRoute({
       },
       {
         property: "og:image",
-        content: "/android-chrome-512x512.png",
+        content: DEFAULT_OG_IMAGE,
+      },
+      {
+        property: "og:image:secure_url",
+        content: DEFAULT_OG_IMAGE,
+      },
+      {
+        property: "og:image:type",
+        content: DEFAULT_OG_IMAGE_TYPE,
+      },
+      {
+        property: "og:image:width",
+        content: DEFAULT_OG_IMAGE_WIDTH,
+      },
+      {
+        property: "og:image:height",
+        content: DEFAULT_OG_IMAGE_HEIGHT,
+      },
+      {
+        property: "og:image:alt",
+        content: DEFAULT_OG_IMAGE_ALT,
       },
       // Twitter Card SEO
       {
@@ -91,7 +124,11 @@ export const Route = createRootRoute({
       },
       {
         name: "twitter:image",
-        content: "/android-chrome-512x512.png",
+        content: DEFAULT_OG_IMAGE,
+      },
+      {
+        name: "twitter:image:alt",
+        content: DEFAULT_OG_IMAGE_ALT,
       },
     ],
     links: [
@@ -129,6 +166,10 @@ export const Route = createRootRoute({
       {
         rel: "manifest",
         href: "/site.webmanifest",
+      },
+      {
+        rel: "canonical",
+        href: SITE_URL,
       },
     ],
   }),

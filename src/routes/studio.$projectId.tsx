@@ -1,3 +1,8 @@
+/**
+ * @file studio.$projectId.tsx
+ * @description Studio & Wizard route container for configuring brand guidelines and live bento preview.
+ */
+
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -19,6 +24,7 @@ import { Loader } from "@/components/ui/loader"
 import GlassPanel from "@/components/shared/GlassPanel"
 import { cn } from "@/lib/utils"
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react"
+import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT } from "@/data/seo"
 
 interface StudioSearchParams {
   step?: number
@@ -40,6 +46,44 @@ export const Route = createFileRoute("/studio/$projectId")({
         name: "description",
         content:
           "Configure visual foundations, color palettes, typography scales, iconography, and export production-ready brand guidelines.",
+      },
+      {
+        property: "og:title",
+        content: "Brand Studio & Guidelines Wizard | Brand10",
+      },
+      {
+        property: "og:description",
+        content:
+          "Configure visual foundations, color palettes, typography scales, iconography, and export production-ready brand guidelines.",
+      },
+      {
+        property: "og:image",
+        content: DEFAULT_OG_IMAGE,
+      },
+      {
+        property: "og:image:secure_url",
+        content: DEFAULT_OG_IMAGE,
+      },
+      {
+        name: "twitter:card",
+        content: "summary_large_image",
+      },
+      {
+        name: "twitter:title",
+        content: "Brand Studio & Guidelines Wizard | Brand10",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Configure visual foundations, color palettes, typography scales, iconography, and export production-ready brand guidelines.",
+      },
+      {
+        name: "twitter:image",
+        content: DEFAULT_OG_IMAGE,
+      },
+      {
+        name: "twitter:image:alt",
+        content: DEFAULT_OG_IMAGE_ALT,
       },
     ],
   }),

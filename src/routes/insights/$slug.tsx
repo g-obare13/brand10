@@ -7,12 +7,15 @@ import { createFileRoute } from "@tanstack/react-router"
 import { mediaData } from "@/data/insights"
 import Header from "@/components/shared/Header"
 import InsightsDetails from "@/components/hero/InsightsDetails"
+import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT, SITE_URL } from "@/data/seo"
 
 export const Route = createFileRoute("/insights/$slug")({
   head: ({ params }) => {
     const post = mediaData.find((p) => p.slug === params.slug) || mediaData[0]
     const title = `${post.title} | Brand10 Insights`
     const description = post.excerpt
+    const canonicalUrl = `${SITE_URL}/insights/${post.slug}`
+
     return {
       meta: [
         { title },
@@ -24,22 +27,24 @@ export const Route = createFileRoute("/insights/$slug")({
         // Open Graph
         { property: "og:title", content: title },
         { property: "og:description", content: description },
-        { property: "og:image", content: post.image },
+        { property: "og:image", content: DEFAULT_OG_IMAGE },
+        { property: "og:image:secure_url", content: DEFAULT_OG_IMAGE },
         { property: "og:type", content: "article" },
         {
           property: "og:url",
-          content: `/insights/${post.slug}`,
+          content: canonicalUrl,
         },
         // Twitter
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
-        { name: "twitter:image", content: post.image },
+        { name: "twitter:image", content: DEFAULT_OG_IMAGE },
+        { name: "twitter:image:alt", content: DEFAULT_OG_IMAGE_ALT },
       ],
       links: [
         {
           rel: "canonical",
-          href: `/insights/${post.slug}`,
+          href: canonicalUrl,
         },
       ],
     }
@@ -55,7 +60,10 @@ function BlogDetailsPage() {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
     headline: post.title,
-    image: [post.image],
+    image: [
+      DEFAULT_OG_IMAGE,
+      post.image.startsWith("http") ? post.image : `${SITE_URL}${post.image}`,
+    ],
     datePublished: new Date().toISOString().split("T")[0],
     author: [
       {
@@ -68,7 +76,7 @@ function BlogDetailsPage() {
       name: "Brand10 Studio",
       logo: {
         "@type": "ImageObject",
-        url: "/android-chrome-512x512.png",
+        url: DEFAULT_OG_IMAGE,
       },
     },
     description: post.excerpt,

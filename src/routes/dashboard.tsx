@@ -1,3 +1,8 @@
+/**
+ * @file dashboard.tsx
+ * @description Master layout wrapper for all dashboard tab views (/dashboard/*).
+ */
+
 import { createFileRoute, Outlet } from "@tanstack/react-router"
 import { useEffect } from "react"
 import {
@@ -9,6 +14,7 @@ import { Header } from "@/components/shared/Header"
 import Container from "@/components/ui/container"
 import { useAuthStore } from "@/store/authStore"
 import { useProjectsStore } from "@/store/projectsStore"
+import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT, SITE_URL } from "@/data/seo"
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -20,6 +26,54 @@ export const Route = createFileRoute("/dashboard")({
         name: "description",
         content:
           "Manage, customize, and view all your brand guidelines, design projects, and live tokens in one central dashboard.",
+      },
+      {
+        property: "og:title",
+        content: "Dashboard | Brand10",
+      },
+      {
+        property: "og:description",
+        content:
+          "Manage, customize, and view all your brand guidelines, design projects, and live tokens in one central dashboard.",
+      },
+      {
+        property: "og:url",
+        content: `${SITE_URL}/dashboard`,
+      },
+      {
+        property: "og:image",
+        content: DEFAULT_OG_IMAGE,
+      },
+      {
+        property: "og:image:secure_url",
+        content: DEFAULT_OG_IMAGE,
+      },
+      {
+        name: "twitter:card",
+        content: "summary_large_image",
+      },
+      {
+        name: "twitter:title",
+        content: "Dashboard | Brand10",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Manage, customize, and view all your brand guidelines, design projects, and live tokens in one central dashboard.",
+      },
+      {
+        name: "twitter:image",
+        content: DEFAULT_OG_IMAGE,
+      },
+      {
+        name: "twitter:image:alt",
+        content: DEFAULT_OG_IMAGE_ALT,
+      },
+    ],
+    links: [
+      {
+        rel: "canonical",
+        href: `${SITE_URL}/dashboard`,
       },
     ],
   }),
