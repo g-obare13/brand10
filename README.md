@@ -15,9 +15,9 @@ Brand10 transforms raw brand inputs (logos, color codes, typographic ideas, and 
 
 ## Visual Showcases
 
-Explore the three central pillars of the Brand10 workflow: **Foundationn**, **Typographyy**, and **Colorss**.
+Explore the three central pillars of the Brand10 workflow: **Foundation**, **Typography**, and **Colors**.
 
-### 1. Foundationn: Identity Architecture & Geometry
+### 1. Foundation: Identity Architecture & Geometry
 
 Establish clearspace boundaries, logo usage rules, brand voice archetypes, tone ratings, and core values. Upload vector SVGs to extract geometry rules and minimum sizing requirements automatically.
 
@@ -30,7 +30,7 @@ Establish clearspace boundaries, logo usage rules, brand voice archetypes, tone 
 
 ---
 
-### 2. Typographyy: Modular Type Scales & Font Pairing
+### 2. Typography: Modular Type Scales & Font Pairing
 
 Curate type systems with dynamic Google Fonts integration, responsive modular scales, and mathematical hierarchy for headings, body text, and code.
 
@@ -43,7 +43,7 @@ Curate type systems with dynamic Google Fonts integration, responsive modular sc
 
 ---
 
-### 3. Colorss: Algorithmic Palettes & Accessibility
+### 3. Colors: Algorithmic Palettes & Accessibility
 
 Extract distinct colors from brand assets and generate complete 50 to 950 tonal shades with automated WCAG 2.1 and APCA accessibility auditing.
 
@@ -97,7 +97,7 @@ Brand10 is built on a modern, high-performance TypeScript and React stack:
 ```
 brand-studio/
 ├── public/
-│   ├── showcases/          # Showcase preview assets (Foundationn, Typographyy, Colorss, etc.)
+│   ├── showcases/          # Showcase preview assets (Foundation, Typography, Colors, etc.)
 │   ├── fonts/              # Local web font fallbacks
 │   └── Brand10.svg         # Brand10 vector logomark
 ├── src/
