@@ -19,12 +19,11 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Loader } from "@/components/ui/loader"
-import { Badge } from "@/components/ui/badge"
+import { Label } from "@/components/ui/label"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { toast } from "sonner"
 import {
   IconKey,
-  IconShieldLock,
   IconCheck,
   IconAlertCircle,
   IconEye,
@@ -47,23 +46,36 @@ interface ApiKeyModalProps {
  * @returns {React.ReactElement}
  */
 export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
-  const {
-    activeProviderId,
-    setProvider,
-    checkConfiguredKey,
-  } = useAiAgentStore()
+  const { activeProviderId, setProvider, checkConfiguredKey } =
+    useAiAgentStore()
 
-  const [selectedProvider, setSelectedProvider] = useState<AiProviderId>(activeProviderId)
+  const [selectedProvider, setSelectedProvider] =
+    useState<AiProviderId>(activeProviderId)
   const [keyInput, setKeyInput] = useState("")
   const [showKey, setShowKey] = useState(false)
   const [isTesting, setIsTesting] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null)
+  const [testResult, setTestResult] = useState<{
+    ok: boolean
+    message: string
+  } | null>(null)
 
   const providerConfig = AI_PROVIDERS[selectedProvider]
 
+  // Reset to activeProviderId only when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      const initialProvider = AI_PROVIDERS[activeProviderId].hidden
+        ? "openapi"
+        : activeProviderId
+      setSelectedProvider(initialProvider)
+      setTestResult(null)
+    }
+  }, [isOpen, activeProviderId])
+
   // Load current saved key when provider changes or modal opens
   useEffect(() => {
+    if (!isOpen) return
     let isMounted = true
     async function loadKey() {
       setTestResult(null)
@@ -72,21 +84,21 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
         setKeyInput(existingKey || "")
       }
     }
-    if (isOpen) {
-      setSelectedProvider(activeProviderId)
-      void loadKey()
-    }
+    void loadKey()
     return () => {
       isMounted = false
     }
-  }, [isOpen, selectedProvider, activeProviderId])
+  }, [isOpen, selectedProvider])
 
   const handleTest = async () => {
     setIsTesting(true)
     setTestResult(null)
 
     try {
-      const result = await testOpenApiConnection(providerConfig.baseUrl, keyInput)
+      const result = await testOpenApiConnection(
+        providerConfig.baseUrl,
+        keyInput
+      )
       setTestResult(result)
       if (result.ok) {
         toast.success("Connection test passed")
@@ -106,7 +118,8 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
       await checkConfiguredKey()
 
       toast.success("API key stored securely", {
-        description: "Your key is encrypted locally with AES-GCM and will never be shared.",
+        description:
+          "Your key is encrypted locally with AES-GCM and will never be shared.",
       })
       onClose()
     } catch (err) {
@@ -129,62 +142,62 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md rounded-2xl border border-border/80 bg-card p-6 shadow-2xl">
         <DialogHeader className="space-y-2">
-          <div className="flex items-center gap-2 text-primary">
+          {/* <div className="flex items-center gap-2 text-primary">
             <IconShieldLock size={20} />
             <Badge variant="secondary" className="px-2 py-0 text-[10px] uppercase font-mono">
               Local BYOK Encryption
             </Badge>
-          </div>
+          </div> */}
           <DialogTitle className="font-heading text-lg font-bold text-foreground">
             Configure AI Provider Key
           </DialogTitle>
-          <DialogDescription className="text-xs text-muted-foreground">
-            Paste your API key for {providerConfig.name}. Keys are encrypted on your local device using WebCrypto AES-GCM and never sent to any cloud database.
+          <DialogDescription className="text-muted-foreground">
+            Paste your API key for {providerConfig.name}. Keys are encrypted on
+            your local device using WebCrypto AES-GCM and never sent to any
+            cloud database.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 pt-3">
           {/* Provider Selector Tabs */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-foreground">
-              Select Provider
-            </label>
-            <div className="grid grid-cols-4 gap-1.5 rounded-xl border border-border/70 bg-muted/30 p-1">
-              {(Object.keys(AI_PROVIDERS) as AiProviderId[]).map((pid) => {
-                const isSelected = selectedProvider === pid
-                return (
-                  <button
-                    key={pid}
-                    type="button"
-                    onClick={() => {
-                      setSelectedProvider(pid)
-                      setTestResult(null)
-                    }}
-                    className={`rounded-lg px-2 py-1.5 text-xs font-medium transition-all ${
-                      isSelected
-                        ? "bg-background text-foreground shadow-xs font-semibold"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {AI_PROVIDERS[pid].name.split(" ")[0]}
-                  </button>
-                )
-              })}
-            </div>
+            <Label>Select Provider</Label>
+            <Tabs
+              value={selectedProvider}
+              onValueChange={(val) => {
+                if (val) {
+                  setSelectedProvider(val as AiProviderId)
+                  setTestResult(null)
+                }
+              }}
+              className="w-full"
+            >
+              <TabsList className="grid h-auto w-full grid-cols-3 rounded-xl p-1">
+                {(Object.keys(AI_PROVIDERS) as AiProviderId[])
+                  .filter((pid) => !AI_PROVIDERS[pid].hidden)
+                  .map((pid) => (
+                    <TabsTrigger
+                      key={pid}
+                      value={pid}
+                      className="rounded-lg px-2 py-1.5 text-xs font-medium data-active:bg-background data-active:font-semibold data-active:text-foreground data-active:shadow-xs"
+                    >
+                      {AI_PROVIDERS[pid].name.split(" ")[0]}
+                    </TabsTrigger>
+                  ))}
+              </TabsList>
+            </Tabs>
           </div>
 
           {/* API Key Input */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-foreground">
-                {providerConfig.name} API Key
-              </label>
+              <Label>{providerConfig.name} API Key</Label>
               {providerConfig.docsUrl && (
                 <a
                   href={providerConfig.docsUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
                 >
                   <span>Get {providerConfig.name.split(" ")[0]} Key</span>
                   <IconExternalLink size={10} />
@@ -201,16 +214,18 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
                   setTestResult(null)
                 }}
                 placeholder={providerConfig.keyPlaceholder}
-                className="pr-10 font-mono text-xs"
               />
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon-xs"
                 onClick={() => setShowKey(!showKey)}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground"
+                className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 aria-label={showKey ? "Hide API key" : "Show API key"}
-              >
-                {showKey ? <IconEyeOff size={16} /> : <IconEye size={16} />}
-              </button>
+                icon={
+                  showKey ? <IconEyeOff size={16} /> : <IconEye size={16} />
+                }
+              />
             </div>
           </div>
 
@@ -224,16 +239,16 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
               }`}
             >
               {testResult.ok ? (
-                <IconCheck size={16} className="shrink-0 mt-0.5" />
+                <IconCheck size={16} className="mt-0.5 shrink-0" />
               ) : (
-                <IconAlertCircle size={16} className="shrink-0 mt-0.5" />
+                <IconAlertCircle size={16} className="mt-0.5 shrink-0" />
               )}
               <span>{testResult.message}</span>
             </div>
           )}
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between pt-2 border-t border-border/60">
+          <div className="flex items-center justify-between border-t border-border/60 pt-2">
             <div>
               {keyInput && (
                 <Button
@@ -242,8 +257,9 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
                   size="sm"
                   onClick={handleClear}
                   className="text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  icon={<IconTrash size={14} />}
+                  iconPlacement="left"
                 >
-                  <IconTrash size={14} className="mr-1" />
                   Clear Key
                 </Button>
               )}
@@ -256,16 +272,11 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
                 size="sm"
                 onClick={handleTest}
                 disabled={isTesting || !keyInput}
+                loading={isTesting}
+                iconPlacement="left"
                 className="text-xs"
               >
-                {isTesting ? (
-                  <>
-                    <Loader size="sm" className="mr-1.5 size-3" />
-                    <span>Testing...</span>
-                  </>
-                ) : (
-                  <span>Test Connection</span>
-                )}
+                {isTesting ? "Testing..." : "Test Connection"}
               </Button>
 
               <Button
@@ -274,19 +285,12 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
                 size="sm"
                 onClick={handleSave}
                 disabled={isSaving || !keyInput}
+                loading={isSaving}
+                icon={<IconKey size={14} />}
+                iconPlacement="left"
                 className="text-xs font-semibold"
               >
-                {isSaving ? (
-                  <>
-                    <Loader size="sm" className="mr-1.5 size-3" />
-                    <span>Saving...</span>
-                  </>
-                ) : (
-                  <>
-                    <IconKey size={14} className="mr-1.5" />
-                    <span>Save Key</span>
-                  </>
-                )}
+                {isSaving ? "Saving..." : "Save Key"}
               </Button>
             </div>
           </div>

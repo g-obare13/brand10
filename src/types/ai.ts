@@ -25,6 +25,7 @@ export interface AiProviderConfig {
   keyPlaceholder: string
   docsUrl: string
   requiresKey: boolean
+  hidden?: boolean
 }
 
 /**

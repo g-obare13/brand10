@@ -5,10 +5,14 @@
  * local BYOK API key configuration, guided onboarding questions, and real-time model switching.
  */
 
-import { useState, useEffect, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { ApiKeyModal } from "@/components/shared/ApiKeyModal"
+import { AiColorsTab } from "@/components/shared/ai-canvas/AiColorsTab"
+import { AiGuidelinesTab } from "@/components/shared/ai-canvas/AiGuidelinesTab"
+import { AiLogTab } from "@/components/shared/ai-canvas/AiLogTab"
+import { AiStrategyTab } from "@/components/shared/ai-canvas/AiStrategyTab"
+import { AiTypographyTab } from "@/components/shared/ai-canvas/AiTypographyTab"
 import type { AutosizeTextAreaRef } from "@/components/ui/autosize-textarea"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,50 +22,36 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Textarea } from "@/components/ui/textarea"
 import { Loader } from "@/components/ui/loader"
+import { Textarea } from "@/components/ui/textarea"
 import {
   AI_PROVIDERS,
   BRAND_PROMPT_CARDS,
   GUIDED_BRAND_QUESTIONS,
 } from "@/data/aiProviders"
-import { ApiKeyModal } from "@/components/shared/ApiKeyModal"
-import { AiStrategyTab } from "@/components/shared/ai-canvas/AiStrategyTab"
-import { AiColorsTab } from "@/components/shared/ai-canvas/AiColorsTab"
-import { AiTypographyTab } from "@/components/shared/ai-canvas/AiTypographyTab"
-import { AiGuidelinesTab } from "@/components/shared/ai-canvas/AiGuidelinesTab"
-import { AiLogTab } from "@/components/shared/ai-canvas/AiLogTab"
+import { cn } from "@/lib/utils"
 import { useAiAgentStore } from "@/store/aiAgentStore"
 import { useAuthStore } from "@/store/authStore"
 import { useBrandStore } from "@/store/brandStore"
 import { useProjectsStore } from "@/store/projectsStore"
-import { cn } from "@/lib/utils"
-import { toast } from "sonner"
+import type { AiProviderId, AiTabId } from "@/types/ai"
+import { ArrowRightStroke, Check, ChevronDown, Robot } from "@boxicons/react"
 import {
-  ArrowRightStroke,
-  Check,
-  ChevronDown,
-  Paperclip,
-  Robot,
-} from "@boxicons/react"
-import {
-  IconSparkles,
-  IconPalette,
-  IconTypography,
-  IconListCheck,
-  IconTerminal2,
-  IconKey,
   IconCloudCheck,
-  IconRotate,
-  IconPlayerStop,
   IconExternalLink,
-  IconArrowRight,
-  IconShieldCheck,
-  IconCompass,
+  IconKey,
+  IconListCheck,
+  IconPalette,
+  IconPlayerStop,
+  IconRotate,
+  IconSparkles,
+  IconTerminal2,
+  IconTypography,
 } from "@tabler/icons-react"
 import { Link } from "@tanstack/react-router"
 import type React from "react"
-import type { AiProviderId, AiTabId, BrandPromptCardItem } from "@/types/ai"
+import { useEffect, useRef, useState } from "react"
+import { toast } from "sonner"
 
 export function OpenAiIcon({ className }: { className?: string }) {
   return (
@@ -179,8 +169,13 @@ export function AiChat({ className = "" }: AiChatProps): React.ReactElement {
   const textareaRef = useRef<AutosizeTextAreaRef>(null)
 
   useEffect(() => {
+    if (AI_PROVIDERS[activeProviderId].hidden) {
+      setProvider("openapi")
+      setSelectedModel(AI_PROVIDERS.openapi.defaultModel)
+      return
+    }
     void checkConfiguredKey()
-  }, [checkConfiguredKey, activeProviderId])
+  }, [checkConfiguredKey, activeProviderId, setProvider, setSelectedModel])
 
   const providerConfig = AI_PROVIDERS[activeProviderId]
 
@@ -235,14 +230,6 @@ export function AiChat({ className = "" }: AiChatProps): React.ReactElement {
     textareaRef.current?.textArea.focus()
   }
 
-  const handleRunPromptCard = async (promptText: string) => {
-    setInputPrompt(promptText)
-    const ready = await handleInteractionGate()
-    if (!ready) return
-    setViewMode("canvas")
-    setInputPrompt("")
-    await sendMessage(promptText)
-  }
 
   const handleReset = () => {
     resetDraft()
@@ -284,20 +271,6 @@ export function AiChat({ className = "" }: AiChatProps): React.ReactElement {
     openapi: <OpenAiIcon className="h-4 w-4" />,
   }
 
-  const getPromptCardIcon = (iconType: BrandPromptCardItem["iconType"]) => {
-    switch (iconType) {
-      case "coffee":
-        return <IconCompass size={16} className="text-amber-500" />
-      case "security":
-        return <IconShieldCheck size={16} className="text-sky-500" />
-      case "skincare":
-        return <IconSparkles size={16} className="text-emerald-500" />
-      case "web3":
-        return <IconTerminal2 size={16} className="text-purple-500" />
-      default:
-        return <IconSparkles size={16} className="text-primary" />
-    }
-  }
 
   const tabsConfig: Array<{
     id: AiTabId
@@ -410,8 +383,9 @@ export function AiChat({ className = "" }: AiChatProps): React.ReactElement {
                   </DropdownMenuTrigger>
 
                   <DropdownMenuContent className="max-h-80 min-w-64 overflow-y-auto border-border/80 bg-popover text-popover-foreground shadow-xl">
-                    {(Object.keys(AI_PROVIDERS) as AiProviderId[]).map(
-                      (pid) => {
+                    {(Object.keys(AI_PROVIDERS) as AiProviderId[])
+                      .filter((pid) => !AI_PROVIDERS[pid].hidden)
+                      .map((pid) => {
                         const config = AI_PROVIDERS[pid]
                         return (
                           <DropdownMenuGroup key={pid}>

@@ -21,11 +21,7 @@ export const AI_PROVIDERS: Record<AiProviderId, AiProviderConfig> = {
     name: "Google Gemini",
     baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai",
     defaultModel: "gemini-2.5-flash",
-    models: [
-      "gemini-2.5-flash",
-      "gemini-2.5-pro",
-      "gemini-2.0-flash",
-    ],
+    models: ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"],
     keyPlaceholder: "AIzaSy...",
     docsUrl: "https://aistudio.google.com/app/apikey",
     requiresKey: true,
@@ -49,25 +45,18 @@ export const AI_PROVIDERS: Record<AiProviderId, AiProviderConfig> = {
     name: "DeepSeek",
     baseUrl: "https://api.deepseek.com/v1",
     defaultModel: "deepseek-chat",
-    models: [
-      "deepseek-chat",
-      "deepseek-reasoner",
-      "deepseek-coder",
-    ],
+    models: ["deepseek-chat", "deepseek-reasoner", "deepseek-coder"],
     keyPlaceholder: "sk-...",
     docsUrl: "https://platform.deepseek.com/api_keys",
     requiresKey: true,
+    hidden: true,
   },
   openapi: {
     id: "openapi",
-    name: "OpenAI / OpenAPI",
+    name: "OpenAI",
     baseUrl: "https://api.openai.com/v1",
     defaultModel: "gpt-4o",
-    models: [
-      "gpt-4o",
-      "gpt-4o-mini",
-      "o3-mini",
-    ],
+    models: ["gpt-4o", "gpt-4o-mini", "o3-mini"],
     keyPlaceholder: "sk-proj-...",
     docsUrl: "https://platform.openai.com/api-keys",
     requiresKey: true,
@@ -129,12 +118,11 @@ export const BRAND_PROMPT_CARDS: BrandPromptCardItem[] = [
 /**
  * Quick prompt starters for users to kickstart a brand generation.
  */
-export const BRAND_PROMPT_STARTERS: Array<{ title: string; prompt: string }> = BRAND_PROMPT_CARDS.map(
-  (card) => ({
+export const BRAND_PROMPT_STARTERS: Array<{ title: string; prompt: string }> =
+  BRAND_PROMPT_CARDS.map((card) => ({
     title: card.title,
     prompt: card.prompt,
-  })
-)
+  }))
 
 /**
  * Initial empty draft brand structure before AI generation.
@@ -185,25 +173,29 @@ export const INITIAL_BRAND_DRAFT: GeneratedBrandDraft = {
       id: "rule-1",
       type: "do",
       rule: "Maintain mark clearspace",
-      detail: "Maintain at least 1.5x logo height in clearspace around all brand marks.",
+      detail:
+        "Maintain at least 1.5x logo height in clearspace around all brand marks.",
     },
     {
       id: "rule-2",
       type: "dont",
       rule: "Do not distort wordmark",
-      detail: "Never skew, stretch, or rotate the brand wordmark under any circumstances.",
+      detail:
+        "Never skew, stretch, or rotate the brand wordmark under any circumstances.",
     },
     {
       id: "rule-3",
       type: "do",
       rule: "Ensure high contrast readability",
-      detail: "Always ensure body text passes WCAG 2.2 AA contrast standards (minimum 4.5:1).",
+      detail:
+        "Always ensure body text passes WCAG 2.2 AA contrast standards (minimum 4.5:1).",
     },
     {
       id: "rule-4",
       type: "dont",
       rule: "Avoid accent fills for body copy",
-      detail: "Do not use accent colors for long paragraph text or background surface fills.",
+      detail:
+        "Do not use accent colors for long paragraph text or background surface fills.",
     },
   ],
 }

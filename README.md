@@ -76,19 +76,19 @@ Extract distinct colors from brand assets and generate complete 50 to 950 tonal 
 
 Brand10 is built on a modern, high-performance TypeScript and React stack:
 
-| Category | Technologies | Description |
-| :--- | :--- | :--- |
-| **Framework & Engine** | React 19, TypeScript 5+, Vite 8 | Modern React architecture with fast Vite HMR and strict typing |
-| **Routing & Navigation** | TanStack Start, TanStack Router | File-based, type-safe routing with devtools integration |
-| **Styling & Design System** | Tailwind CSS v4, Vanilla CSS Tokens | Zero-runtime CSS v4 engine paired with scoped design tokens |
-| **UI Components & Primitives** | Base UI (`@base-ui/react`), shadcn/ui | Accessible headless primitives and styled component patterns |
-| **Iconography** | Tabler Icons (`@tabler/icons-react`), Boxicons (`@boxicons/react`) | Comprehensive SVG icon libraries for studio controls |
-| **Animation & Motion** | GSAP 3, Lenis Smooth Scroll, `tw-animate-css` | Fluid timeline animations, parallax cards, and inertial scrolling |
-| **Color & Graphic Engine** | Chroma.js, ColorThief, `html-to-image` | Perceptual color manipulation, raster palette extraction, canvas rendering |
-| **Document & Asset Export** | `@react-pdf/renderer`, jsPDF, JSZip, FileSaver | Client-side PDF compilation, token generation, and ZIP packaging |
-| **State & Persistence** | Zustand 5, Zundo, `idb-keyval` | Local store, undo/redo middleware, and IndexedDB caching |
-| **Cloud & Backend (Optional)**| Supabase (`@supabase/supabase-js`) | Authentication, user project storage, and Row Level Security |
-| **Testing & Quality** | Vitest, Testing Library, ESLint 9, Prettier | Unit and component testing suite, code formatting, and linting |
+| Category                       | Technologies                                                       | Description                                                                |
+| :----------------------------- | :----------------------------------------------------------------- | :------------------------------------------------------------------------- |
+| **Framework & Engine**         | React 19, TypeScript 5+, Vite 8                                    | Modern React architecture with fast Vite HMR and strict typing             |
+| **Routing & Navigation**       | TanStack Start, TanStack Router                                    | File-based, type-safe routing with devtools integration                    |
+| **Styling & Design System**    | Tailwind CSS v4, Vanilla CSS Tokens                                | Zero-runtime CSS v4 engine paired with scoped design tokens                |
+| **UI Components & Primitives** | Base UI (`@base-ui/react`), shadcn/ui                              | Accessible headless primitives and styled component patterns               |
+| **Iconography**                | Tabler Icons (`@tabler/icons-react`), Boxicons (`@boxicons/react`) | Comprehensive SVG icon libraries for studio controls                       |
+| **Animation & Motion**         | GSAP 3, Lenis Smooth Scroll, `tw-animate-css`                      | Fluid timeline animations, parallax cards, and inertial scrolling          |
+| **Color & Graphic Engine**     | Chroma.js, ColorThief, `html-to-image`                             | Perceptual color manipulation, raster palette extraction, canvas rendering |
+| **Document & Asset Export**    | `@react-pdf/renderer`, jsPDF, JSZip, FileSaver                     | Client-side PDF compilation, token generation, and ZIP packaging           |
+| **State & Persistence**        | Zustand 5, Zundo, `idb-keyval`                                     | Local store, undo/redo middleware, and IndexedDB caching                   |
+| **Cloud & Backend (Optional)** | Supabase (`@supabase/supabase-js`)                                 | Authentication, user project storage, and Row Level Security               |
+| **Testing & Quality**          | Vitest, Testing Library, ESLint 9, Prettier                        | Unit and component testing suite, code formatting, and linting             |
 
 ---
 
@@ -177,16 +177,16 @@ Open your browser and navigate to `http://localhost:3000` to start designing you
 
 ## Available Scripts
 
-| Command | Description |
-| :--- | :--- |
-| `pnpm dev` | Starts the Vite development server on port 3000 with HMR |
-| `pnpm build` | Compiles TypeScript and builds production-ready static assets |
-| `pnpm preview` | Locally serves the production build in `./dist` for verification |
-| `pnpm test` | Runs the Vitest automated test suite |
+| Command          | Description                                                                |
+| :--------------- | :------------------------------------------------------------------------- |
+| `pnpm dev`       | Starts the Vite development server on port 3000 with HMR                   |
+| `pnpm build`     | Compiles TypeScript and builds production-ready static assets              |
+| `pnpm preview`   | Locally serves the production build in `./dist` for verification           |
+| `pnpm test`      | Runs the Vitest automated test suite                                       |
 | `pnpm typecheck` | Validates TypeScript types across the entire project without emitting code |
-| `pnpm lint` | Runs ESLint to verify code quality and rule compliance |
-| `pnpm format` | Formats all code files with Prettier |
-| `pnpm check` | Runs Prettier in check mode to ensure formatting standards |
+| `pnpm lint`      | Runs ESLint to verify code quality and rule compliance                     |
+| `pnpm format`    | Formats all code files with Prettier                                       |
+| `pnpm check`     | Runs Prettier in check mode to ensure formatting standards                 |
 
 ---
 
@@ -241,4 +241,4 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-Built with craft by the Brand10 team and open source contributors.
+Built with craft by Obare and open source contributors.
