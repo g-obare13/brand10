@@ -101,9 +101,16 @@ export const DEFAULT_AMBIENT_COLORS = ["#6366f1", "#a855f7", "#38bdf8"]
  * Mock/available AI models list for AI chat and generative assistant widgets.
  */
 export const DEFAULT_AI_MODELS = [
-  "Gemini 3 Pro",
-  "GPT-5.6 Mini",
-  "Claude Fable 5",
-  "GPT-5.6 Codex",
-  "GPT-5.6",
+  "gemini-2.5-flash",
+  "gemini-2.5-pro",
+  "gemini-2.0-flash",
+  "claude-3-7-sonnet-20250219",
+  "claude-3-5-sonnet-20241022",
+  "claude-3-5-haiku-20241022",
+  "deepseek-chat",
+  "deepseek-reasoner",
+  "deepseek-coder",
+  "gpt-4o",
+  "gpt-4o-mini",
+  "o3-mini",
 ]
