@@ -7,68 +7,19 @@ import { createFileRoute } from "@tanstack/react-router"
 import { Header } from "@/components/shared/Header"
 import Container from "@/components/ui/container"
 import { SystemsTab } from "@/components/dashboard/tabs/SystemsTab"
-import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT, SITE_URL } from "@/data/seo"
+import { SITE_URL, buildSeoLinks, buildSeoMeta } from "@/data/seo"
 
 export const Route = createFileRoute("/systems")({
   head: () => ({
-    meta: [
-      {
-        title: "Design Systems & Guidelines | Brand10",
-      },
-      {
-        name: "description",
-        content:
-          "Explore world-class living design systems and brand style guides from leading industry pioneers.",
-      },
-      {
-        property: "og:title",
-        content: "Design Systems & Guidelines | Brand10",
-      },
-      {
-        property: "og:description",
-        content:
-          "Explore world-class living design systems and brand style guides from leading industry pioneers.",
-      },
-      {
-        property: "og:url",
-        content: `${SITE_URL}/systems`,
-      },
-      {
-        property: "og:image",
-        content: DEFAULT_OG_IMAGE,
-      },
-      {
-        property: "og:image:secure_url",
-        content: DEFAULT_OG_IMAGE,
-      },
-      {
-        name: "twitter:card",
-        content: "summary_large_image",
-      },
-      {
-        name: "twitter:title",
-        content: "Design Systems & Guidelines | Brand10",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "Explore world-class living design systems and brand style guides from leading industry pioneers.",
-      },
-      {
-        name: "twitter:image",
-        content: DEFAULT_OG_IMAGE,
-      },
-      {
-        name: "twitter:image:alt",
-        content: DEFAULT_OG_IMAGE_ALT,
-      },
-    ],
-    links: [
-      {
-        rel: "canonical",
-        href: `${SITE_URL}/systems`,
-      },
-    ],
+    meta: buildSeoMeta({
+      title: "Design Systems & Guidelines | Brand10",
+      description:
+        "Explore world-class living design systems and brand style guides from leading industry pioneers.",
+      url: `${SITE_URL}/systems`,
+    }),
+    links: buildSeoLinks({
+      canonicalUrl: `${SITE_URL}/systems`,
+    }),
   }),
   component: SystemsPage,
 })
@@ -91,4 +42,3 @@ function SystemsPage() {
     </div>
   )
 }
-

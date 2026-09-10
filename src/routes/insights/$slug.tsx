@@ -7,7 +7,12 @@ import { createFileRoute } from "@tanstack/react-router"
 import { mediaData } from "@/data/insights"
 import Header from "@/components/shared/Header"
 import InsightsDetails from "@/components/hero/InsightsDetails"
-import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT, SITE_URL } from "@/data/seo"
+import {
+  DEFAULT_OG_IMAGE,
+  SITE_URL,
+  buildSeoLinks,
+  buildSeoMeta,
+} from "@/data/seo"
 
 export const Route = createFileRoute("/insights/$slug")({
   head: ({ params }) => {
@@ -17,36 +22,16 @@ export const Route = createFileRoute("/insights/$slug")({
     const canonicalUrl = `${SITE_URL}/insights/${post.slug}`
 
     return {
-      meta: [
-        { title },
-        { name: "description", content: description },
-        {
-          name: "keywords",
-          content: `${post.title}, ${post.category}, UX design, brand perception, living design systems, Brand10`,
-        },
-        // Open Graph
-        { property: "og:title", content: title },
-        { property: "og:description", content: description },
-        { property: "og:image", content: DEFAULT_OG_IMAGE },
-        { property: "og:image:secure_url", content: DEFAULT_OG_IMAGE },
-        { property: "og:type", content: "article" },
-        {
-          property: "og:url",
-          content: canonicalUrl,
-        },
-        // Twitter
-        { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:title", content: title },
-        { name: "twitter:description", content: description },
-        { name: "twitter:image", content: DEFAULT_OG_IMAGE },
-        { name: "twitter:image:alt", content: DEFAULT_OG_IMAGE_ALT },
-      ],
-      links: [
-        {
-          rel: "canonical",
-          href: canonicalUrl,
-        },
-      ],
+      meta: buildSeoMeta({
+        title,
+        description,
+        keywords: `${post.title}, ${post.category}, UX design, brand perception, living design systems, Brand10`,
+        url: canonicalUrl,
+        type: "article",
+      }),
+      links: buildSeoLinks({
+        canonicalUrl,
+      }),
     }
   },
   component: BlogDetailsPage,

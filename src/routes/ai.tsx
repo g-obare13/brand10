@@ -7,68 +7,19 @@ import { createFileRoute } from "@tanstack/react-router"
 import { Header } from "@/components/shared/Header"
 import Container from "@/components/ui/container"
 import { AiAssistanceTab } from "@/components/dashboard/tabs/AiAssistanceTab"
-import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT, SITE_URL } from "@/data/seo"
+import { SITE_URL, buildSeoLinks, buildSeoMeta } from "@/data/seo"
 
 export const Route = createFileRoute("/ai")({
   head: () => ({
-    meta: [
-      {
-        title: "AI Studio Assistance & Generators | Brand10",
-      },
-      {
-        name: "description",
-        content:
-          "Automated brand extraction, contrast computation, and voice synthesis powered by AI.",
-      },
-      {
-        property: "og:title",
-        content: "AI Studio Assistance & Generators | Brand10",
-      },
-      {
-        property: "og:description",
-        content:
-          "Automated brand extraction, contrast computation, and voice synthesis powered by AI.",
-      },
-      {
-        property: "og:url",
-        content: `${SITE_URL}/ai`,
-      },
-      {
-        property: "og:image",
-        content: DEFAULT_OG_IMAGE,
-      },
-      {
-        property: "og:image:secure_url",
-        content: DEFAULT_OG_IMAGE,
-      },
-      {
-        name: "twitter:card",
-        content: "summary_large_image",
-      },
-      {
-        name: "twitter:title",
-        content: "AI Studio Assistance & Generators | Brand10",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "Automated brand extraction, contrast computation, and voice synthesis powered by AI.",
-      },
-      {
-        name: "twitter:image",
-        content: DEFAULT_OG_IMAGE,
-      },
-      {
-        name: "twitter:image:alt",
-        content: DEFAULT_OG_IMAGE_ALT,
-      },
-    ],
-    links: [
-      {
-        rel: "canonical",
-        href: `${SITE_URL}/ai`,
-      },
-    ],
+    meta: buildSeoMeta({
+      title: "AI Studio Assistance & Generators | Brand10",
+      description:
+        "Automated brand extraction, contrast computation, and voice synthesis powered by AI.",
+      url: `${SITE_URL}/ai`,
+    }),
+    links: buildSeoLinks({
+      canonicalUrl: `${SITE_URL}/ai`,
+    }),
   }),
   component: AiPage,
 })
@@ -91,4 +42,3 @@ function AiPage() {
     </div>
   )
 }
-

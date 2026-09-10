@@ -8,7 +8,7 @@ import { createFileRoute } from "@tanstack/react-router"
 import { Header } from "@/components/shared/Header"
 import { GuidelineDetails } from "@/components/guidelines/GuidelineDetails"
 import { GUIDELINE_ARTICLES } from "@/data/guidelines"
-import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT, SITE_URL } from "@/data/seo"
+import { SITE_URL, buildSeoLinks, buildSeoMeta } from "@/data/seo"
 
 export const Route = createFileRoute("/guidelines/$slug")({
   head: ({ params }) => {
@@ -20,33 +20,16 @@ export const Route = createFileRoute("/guidelines/$slug")({
     const canonicalUrl = `${SITE_URL}/guidelines/${params.slug}`
 
     return {
-      meta: [
-        { title },
-        { name: "description", content: description },
-        {
-          name: "keywords",
-          content: `${article.title}, ${article.category}, design system guidelines, Brand10`,
-        },
-        // Open Graph
-        { property: "og:title", content: title },
-        { property: "og:description", content: description },
-        { property: "og:type", content: "article" },
-        { property: "og:url", content: canonicalUrl },
-        { property: "og:image", content: DEFAULT_OG_IMAGE },
-        { property: "og:image:secure_url", content: DEFAULT_OG_IMAGE },
-        // Twitter
-        { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:title", content: title },
-        { name: "twitter:description", content: description },
-        { name: "twitter:image", content: DEFAULT_OG_IMAGE },
-        { name: "twitter:image:alt", content: DEFAULT_OG_IMAGE_ALT },
-      ],
-      links: [
-        {
-          rel: "canonical",
-          href: canonicalUrl,
-        },
-      ],
+      meta: buildSeoMeta({
+        title,
+        description,
+        keywords: `${article.title}, ${article.category}, design system guidelines, Brand10`,
+        url: canonicalUrl,
+        type: "article",
+      }),
+      links: buildSeoLinks({
+        canonicalUrl,
+      }),
     }
   },
   component: GuidelineArticlePage,

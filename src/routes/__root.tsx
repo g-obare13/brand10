@@ -16,121 +16,14 @@ import "sonner/dist/styles.css"
 import "@/styles.css"
 import { ProgressiveBlur } from "@/components/shared/ProgressiveBlur"
 import { PUBLIC_ROUTES } from "@/data/navigation"
-import {
-  DEFAULT_OG_IMAGE,
-  DEFAULT_OG_IMAGE_ALT,
-  DEFAULT_OG_IMAGE_HEIGHT,
-  DEFAULT_OG_IMAGE_TYPE,
-  DEFAULT_OG_IMAGE_WIDTH,
-  SITE_NAME,
-  SITE_URL,
-} from "@/data/seo"
+import { DEFAULT_OG_IMAGE, SITE_URL, buildSeoMeta } from "@/data/seo"
 import Footer from "@/components/shared/Footer"
 
 initConsole()
 
 export const Route = createRootRoute({
   head: () => ({
-    meta: [
-      {
-        charSet: "utf-8",
-      },
-      {
-        name: "viewport",
-        content: "width=device-width, initial-scale=1",
-      },
-      {
-        title: "Brand10 - Modern Brand Identity Studio & Living Design Systems",
-      },
-      {
-        name: "description",
-        content:
-          "Generate, organize, and preview living brand guidelines, smart color palettes, typography scales, and vector brand kits in real time.",
-      },
-      {
-        name: "keywords",
-        content:
-          "brand identity, design system, brand guidelines, typography scale, color palette generator, brand kit, SVG logo, Brand10",
-      },
-      {
-        name: "author",
-        content: "Brand10",
-      },
-      {
-        name: "theme-color",
-        content: "#090d16",
-      },
-      // Open Graph / Social SEO
-      {
-        property: "og:type",
-        content: "website",
-      },
-      {
-        property: "og:site_name",
-        content: SITE_NAME,
-      },
-      {
-        property: "og:url",
-        content: SITE_URL,
-      },
-      {
-        property: "og:title",
-        content:
-          "Brand10 - Modern Brand Identity Studio & Living Design Systems",
-      },
-      {
-        property: "og:description",
-        content:
-          "Generate, organize, and preview living brand guidelines, smart color palettes, typography scales, and vector brand kits in real time.",
-      },
-      {
-        property: "og:image",
-        content: DEFAULT_OG_IMAGE,
-      },
-      {
-        property: "og:image:secure_url",
-        content: DEFAULT_OG_IMAGE,
-      },
-      {
-        property: "og:image:type",
-        content: DEFAULT_OG_IMAGE_TYPE,
-      },
-      {
-        property: "og:image:width",
-        content: DEFAULT_OG_IMAGE_WIDTH,
-      },
-      {
-        property: "og:image:height",
-        content: DEFAULT_OG_IMAGE_HEIGHT,
-      },
-      {
-        property: "og:image:alt",
-        content: DEFAULT_OG_IMAGE_ALT,
-      },
-      // Twitter Card SEO
-      {
-        name: "twitter:card",
-        content: "summary_large_image",
-      },
-      {
-        name: "twitter:title",
-        content:
-          "Brand10 - Modern Brand Identity Studio & Living Design Systems",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "Generate, organize, and preview living brand guidelines, smart color palettes, typography scales, and vector brand kits in real time.",
-      },
-      {
-        name: "twitter:image",
-        content: DEFAULT_OG_IMAGE,
-      },
-      {
-        name: "twitter:image:alt",
-        content: DEFAULT_OG_IMAGE_ALT,
-      },
-    ],
+    meta: buildSeoMeta({ includeCharsetViewport: true }),
     links: [
       {
         rel: "preconnect",
@@ -170,6 +63,10 @@ export const Route = createRootRoute({
       {
         rel: "canonical",
         href: SITE_URL,
+      },
+      {
+        rel: "image_src",
+        href: DEFAULT_OG_IMAGE,
       },
     ],
   }),

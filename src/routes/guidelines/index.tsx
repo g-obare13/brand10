@@ -7,68 +7,19 @@ import { createFileRoute } from "@tanstack/react-router"
 import { Header } from "@/components/shared/Header"
 import Container from "@/components/ui/container"
 import { GuidelinesTab } from "@/components/dashboard/tabs/GuidelinesTab"
-import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT, SITE_URL } from "@/data/seo"
+import { SITE_URL, buildSeoLinks, buildSeoMeta } from "@/data/seo"
 
 export const Route = createFileRoute("/guidelines/")({
   head: () => ({
-    meta: [
-      {
-        title: "Design System Guidelines | Brand10",
-      },
-      {
-        name: "description",
-        content:
-          "The 8 architectural pillars for constructing scalable, accessible, and unified living design systems.",
-      },
-      {
-        property: "og:title",
-        content: "Design System Guidelines | Brand10",
-      },
-      {
-        property: "og:description",
-        content:
-          "The 8 architectural pillars for constructing scalable, accessible, and unified living design systems.",
-      },
-      {
-        property: "og:url",
-        content: `${SITE_URL}/guidelines`,
-      },
-      {
-        property: "og:image",
-        content: DEFAULT_OG_IMAGE,
-      },
-      {
-        property: "og:image:secure_url",
-        content: DEFAULT_OG_IMAGE,
-      },
-      {
-        name: "twitter:card",
-        content: "summary_large_image",
-      },
-      {
-        name: "twitter:title",
-        content: "Design System Guidelines | Brand10",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "The 8 architectural pillars for constructing scalable, accessible, and unified living design systems.",
-      },
-      {
-        name: "twitter:image",
-        content: DEFAULT_OG_IMAGE,
-      },
-      {
-        name: "twitter:image:alt",
-        content: DEFAULT_OG_IMAGE_ALT,
-      },
-    ],
-    links: [
-      {
-        rel: "canonical",
-        href: `${SITE_URL}/guidelines`,
-      },
-    ],
+    meta: buildSeoMeta({
+      title: "Design System Guidelines | Brand10",
+      description:
+        "The 8 architectural pillars for constructing scalable, accessible, and unified living design systems.",
+      url: `${SITE_URL}/guidelines`,
+    }),
+    links: buildSeoLinks({
+      canonicalUrl: `${SITE_URL}/guidelines`,
+    }),
   }),
   component: GuidelinesPage,
 })
@@ -91,4 +42,3 @@ function GuidelinesPage() {
     </div>
   )
 }
-

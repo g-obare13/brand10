@@ -8,73 +8,22 @@ import FAQSection from "@/components/hero/FAQSection"
 import HowItWorks from "@/components/hero/HowItWorks"
 import InsightsSection from "@/components/hero/InsightsSection"
 import { Header } from "@/components/shared/Header"
-import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT, SITE_URL } from "@/data/seo"
+import { SITE_URL, buildSeoLinks, buildSeoMeta } from "@/data/seo"
 import { useAuthStore } from "@/store/authStore"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useEffect } from "react"
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    meta: [
-      {
-        title: "Brand10 - Modern Brand Identity Studio & Living Design Systems",
-      },
-      {
-        name: "description",
-        content:
-          "Transform brand assets into living design systems. Real-time token synchronization, responsive typography calculators, SVG palette clustering, and exportable PDF decks.",
-      },
-      {
-        property: "og:title",
-        content:
-          "Brand10 - Modern Brand Identity Studio & Living Design Systems",
-      },
-      {
-        property: "og:description",
-        content:
-          "Transform brand assets into living design systems. Real-time token synchronization, responsive typography calculators, SVG palette clustering, and exportable PDF decks.",
-      },
-      {
-        property: "og:url",
-        content: SITE_URL,
-      },
-      {
-        property: "og:image",
-        content: DEFAULT_OG_IMAGE,
-      },
-      {
-        property: "og:image:secure_url",
-        content: DEFAULT_OG_IMAGE,
-      },
-      {
-        name: "twitter:card",
-        content: "summary_large_image",
-      },
-      {
-        name: "twitter:title",
-        content:
-          "Brand10 - Modern Brand Identity Studio & Living Design Systems",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "Transform brand assets into living design systems. Real-time token synchronization, responsive typography calculators, SVG palette clustering, and exportable PDF decks.",
-      },
-      {
-        name: "twitter:image",
-        content: DEFAULT_OG_IMAGE,
-      },
-      {
-        name: "twitter:image:alt",
-        content: DEFAULT_OG_IMAGE_ALT,
-      },
-    ],
-    links: [
-      {
-        rel: "canonical",
-        href: SITE_URL,
-      },
-    ],
+    meta: buildSeoMeta({
+      title: "Brand10 - Modern Brand Identity Studio & Living Design Systems",
+      description:
+        "Transform brand assets into living design systems. Real-time token synchronization, responsive typography calculators, SVG palette clustering, and exportable PDF decks.",
+      url: SITE_URL,
+    }),
+    links: buildSeoLinks({
+      canonicalUrl: SITE_URL,
+    }),
   }),
   component: LandingPage,
 })
